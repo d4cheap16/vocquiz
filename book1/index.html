@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>第一冊單字練習</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 規則五：從外部 data.js 檔案載入單字庫 -->
     <script src="data.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -84,7 +83,6 @@
     </style>
 </head>
 <body class="p-4 sm:p-8">
-    <!-- 規則三：增加返回主頁按鈕 -->
     <div class="max-w-4xl mx-auto mb-4">
         <a href="https://sites.google.com/tcsh.hlc.edu.tw/d4cheap/home" 
            class="inline-flex items-center px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 transition-colors duration-200">
@@ -98,9 +96,8 @@
     <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6 sm:p-10">
         <div id="quiz-container" class="space-y-6">
             <h1 class="text-3xl sm:text-4xl font-bold text-center text-gray-800">第一冊單字練習</h1>
-            
+
             <div class="space-y-4 border-b border-gray-200 pb-6">
-                <!-- User Info -->
                 <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-4 text-gray-700">
                     <div class="flex flex-col items-center text-center sm:flex-row sm:space-x-2">
                         <label for="unit-select" class="font-medium mb-1 sm:mb-0">單元:</label>
@@ -128,8 +125,7 @@
                         <input type="text" id="seat-number" class="w-20 rounded-md border border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center" placeholder="00" maxlength="10">
                     </div>
                 </div>
-        
-                <!-- Group & Difficulty Selection -->
+
                 <div class="space-y-3 pt-2">
                     <div class="flex items-center justify-center space-x-2 sm:space-x-4">
                         <label class="font-medium text-gray-700">選擇組別:</label>
@@ -163,8 +159,7 @@
                             徽章殿堂 (點擊展開/收合)
                         </summary>
                         <div id="badge-hall-container" class="pt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- Badges will be dynamically inserted here -->
-                        </div>
+                            </div>
                     </details>
                 </div>
                 <div class="border-t border-gray-200 pt-6 mt-6">
@@ -191,7 +186,7 @@
                 <p class="text-gray-500 mt-2">完成設定後，測驗內容將會顯示於此處。</p>
             </div>
         </div>
-        
+
         <div id="dev-tools-panel" class="hidden border-t-4 border-red-500 pt-6 mt-8">
              <h2 class="text-2xl font-bold text-center text-red-700">開發者工具</h2>
              <div class="flex flex-wrap justify-center gap-4 mt-4">
@@ -223,7 +218,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, serverTimestamp, setLogLevel, query, where, onSnapshot, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
+
         // 規則一：直接寫入固定的 Firebase 設定
         const firebaseConfig = {
             apiKey: "AIzaSyDF4TY-2_z4rX7d_1l_6yW_Kmv-Y3a5PjY",
@@ -234,17 +229,17 @@
             appId: "1:41040306179:web:a41ef655e0031846b0a943"
         };
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
+
         // 規則二：定義本書專屬的 ID
         const BOOK_ID = 'book1';
-        
+
         // 規則五：從外部 data.js 檔案的全域物件 allBookData 獲取單字庫
         // 將變數宣告提前，但延後賦值，確保 data.js 載入完成
         let vocabulary;
         let wordDetails;
 
         setLogLevel('debug');
-        
+
         let db, auth, userId;
         let localScores = [];
         let earnedBadges = {};
@@ -262,7 +257,7 @@
                 else await signInAnonymously(auth);
             } catch (error) { console.error("Firebase authentication failed:", error); }
         }
-        
+
         onAuthStateChanged(auth, user => {
             if (user) {
                 userId = user.uid;
@@ -294,7 +289,7 @@
             // Ultimate Badge
             cute_cat: { name: "可愛貓貓", icon: "😺", description: "是的，你沒看錯，宇宙的盡頭是貓貓。恭喜你完成所有挑戰，這隻可愛的橘貓是你的了。" },
         };
-        
+
         const dom = {
             unitSelect: document.getElementById('unit-select'),
             groupSelector: document.getElementById('group-selector'),
@@ -344,7 +339,7 @@
                 console.error("Error updating badges:", e);
             }
         };
-        
+
         const checkAchievements = async (score) => {
             const newlyEarned = [];
             const addBadge = (key) => {
@@ -388,7 +383,7 @@
                 const allScoresForUnit = localScores.filter(s => s.unitKey === state.currentUnit);
                 const allTests = [];
                 const groups = Object.keys(vocabulary[state.currentUnit]).filter(g => g !== 'groupBonus');
-                
+
                 groups.forEach(g => {
                     if (vocabulary[state.currentUnit][g].stories) {
                         vocabulary[state.currentUnit][g].stories.forEach(story => {
@@ -396,7 +391,7 @@
                         });
                     }
                 });
-                
+
                 const passedAll100 = allTests.every(test => {
                     const [group, level] = test.split('-');
                     return allScoresForUnit.some(s => s.group === group && s.level === level && s.score === 100);
@@ -407,7 +402,7 @@
                     updateBonusButtonVisibility();
                 }
             }
-            
+
             if (state.currentGroup === 'groupBonus' && score === 100) {
                 addBadge('alien');
             }
@@ -415,7 +410,7 @@
             if (earnedBadges[`legend_${state.currentUnit}`] && earnedBadges[`alien_${state.currentUnit}`]) {
                  addBadge('unit_master');
             }
-            
+
             const allUnitKeys = Object.keys(vocabulary);
             const hasMasteredAllUnits = allUnitKeys.every(unitKey => 
                 earnedBadges[`legend_${unitKey}`] && earnedBadges[`alien_${unitKey}`]
@@ -431,7 +426,7 @@
 
             return newlyEarned;
         };
-        
+
         const updateBonusButtonVisibility = () => {
              const currentUnitKey = state.currentUnit;
              if(!currentUnitKey) return;
@@ -442,7 +437,7 @@
                 dom.bonusGroupBtn.classList.add('hidden');
             }
         };
-        
+
         const fetchBadges = async () => {
              if (!userId) return;
              // 規則二：修改徽章讀取路徑
@@ -461,7 +456,7 @@
                  earnedBadges = {};
              }
         };
-        
+
         const renderBadgeHall = () => {
             const container = dom.badgeHallContainer;
             if (!container || !state.currentUnit) {
@@ -470,7 +465,7 @@
             };
 
             container.innerHTML = '';
-            
+
             const sortedBadges = Object.keys(allBadges).sort((a, b) => {
                 const order = ['effortful_learner', 'high_achiever', 'perfect_score', 'a2_explorer', 'b1_voyager', 'conqueror', 'strong_one', 'english_monster', 'legend', 'alien', 'unit_master', 'cute_cat'];
                 return order.indexOf(a) - order.indexOf(b);
@@ -487,7 +482,7 @@
                     const uniqueKey = `${key}_${state.currentUnit}`;
                     isEarned = earnedBadges[uniqueKey] === true;
                 }
-                
+
                 const badgeHTML = `
                     <div class="flex items-center p-4 bg-white rounded-lg shadow ${isEarned ? 'opacity-100 ring-2 ring-yellow-400' : 'opacity-40'}">
                         <div class="text-4xl mr-4">${badge.icon}</div>
@@ -500,7 +495,7 @@
                 container.innerHTML += badgeHTML;
             });
         };
-        
+
         const updateDropdownOptions = () => {
             const allSelects = Array.from(document.querySelectorAll('.word-select'));
             const answeredCount = allSelects.filter(s => s.value !== '').length;
@@ -519,17 +514,17 @@
                 select.innerHTML = optionsHtml;
             });
         };
-        
+
         const loadQuiz = () => {
             if (!state.currentUnit || !state.currentGroup || !state.currentDifficulty) return;
-            
+
             dom.quizArea.classList.remove('hidden');
             dom.welcomeMessage.classList.add('hidden');
-            
+
             const isBonus = state.currentGroup === 'groupBonus';
             const unitData = vocabulary[state.currentUnit][state.currentGroup];
             Object.assign(state, { correctAnswers: {}, earnedBadgesForSharing: [] });
-            
+
             dom.storyPassage.innerHTML = '';
             dom.wordOptions.innerHTML = '';
             dom.resultsDiv.innerHTML = '';
@@ -549,10 +544,10 @@
             });
 
             dom.storyPassage.innerHTML = processedStory;
-            
+
             dom.storyPassage.querySelectorAll('.word-select').forEach(select => select.addEventListener('change', updateDropdownOptions));
             updateDropdownOptions();
-            
+
             dom.wordOptions.innerHTML = '';
             state.currentWords.forEach(word => {
                 const wordBtn = document.createElement('button');
@@ -564,7 +559,7 @@
 
             renderBadgeHall();
         };
-        
+
         const speak = (text, rate = 1.0) => {
              if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -574,7 +569,7 @@
                 window.speechSynthesis.speak(utterance);
              }
         };
-        
+
         const stopSpeak = () => {
             if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         };
@@ -601,9 +596,9 @@
             const mainWordData = allWordData[mainWordKey];
             if (mainWordData && mainWordData.family && mainWordData.family.length > 0) {
                  familyHtml += `<details class="mt-4 pt-4 border-t border-gray-200 text-left"><summary class="text-xl font-semibold text-indigo-700 mb-2 cursor-pointer p-2 rounded-lg hover:bg-yellow-100 flex justify-between items-center"><span>單字家族 (Word Family)</span><span class="text-sm font-normal text-gray-500">點擊展開/收合</span></summary><div class="space-y-2 mt-2">`;
-                
+
                 familyHtml += createFamilyWordHtml(mainWordKey, mainWordData);
-                
+
                 mainWordData.family.forEach(familyWordKey => {
                     const familyWordData = allWordData[familyWordKey];
                     if (familyWordData) {
@@ -612,7 +607,7 @@
                 });
                 familyHtml += `</div></details>`;
             }
-            
+
             let usageNoteHtml = mainWordData.note ? `<div class="mt-4 text-left p-3 bg-blue-50 border-l-4 border-blue-400">${mainWordData.note}</div>` : '';
 
             dom.modalContent.innerHTML = `
@@ -644,7 +639,7 @@
                 ${usageNoteHtml}
                 ${familyHtml}
             `;
-            
+
             document.getElementById('modal-word-title').textContent = word;
             document.getElementById('chinese-translation').textContent = `(${wordData.pos}) ${wordData.translation}`;
             document.getElementById('modal-example-text').textContent = wordData.example;
@@ -675,7 +670,7 @@
 
             dom.hintModal.style.display = 'block';
         };
-        
+
         const createFamilyWordHtml = (wordKey, wordData) => {
             return `
                 <div class="p-2 border-b border-gray-100 flex justify-between items-center">
@@ -706,7 +701,7 @@
                 } else {
                     selectElement.classList.add('incorrect');
                     hasIncorrect = true;
-                    
+
                     const wordData = wordDetails[state.currentUnit]?.[correctAnswer];
                     if (wordData) {
                         dom.incorrectAnswersDiv.innerHTML += `<div class="p-4 bg-red-50 rounded-lg border border-red-200"><p>您選擇了 <strong class="text-red-500">${selectElement.value || "（未選擇）"}</strong>，正確答案是 <strong class="text-green-600">${correctAnswer}</strong>。</p><p class="text-sm text-gray-600">(${wordData.pos}) ${wordData.translation} - ${wordData.definition}</p></div>`;
@@ -717,15 +712,15 @@
 
             state.currentScore = Math.round((correctCount / totalCount) * 100);
             dom.resultsDiv.innerHTML = `<span class="text-blue-600">答對 ${correctCount} / ${totalCount} 題</span> <span class="text-green-600">分數: ${state.currentScore}</span>`;
-            
+
             if (hasIncorrect) dom.analysisContainer.style.display = 'block';
-            
+
             dom.submitBtn.disabled = true;
             dom.shareBtn.classList.remove('hidden');
-            
+
             await saveScore(state.currentScore);
             state.earnedBadgesForSharing = await checkAchievements(state.currentScore);
-            
+
             if(state.earnedBadgesForSharing.length > 0) {
                 dom.resultsDiv.innerHTML += `<div class="mt-4 text-yellow-600 font-semibold">恭喜！您獲得了新的徽章！</div>`;
             }
@@ -738,9 +733,9 @@
             const { value: seatNumber } = dom.seatNumberInput;
             const { options, selectedIndex } = dom.unitSelect;
             const unitText = options[selectedIndex].text;
-            
+
             localScores.push({unitKey: state.currentUnit, group: state.currentGroup, level: state.currentDifficulty, score});
-            
+
             if (seatNumber.trim()) {
                  const newScoreData = {
                     userId, studentClass, seatNumber: seatNumber.padStart(2, '0'),
@@ -761,14 +756,14 @@
             dom.recordsStatus.textContent = '正在載入成績...';
             // 規則二：修改成績讀取路徑
             const q = query(collection(db, `artifacts/d4cheap/public/data/scores_${BOOK_ID}`), where("userId", "==", userId));
-            
+
             onSnapshot(q, (querySnapshot) => {
                 const scores = [];
                 querySnapshot.forEach(doc => scores.push({ id: doc.id, ...doc.data() }));
                 scores.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
-                
+
                 localScores = scores.map(s => ({unitKey: s.unitKey, group: s.group, level: s.level, score: s.score}));
-                
+
                 if (localScores.length > 0) {
                     dom.shareAchievementsBtn.disabled = false;
                 } else {
@@ -789,7 +784,7 @@
                 }
             }, (error) => { dom.recordsStatus.textContent = '無法載入成績紀錄。'; });
         };
-        
+
         const getEarnedBadgesForImage = () => {
             const collectedBadges = new Map();
             const generalBadgeKeys = ['effortful_learner', 'high_achiever', 'perfect_score', 'cute_cat'];
@@ -817,14 +812,14 @@
 
         const drawBadgeSection = (ctx, title, badges, startY, highlight = false) => {
             if (badges.length === 0) return startY;
-            
+
             let currentY = startY;
             ctx.font = 'bold 28px "Noto Sans TC", sans-serif';
             ctx.fillStyle = highlight ? '#c2410c' : '#004d40';
             ctx.textAlign = 'center';
             ctx.fillText(title, ctx.canvas.width / 2, currentY);
             currentY += 50;
-            
+
             const catBadge = badges.find(b => b.name === "可愛貓貓");
             const otherBadges = badges.filter(b => b.name !== "可愛貓貓");
 
@@ -833,17 +828,17 @@
 
             for (let i = 0; i < rowCount; i++) {
                 const rowBadges = otherBadges.slice(i * badgesPerRow, (i + 1) * badgesPerRow);
-                
+
                 const badgeDimensions = rowBadges.map(b => ({
                     badge: b, width: 220, height: 65
                 }));
-                
+
                 const totalRowWidth = badgeDimensions.reduce((sum, dim) => sum + dim.width, 0) + (rowBadges.length - 1) * 20;
                 let currentX = (ctx.canvas.width - totalRowWidth) / 2;
-                
+
                 badgeDimensions.forEach(dim => {
                     const { badge, width, height } = dim;
-                    
+
                     ctx.fillStyle = '#ffffff'; 
                     ctx.strokeStyle = highlight ? '#f59e0b' : '#00796b'; 
                     ctx.lineWidth = highlight ? 5 : 3;
@@ -852,27 +847,27 @@
                     else ctx.rect(currentX, currentY, width, height);
                     ctx.fill();
                     ctx.stroke();
-                    
+
                     ctx.font = '40px sans-serif'; 
                     ctx.fillStyle = '#004d40';
                     ctx.textAlign = 'left';
                     ctx.fillText(badge.icon, currentX + 20, currentY + 47);
-                    
+
                     ctx.font = '28px "Noto Sans TC", sans-serif';
                     ctx.fillText(badge.name, currentX + 75, currentY + 43);
-                    
+
                     currentX += width + 20;
                 });
 
                 currentY += 65 + 15;
             }
-            
+
             if (catBadge) {
                 currentY += 10;
                 const width = 300;
                 const height = 80;
                 const startX = (ctx.canvas.width - width) / 2;
-                
+
                 ctx.fillStyle = '#ffffff'; 
                 ctx.strokeStyle = highlight ? '#f59e0b' : '#00796b'; 
                 ctx.lineWidth = highlight ? 5 : 3;
@@ -881,12 +876,12 @@
                 else ctx.rect(startX, currentY, width, height);
                 ctx.fill();
                 ctx.stroke();
-                
+
                 ctx.font = '50px sans-serif'; 
                 ctx.fillStyle = '#004d40';
                 ctx.textAlign = 'left';
                 ctx.fillText(catBadge.icon, startX + 20, currentY + 58);
-                
+
                 ctx.font = '30px "Noto Sans TC", sans-serif';
                 ctx.fillText(catBadge.name, startX + 85, currentY + 52);
 
@@ -895,7 +890,7 @@
 
             return currentY + 30;
         };
-        
+
         const shareSingleScore = () => {
             if (!dom.seatNumberInput.value.trim()) { 
                 dom.modalContent.innerHTML = `<p class="text-red-600 font-semibold">請先輸入有效的班級座號才能分享！</p>`;
@@ -914,32 +909,32 @@
             if (newlyEarnedBadges.length > 0) canvasHeight += 100 + Math.ceil(newlyEarnedBadges.length / 3) * 85 + (newlyEarnedBadges.some(b => b.name === '可愛貓貓') ? 20 : 0);
             if (allEarnedBadgesForImage.length > 0) canvasHeight += 100 + Math.ceil(allEarnedBadgesForImage.length / 3) * 85 + (allEarnedBadgesForImage.some(b => b.name === '可愛貓貓') ? 20 : 0);
             canvas.height = canvasHeight;
-            
+
             const ctx = canvas.getContext('2d');
             const { value: studentClass } = dom.classSelect;
             const seatNumber = dom.seatNumberInput.value.padStart(2, '0');
             const group = state.currentGroup === 'groupBonus' ? '傳說級' : `Group ${state.currentGroup.slice(-1)}`;
             const { options, selectedIndex } = dom.unitSelect;
             const unitText = options[selectedIndex].text;
-            
+
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             gradient.addColorStop(0, '#e0f7fa'); 
             gradient.addColorStop(1, '#b2ebf2');
             ctx.fillStyle = gradient; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
+
             ctx.fillStyle = '#004d40'; 
             ctx.font = 'bold 55px "Noto Sans TC", sans-serif';
             ctx.textAlign = 'center'; 
             ctx.fillText('成績單', canvas.width / 2, 80);
-            
+
             ctx.fillStyle = '#00796b'; 
             ctx.font = '36px "Noto Sans TC", sans-serif';
             ctx.fillText(`${studentClass} ${seatNumber}號`, canvas.width / 2, 140);
-            
+
             ctx.font = '30px "Noto Sans TC", sans-serif';
             ctx.fillText(`測驗: ${unitText} - ${group} ${state.currentGroup !== 'groupBonus' ? `(${state.currentDifficulty})` : ''}`, canvas.width / 2, 190);
-            
+
             ctx.fillStyle = state.currentScore >= 80 ? '#2e7d32' : (state.currentScore >= 60 ? '#f57f17' : '#c62828');
             ctx.font = 'bold 110px "Inter", sans-serif'; 
             ctx.fillText(state.currentScore, canvas.width / 2, 300);
@@ -949,7 +944,7 @@
             let currentY = 350;
             currentY = drawBadgeSection(ctx, "本次新獲得！", newlyEarnedBadges, currentY, true);
             currentY = drawBadgeSection(ctx, "已獲得的所有徽章", allEarnedBadgesForImage, currentY);
-            
+
             ctx.textAlign = 'center'; 
             ctx.fillStyle = '#004d40'; 
             ctx.font = '20px "Noto Sans TC", sans-serif';
@@ -967,16 +962,16 @@
                  dom.hintModal.style.display = 'block'; 
                  return; 
              }
-            
+
             const allEarnedBadgesForImage = getEarnedBadgesForImage();
             const totalTests = localScores.length;
             const highScore = totalTests > 0 ? Math.max(...localScores.map(s => s.score)) : 0;
-            
+
             const canvas = document.getElementById('shareCanvas');
             let canvasHeight = 450;
             if (allEarnedBadgesForImage.length > 0) canvasHeight += 100 + Math.ceil(allEarnedBadgesForImage.length / 3) * 85 + (allEarnedBadgesForImage.some(b => b.name === '可愛貓貓') ? 20 : 0);
             canvas.height = canvasHeight;
-            
+
             const ctx = canvas.getContext('2d');
             const { value: studentClass } = dom.classSelect;
             const seatNumber = dom.seatNumberInput.value.padStart(2, '0');
@@ -986,23 +981,23 @@
             gradient.addColorStop(1, '#d8b4fe');
             ctx.fillStyle = gradient; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
+
             ctx.fillStyle = '#4a044e';
             ctx.font = 'bold 60px "Noto Sans TC", sans-serif';
             ctx.textAlign = 'center'; 
             ctx.fillText('學習成就總覽', canvas.width / 2, 100);
-            
+
             ctx.fillStyle = '#6b21a8';
             ctx.font = '40px "Noto Sans TC", sans-serif';
             ctx.fillText(`${studentClass} ${seatNumber}號`, canvas.width / 2, 180);
-            
+
             ctx.font = 'bold 32px "Inter", sans-serif';
             ctx.fillStyle = '#3b0764';
             ctx.fillText(`總完成測驗: ${totalTests}次`, canvas.width / 2, 250);
             ctx.fillText(`最高分紀錄: ${highScore}分`, canvas.width / 2, 300);
 
             let currentY = drawBadgeSection(ctx, "我的徽章牆", allEarnedBadgesForImage, 380);
-            
+
             ctx.textAlign = 'center'; 
             ctx.fillStyle = '#4a044e'; 
             ctx.font = '20px "Noto Sans TC", sans-serif';
@@ -1061,9 +1056,9 @@
             if (button && state.currentUnit) {
                 const group = button.dataset.group;
                 state.currentGroup = group;
-                
+
                 dom.groupSelector.querySelectorAll('button').forEach(btn => btn.classList.toggle('active', btn.dataset.group === group));
-                
+
                 if (group === 'groupBonus') {
                     state.currentDifficulty = 'C2';
                     dom.difficultySelector.querySelectorAll('.difficulty-btn-wrapper').forEach(btn => {
@@ -1111,7 +1106,7 @@
         dom.classSelect.addEventListener('change', (e) => {
             localStorage.setItem('studentClass', e.target.value);
         });
-        
+
         window.addEventListener('load', async () => {
             // 在 DOM 載入後，才從 allBookData 賦值
             if (typeof allBookData !== 'undefined' && allBookData[BOOK_ID]) {
@@ -1154,7 +1149,7 @@
                 dom.devToolsPanel.classList.toggle('hidden');
             });
         }
-        
+
         const unlockAllBtn = document.getElementById('unlockAllBtn');
         if(unlockAllBtn) {
             unlockAllBtn.addEventListener('click', async () => {
@@ -1174,7 +1169,7 @@
                 alert('所有徽章已解鎖！');
             });
         }
-        
+
         const clearAllBtn = document.getElementById('clearAllBtn');
         if(clearAllBtn) {
             clearAllBtn.addEventListener('click', async () => {
@@ -1185,12 +1180,12 @@
                 alert('所有徽章已清除！');
             });
         }
-        
+
         const testAchievementShare = document.getElementById('testAchievementShare');
         if(testAchievementShare) {
             testAchievementShare.addEventListener('click', shareAchievements);
         }
-        
+
         const testScoreShare = document.getElementById('testScoreShare');
         if(testScoreShare) {
             testScoreShare.addEventListener('click', () => {
@@ -1221,4 +1216,3 @@
     </script>
 </body>
 </html>
-
