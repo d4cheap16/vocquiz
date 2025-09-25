@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第三冊單字練習</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .control-btn {
+            transition: all 0.2s ease;
+        }
+        .control-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 4px 14px 0 rgb(0 0 0 / 10%);
+        }
+        .group-btn.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .difficulty-btn-wrapper {
+            background-color: #f3f4f6;
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border: 2px solid transparent;
+        }
+        .difficulty-btn-wrapper.active {
+             border-color: #facc15;
+        }
+        .difficulty-btn {
+            color: #d1d5db; /* gray-300 */
+        }
+        .difficulty-btn-wrapper.active .difficulty-btn {
+            color: #facc15; /* yellow-400 */
+        }
+        .difficulty-btn-wrapper:not(.disabled) {
+            cursor: pointer;
+        }
+        .difficulty-btn-wrapper:not(.disabled):hover .difficulty-btn {
+            color: #fde047; /* yellow-300 */
+            transform: scale(1.1);
+        }
+        .difficulty-btn-wrapper.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .word-select {
+            min-width: 150px;
+            height: 40px; border: 2px solid #9ca3af;
+            background-color: #f9fafb; border-radius: 0.75rem; vertical-align: middle;
+            margin: 0 4px; padding: 2px 8px; appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1.5em; cursor: pointer; transition: border-color 0.3s;
+        }
+        .word-select.correct { border-color: #10b981; background-color: #ecfdf5; }
+        .word-select.incorrect { border-color: #ef4444; background-color: #fef2f2; }
+        .word-pronounceable {
+            transition: all 0.2s ease;
+            display: flex; align-items: center;
+            justify-content: center; border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); background-color: #e0f2fe;
+            color: #0c4a6e;
+            padding: 0.5rem 1rem; font-weight: 500; cursor: pointer;
+        }
+        .word-pronounceable:hover { transform: translateY(-2px); box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); }
+        #word-options { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; padding: 1rem; border-radius: 0.75rem; background-color: #f3f4f6; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+        .modal-content { background-color: #fefefe; margin: 5% auto; padding: 20px; border-radius: 12px; max-width: 500px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+        .close-btn:hover, .close-btn:focus { color: black; text-decoration: none; cursor: pointer; }
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+<div class="max-w-4xl mx-auto mb-4">
+    <a href="https://sites.google.com/tcsh.hlc.edu.tw/d4cheap/home" 
+       class="inline-block bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-full transition-colors duration-300">
+        &larr; 返回入口主頁
+    </a>
+</div>
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6 sm:p-10">
+        <div id="quiz-container" class="space-y-6">
+            <h1 class="text-3xl sm:text-4xl font-bold text-center text-gray-800">第三冊單字練習</h1>
+            
+            <div class="space-y-4 border-b border-gray-200 pb-6">
+                <!-- User Info -->
+                <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-4 text-gray-700">
+                    <div class="flex flex-col items-center text-center sm:flex-row sm:space-x-2">
+                        <label for="unit-select" class="font-medium mb-1 sm:mb-0">單元:</label>
+                        <select id="unit-select" class="rounded-md border border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-64 sm:w-auto">
+                            <option value="" selected disabled>--請選擇單元--</option>
+                            <option value="L01">1: The Day I Broke the Rules</option>
+                            <option value="L02">2: The Marshmallow Challenge</option>
+                            <option value="L03">3: Prometheus</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col items-center text-center sm:flex-row sm:space-x-2">
+                        <label for="class-select" class="font-medium mb-1 sm:mb-0">班級:</label>
+                        <select id="class-select" class="rounded-md border border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-64 sm:w-auto">
+                             <option value="" selected disabled>--請選擇班級--</option>
+                            <option value="知足">知足</option> 
+                            <option value="感恩">感恩</option> 
+                            <option value="善解">善解</option> 
+                            <option value="包容">包容</option> 
+                            <option value="大愛">大愛</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col items-center text-center sm:flex-row sm:space-x-2">
+                        <label for="seat-number" class="font-medium mb-1 sm:mb-0">座號:</label>
+                        <input type="text" id="seat-number" class="w-20 rounded-md border border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center" placeholder="00" maxlength="10">
+                    </div>
+                </div>
+        
+                <!-- Group & Difficulty Selection -->
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-center justify-center space-x-2 sm:space-x-4">
+                        <label class="font-medium text-gray-700">選擇組別:</label>
+                        <div id="group-selector" class="flex space-x-2 rounded-lg p-1 bg-gray-200">
+                            <button data-group="groupA" class="control-btn group-btn px-4 sm:px-6 py-2 text-sm sm:text-base font-medium text-gray-600 rounded-md">Group A</button>
+                            <button data-group="groupB" class="control-btn group-btn px-4 sm:px-6 py-2 text-sm sm:text-base font-medium text-gray-600 rounded-md">Group B</button>
+                            <button data-group="groupC" class="control-btn group-btn px-4 sm:px-6 py-2 text-sm sm:text-base font-medium text-gray-600 rounded-md">Group C</button>
+                            <button data-group="groupBonus" id="bonus-group-btn" class="hidden control-btn group-btn px-4 sm:px-6 py-2 text-sm sm:text-base font-medium text-yellow-500 bg-gray-800 rounded-md" title="傳說級挑戰">❓</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-center space-x-2 sm:space-x-4">
+                        <label class="font-medium text-gray-700">選擇難度:</label>
+                        <div id="difficulty-selector" class="flex items-center space-x-2 text-3xl">
+                             <button data-level="A2" class="control-btn difficulty-btn-wrapper disabled" title="A2 - 初級 (一顆星)"><span class="difficulty-btn">★</span></button>
+                            <button data-level="B1" class="control-btn difficulty-btn-wrapper disabled" title="B1 - 中級 (兩顆星)"><span class="difficulty-btn">★ ★</span></button>
+                            <button data-level="B2" class="control-btn difficulty-btn-wrapper disabled" title="B2 - 中高級 (三顆星)"><span class="difficulty-btn">★ ★ ★</span></button>
+                            <button data-level="C1" class="control-btn difficulty-btn-wrapper disabled text-4xl" title="C1 - 高級 (四顆星)"><span class="difficulty-btn">★ ★ ★ ★</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quiz-area" class="hidden">
+                <div class="text-center text-gray-600 p-2 mb-4">
+                    <strong>作答指引：</strong> 請從下拉選單中選擇正確的單字。點擊下方的選項可聽發音與查看提示。
+                </div>
+                <div id="story-passage" class="text-lg leading-relaxed text-gray-800 bg-gray-50 rounded-lg p-4 sm:p-6 border border-gray-200"></div>
+                <div class="border-t border-gray-200 pt-6 mt-6">
+                    <details id="badge-hall-details">
+                        <summary class="text-center bg-gray-500 text-white hover:bg-gray-600 py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">
+                            徽章殿堂 (點擊展開/收合)
+                        </summary>
+                        <div id="badge-hall-container" class="pt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Badges will be dynamically inserted here -->
+                        </div>
+                    </details>
+                </div>
+                <div class="border-t border-gray-200 pt-6 mt-6">
+                    <h2 class="text-xl font-bold text-gray-700 text-center mb-4">單字選項（點擊查看發音與例句）</h2>
+                    <div id="word-options"></div>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mt-8">
+                    <button id="submitBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed" disabled>檢查答案</button>
+                    <button id="clearBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">清除答案</button>
+                    <div id="admin-tools" class="hidden flex space-x-4">
+                        <button id="adminFillBtn" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">一鍵填答</button>
+                    </div>
+                </div>
+                <div id="results-and-share" class="mt-8 text-center">
+                    <div id="results" class="text-xl font-semibold mb-4"></div>
+                    <button id="shareBtn" class="hidden bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">分享本次成績</button>
+                </div>
+                <div id="analysis-container" class="hidden mt-8">
+                     <details id="analysis-details"><summary class="text-center bg-purple-600 text-white hover:bg-purple-700 py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">檢討您的答案</summary><div id="incorrect-answers" class="pt-6 space-y-4"></div></details>
+                </div>
+            </div>
+             <div id="welcome-message" class="text-center py-12">
+                <h2 class="text-2xl font-semibold text-gray-700">請先選擇單元、組別與難度</h2>
+                <p class="text-gray-500 mt-2">完成設定後，測驗內容將會顯示於此處。</p>
+            </div>
+        </div>
+        
+        <div id="dev-tools-panel" class="hidden border-t-4 border-red-500 pt-6 mt-8">
+             <h2 class="text-2xl font-bold text-center text-red-700">開發者工具</h2>
+             <div class="flex flex-wrap justify-center gap-4 mt-4">
+                 <button id="unlockAllBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg">一鍵解鎖所有徽章</button>
+                 <button id="clearAllBtn" class="bg-red-800 hover:bg-red-900 text-white font-semibold py-2 px-4 rounded-lg">一鍵清除所有徽章</button>
+                 <button id="testAchievementShare" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg">測試「成就總覽」圖片</button>
+                 <button id="testScoreShare" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg">測試「成績單」圖片</button>
+             </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-6 mt-8">
+            <div class="flex justify-center items-start gap-4">
+                 <details id="records-details" class="flex-1">
+                    <summary class="text-center bg-indigo-600 text-white hover:bg-indigo-700 py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">查看我的成績</summary>
+                    <div id="records-container" class="pt-6 space-y-4">
+                        <p id="records-status" class="text-center text-gray-500"></p>
+                        <div id="records-list" class="space-y-4"></div>
+                    </div>
+                </details>
+                <button id="share-achievements-btn" disabled class="flex-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-center bg-teal-600 text-white hover:bg-teal-700 py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">分享學習成就</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="hintModal" class="modal"><div class="modal-content"><span class="close-btn">&times;</span><div id="modal-content-inner" class="space-y-4"></div></div></div>
+    <canvas id="shareCanvas" class="hidden" width="800" height="800"></canvas>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, setLogLevel, query, where, onSnapshot, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = {
+            apiKey: "AIzaSyDF4TY-2_z4rX7d_1l_6yW_Kmv-Y3a5PjY",
+            authDomain: "d4cheap.firebaseapp.com",
+            projectId: "d4cheap",
+            storageBucket: "d4cheap.appspot.com",
+            messagingSenderId: "41040306179",
+            appId: "1:41040306179:web:a41ef655e0031846b0a943"
+        };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        setLogLevel('debug');
+        
+        let db, auth, userId;
+        let localScores = [];
+        let earnedBadges = {};
+        const ADMIN_PASS_B64 = 'TWFLaU1hNzc3';
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (error) { console.error("Firebase initialization failed:", error); }
+
+        async function signIn() {
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) { 
+                console.error("Firebase authentication failed:", error); 
+            }
+        }
+        
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                userId = user.uid;
+                fetchScores();
+                fetchBadges();
+            } else {
+                userId = null;
+                localScores = [];
+                earnedBadges = {};
+            }
+        });
+
+        const allBadges = {
+            // General Badges
+            perfect_score: { name: "滿分達人", icon: "🏆", description: "在任何測驗中獲得100分。" },
+            high_achiever: { name: "高分好手", icon: "⭐", description: "在任何測驗中獲得90分(含)以上。" },
+            effortful_learner: { name: "努力不懈", icon: "💪", description: "在任何測驗中獲得60分(含)以上。" },
+            // Horizontal Completion Badges
+            a2_explorer: { name: "探索者", icon: "🧭", description: "完成一個單元內所有組別的\"一顆星\"難度測驗（80分以上）。" },
+            b1_voyager: { name: "旅行家", icon: "🗺️", description: "完成一個單元內所有組別的\"兩顆星\"難度測驗（80分以上）。" },
+            // Vertical Completion Badges
+            conqueror: { name: "征服者", icon: "👑", description: "完成一個單元內所有組別的三顆星難度測驗(80分以上)。" },
+            strong_one: { name: "真強者", icon: "💎", description: "完成一個單元內所有組別的四顆星難度測驗(80分以上)。" },
+            english_monster: { name: "英文怪物", icon: "👹", description: "完成一個單元內所有組別的四顆星難度測驗(皆為滿分)。" },
+            // Unit Mastery Badges
+            legend: { name: "傳說", icon: "🌌", description: "完成一個單元內所有常規測驗且皆為滿分。" },
+            alien: { name: "外星人", icon: "👽", description: "在一個單元的傳說級(❓)挑戰中獲得滿分。" },
+            unit_master: { name: "單元大師", icon: "🎖️", description: "在單一單元內，同時獲得「傳說」與「外星人」徽章。" },
+            // Ultimate Badge
+            cute_cat: { name: "可愛貓貓", icon: "😺", description: "是的，你沒看錯，宇宙的盡頭是貓貓。恭喜你完成所有挑戰，這隻可愛的橘貓是你的了。" },
+        };
+
+        const vocabulary = {
+            'L01': {
+                'groupA': {
+                    words: ['employ', 'suffer', 'tremendously', 'frighten', 'contact', 'prompt', 'hug'],
+                    stories: [
+                        { level: 'A2', text: "My elderly neighbor lives alone and I often help her out. I didn't want her to **suffer** during the cold winter. It was a simple offer of help, but she was **tremendously** grateful. A sudden power outage seemed to **frighten** her, which made me **prompt** to check on her immediately. I gave her a warm **hug** to comfort her. I also left my phone number so she could **contact** me anytime. My parents are proud that I chose to **employ** my time in such a kind way." },
+                        { level: 'B1', text: "My first job was at a local animal shelter. Some of the animals there **suffer** from neglect, which can **frighten** them easily. It was my duty to **contact** potential adopters and arrange visits. A sad-looking dog would always **prompt** me to give it extra attention. The shelter was **tremendously** busy, so they decided to **employ** more volunteers. The most rewarding part of the job was when a family gave a rescued dog a gentle **hug** before taking it home." },
+                        { level: 'B2', text: "As a hotline volunteer, I often speak with people who **suffer** from loneliness. Some callers are so distressed that a sudden noise can **frighten** them. My role is to be the first point of **contact** for them in a crisis. The goal is to be **tremendously** empathetic, which can **prompt** them to open up. The organization decided to **employ** new digital tools to reach more people. Even though it's over the phone, you can almost feel the relief in their voice, like a verbal **hug**." },
+                        { level: 'C1', text: "In her memoir, the diplomat explains why the government chose to **employ** her for the difficult negotiation. The first step was to **contact** the opposing party to establish a channel for dialogue. The tense political atmosphere could easily **frighten** less experienced negotiators. A minor misunderstanding could **prompt** a breakdown in talks, causing both nations to **suffer** the consequences. It required a **tremendously** calm approach. She wrote that the final peace treaty felt like a symbolic **hug** between two old rivals." }
+                    ]
+                },
+                'groupB': {
+                    words: ['corporation', 'illness', 'laughter', 'germ', 'warmth', 'confine', 'stretch'],
+                    stories: [
+                        { level: 'A2', text: "A clown visited the children's hospital to bring some fun. His job was to share **laughter** and the **warmth** of his personality with every child. He was careful to wash his hands to avoid spreading any **germ**. For a child with a serious **illness**, this visit was a bright spot in their day. His visit made them feel they weren't just **confine**d to a small room. A big tech **corporation** sponsors this wonderful program. At the end of his visit, the clown would **stretch** his arms out wide for a final, funny wave." },
+                        { level: 'B1', text: "Working from home doesn't have to **confine** you to your desk all day. It's important to get up and **stretch** regularly. This helps you avoid the physical discomfort that can lead to **illness**. You also don't have to worry about catching a **germ** from coworkers. I can hear my family's **laughter** from the other room, which fills my heart with **warmth**. I work for a large **corporation** that truly supports this modern way of working." },
+                        { level: 'B2', text: "A large pharmaceutical **corporation** announced it is close to developing a cure for a rare **illness**. The disease can **confine** patients to their beds for months. The lead scientist said they had to **stretch** their resources to the limit to make this breakthrough. Their goal was to create a medicine that could target the specific **germ** causing the disease. The news brought a feeling of **warmth** and hope to many families. It was a moment that replaced tears with **laughter**." },
+                        { level: 'C1', text: "Living on a space station means astronauts must **confine** themselves to a small area for a long time. They have to **stretch** their muscles daily to counteract the effects of zero gravity. The entire station is a sterile environment to prevent any dangerous **germ** from spreading. The psychological toll of such isolation can sometimes lead to **illness**. However, the human spirit's **warmth** is evident when they share jokes and **laughter** during video calls with their families. A private **corporation**, in partnership with NASA, sponsored the mission." }
+                    ]
+                },
+                'groupC': {
+                    words: ['terminal', 'hesitate', 'refuse', 'drowsy', 'sparkle'],
+                    stories: [
+                        { level: 'A2', text: "Grandpa has been feeling a bit **drowsy** lately. We wanted to bring a **sparkle** back to his eyes for his 80th birthday. We planned a surprise party, but I was worried he might **refuse** to come. When the day came, I didn't **hesitate** to drag him out of the house. The party was not for a sad reason like a **terminal** illness; it was a celebration of his wonderful life." },
+                        { level: 'B1', text: "After the long flight, I felt so **drowsy** that I was afraid I would lose the **sparkle** of my confidence during the interview. The company was looking for someone who would not **hesitate** to take on big challenges. I knew I could not **refuse** this opportunity. It felt like a final exam, not a **terminal** diagnosis, but the pressure was still immense." },
+                        { level: 'B2', text: "The patient was suffering from a **terminal** illness, and the strong medication often made him feel **drowsy**. When the doctor explained a new experimental treatment, a **sparkle** of hope returned to his eyes. He did not **hesitate** to ask for more details. Although the new plan offered hope, he ultimately had to **refuse** the offer to join the clinical trial due to family reasons." },
+                        { level: 'C1', text: "The CEO felt mentally exhausted and **drowsy** after days of intense negotiations. The deal was at a **terminal** stage; it would either succeed or fail tonight. He knew he must not **hesitate** when making the final offer. The only **sparkle** of hope was a small concession from the other side. However, if the terms were not right, he was prepared to **refuse** the deal entirely to protect his company." }
+                    ]
+                },
+                'groupBonus': {
+                    words: ['employ', 'corporation', 'suffer', 'terminal', 'illness', 'tremendously', 'laughter', 'frighten', 'contact', 'germ', 'warmth', 'frail', 'prompt', 'confine', 'sparkle', 'hug', 'drowsy', 'stretch', 'refuse', 'hesitate'],
+                    story: { level: 'C2', text: "Today, I met a new patient, a **frail** old man with a **terminal** **illness**. The disease tried to **confine** him to his bed, making him feel **drowsy** most of the time. I knew I couldn't **hesitate** in trying to bring him some comfort. He seemed to **suffer** silently, so my goal was to bring a **sparkle** back to his eyes. My initial attempt to start a conversation didn't **prompt** much of a response, and I was worried my presence might **frighten** him. I almost decided to just leave, but I chose not to **refuse** the challenge. A huge **corporation** donates funds for us to **employ** therapy animals. So, I decided to **contact** the pet therapy team. An hour later, a golden retriever visited. The dog gently laid its head on the bed, and the man began to **stretch** out his hand. The **warmth** of the animal was a better medicine than any drug. Soon, I heard the sound of soft **laughter**. We must be careful about every **germ**, of course, but sometimes a loving **hug**, whether from a person or a pet, is **tremendously** important." }
+                }
+            },
+            'L02': {
+                'groupA': {
+                    words: ['innovative', 'structure', 'construct', 'adjust', 'explore'],
+                    stories: [
+                        { level: 'A2', text: "Our company has an **innovative** idea for a new app. We plan to **construct** a simple version first to see if people like it. The app’s basic **structure** is very user-friendly. We will listen to user feedback and constantly **adjust** its features. We are excited to **explore** all the possibilities this app can offer to our users." },
+                        { level: 'B1', text: "We decided to **explore** different ways to renovate our old kitchen. We wanted an **innovative** open-plan design, which meant we had to change the entire room's **structure**. After finalizing the layout, the most difficult part was to **construct** a new island in the center. We also had to **adjust** the height of the cabinets to fit the new appliances." },
+                        { level: 'B2', text: "Our team's goal is to **construct** a virtual world where players have complete freedom. The game's core **structure** allows for endless creativity. To enhance this, we are developing an **innovative** tool that lets players **adjust** the environment in real-time. This feature will encourage players to **explore** the vast map and build whatever they can imagine." },
+                        { level: 'C1', text: "Engineers are working on an **innovative** plan to colonize Mars. They must first **explore** the planet's surface to find a suitable location. The primary challenge is to **construct** a self-sustaining habitat. The proposed **structure** for this habitat must be incredibly strong to withstand Mars's harsh environment. Furthermore, the life support systems will need to constantly **adjust** to changing atmospheric conditions." }
+                    ]
+                },
+                'groupB': {
+                    words: ['promise', 'capable', 'architect', 'graduate', 'slightly', 'unique', 'feedback'],
+                    stories: [
+                        { level: 'A2', text: "My dad, who is an **architect**, designed a cool new house for our family. After we moved in, I made a **promise** to my parents that I would be responsible. They wanted to be sure I was **capable** of taking care of a pet. We went to a shelter and found a dog with a **unique** white spot over one eye. He was **slightly** nervous at first, but he warmed up to us. The shelter volunteer, a recent college **graduate**, asked us to provide **feedback** after a week, and we happily told her everything was perfect." },
+                        { level: 'B1', text: "The restaurant's interior, designed by a famous **architect**, is truly **unique** and creates an amazing atmosphere. The menu shows a lot of **promise**, featuring creative dishes I haven't seen elsewhere. I believe the young chef, a recent culinary school **graduate**, is very **capable** of earning a Michelin star one day. Our main course did arrive **slightly** later than expected, however. My main **feedback** for the management is to improve the timing from the kitchen, but I would still highly recommend this place." },
+                        { level: 'B2', text: "As the main **architect** of the film's narrative, the director had a very **unique** vision for the story. The studio executives agreed that the early cut showed immense **promise**, but their initial **feedback** was that the ending was **slightly** too ambiguous for a mainstream audience. The director, a recent film school **graduate**, argued passionately that she was perfectly **capable** of delivering a powerful conclusion without explicitly explaining every detail to the viewers." },
+                        { level: 'C1', text: "The core of the debate was whether the city was **capable** of funding the restoration of the historic theater. The lead conservation **architect** argued that the project held the **promise** of a cultural revival for the downtown area. She emphasized its **unique** art deco style, a design that could never be replicated today. A young urban planning **graduate** offered a counter-proposal, suggesting a plan that was **slightly** more focused on multi-purpose commercial use. The public **feedback** was sharply divided, reflecting the deep conflict between preserving heritage and ensuring economic viability." }
+                    ]
+                },
+                'groupC': {
+                    words: ['mention', 'rank', 'rely', 'element', 'stability', 'route'],
+                    stories: [
+                        { level: 'A2', text: "For our hike, we first planned the safest **route** up the mountain. Good weather is an important **element** for a safe trip. I forgot to **mention** that we need proper hiking shoes to ensure our **stability** on the slippery rocks. We can't just **rely** on our phones for directions, so we brought a paper map. I hope this trip will **rank** as our best adventure ever!" },
+                        { level: 'B1', text: "When choosing a university, you shouldn't solely **rely** on its reputation. It's wise to check how its specific programs **rank** nationally. Another key **element** to consider is the campus environment. Did I **mention** that the location is also critical, as it might affect your daily travel **route**? Finally, look into the school's financial **stability**, as it can impact the resources available to students." },
+                        { level: 'B2', text: "The company's sharp decline in market **rank** was due to several overlooked factors. A critical **element** was its unwillingness to innovate; the board continued to **rely** on outdated business models. The annual report didn't even **mention** the threat of new online competitors. This lack of foresight compromised the firm's financial **stability**, forcing them to pursue a drastic new **route** simply to avoid bankruptcy." },
+                        { level: 'C1', text: "Ensuring the structural **stability** of the new skyscraper was the engineering team's paramount concern. To achieve this, every single **element** of the design, from the foundation to the windows, had to be flawless. The lead engineer didn't **mention** this in the press conference, but they had to devise an entirely new **route** for the underground public utilities. The project's success will **rank** among the city's greatest architectural achievements, so the team cannot **rely** on standard procedures alone; constant innovation is required." }
+                    ]
+                },
+                'groupBonus': {
+                    words: ['innovative', 'promise', 'material', 'mention', 'structure', 'capable', 'collaborate', 'architect', 'graduate', 'construct', 'slightly', 'rank', 'unique', 'adjust', 'rely', 'feedback', 'element', 'stability', 'route', 'explore'],
+                    story: { level: 'C2', text: "Our team, led by a brilliant **architect** and a recent engineering **graduate**, entered a global competition to design a sustainable city. Our **innovative** concept showed immense **promise**. The core idea was to **construct** a city that could grow organically using a revolutionary new **material**. The **unique** core **structure** was designed to be modular. A key **element** was its long-term **stability**. We knew we couldn't just **rely** on existing models, so we decided to **explore** radical ideas. The judges' initial **feedback** was that our plan was **slightly** too ambitious, so we had to **adjust** our proposed transport **route** multiple times. Did I **mention** that we had to **collaborate** with teams from three different continents? We proved we were **capable** of handling the pressure, and we believe our final design will **rank** among the very best." }
+                }
+            },
+            'L03': {
+                'groupA': {
+                    words: ['humankind', 'universe', 'fur', 'enable', 'upright', 'generous'],
+                    stories: [
+                        { level: 'A2', text: "Imagine a visitor from another part of the **universe**. This alien is very tall and walks **upright**, just like **humankind**. He is covered in soft, blue **fur**. His spaceship has special tools that **enable** him to understand our language. He is also very **generous**, bringing gifts of strange and beautiful fruits from his home planet for everyone to try." },
+                        { level: 'B1', text: "A **generous** inventor wanted to create something to help all of **humankind**. His new device would **enable** people with disabilities to walk again. It was a complex suit that helped them stand **upright**. Some people joked that it looked like it came from another part of the **universe**. For those who were cold, he even designed a special coat made from synthetic **fur** that was warmer than any real animal's coat." },
+                        { level: 'B2', text: "The ancient myth speaks of a time before the **universe** as we know it existed. In this void, the gods were creating all life forms. They wanted a special creature to rule over the others, and so they created **humankind**. To distinguish them, they gave humans the ability to stand **upright**. The creator god was so **generous** that he also gifted them with intelligence. To protect them from the harsh winters, he gave them the idea to use animal **fur** for warmth. This gift would **enable** them to survive and build civilizations." },
+                        { level: 'C1', text: "The novel is set in a distant future where **humankind** has colonized a new solar system. This expansion across the **universe** was made possible by a single, **generous** corporation that funded the project. Their technology can **enable** humans to adapt to alien environments. On one planet, the colonists even evolved a fine layer of **fur** to protect them from the radiation. The plot's main twist is that this adaptation prevents them from standing fully **upright**, creating a new set of challenges for their society." }
+                    ]
+                },
+                'groupB': {
+                    words: ['conflict', 'distribution', 'benefit', 'underneath', 'freeze', 'victim', 'miserable'],
+                    stories: [
+                        { level: 'A2', text: "Our picnic was a disaster and made everyone feel **miserable**. First, we had a **conflict** about where to sit. Then we realized we had forgotten the sandwiches, which were still on the kitchen table **underneath** a newspaper. The only thing we had was ice cream, but it was starting to **freeze** again in the cold wind. For the **benefit** of everyone, we decided to just go home. I think I was the biggest **victim** of our poor planning, because I was the hungriest! We also need to work on the **distribution** of tasks next time." },
+                        { level: 'B1', text: "The new community garden is designed to **benefit** everyone. A generous donation from a local company helped us start. The official **distribution** of garden plots was done by lottery to ensure fairness for all residents. This has finally resolved the previous **conflict** over the lack of shared green space in our neighborhood. I found a big, flat rock **underneath** the soil in my plot. When winter comes, we have to cover the plants so they don't **freeze**. I used to feel **miserable** living in the city, but this garden has changed everything. No one feels like a **victim** of urban life anymore." },
+                        { level: 'B2', text: "The documentary showed how polar bears survive in the harsh arctic environment. When the sea begins to **freeze**, their hunting season starts. A mother bear becomes a **victim** of hunger if she cannot find food for her cubs. Life can be **miserable** in such an unforgiving place. The film also explored the territorial **conflict** between male bears. **Underneath** their thick fur lies a layer of fat for insulation. The primary **benefit** of this fat is survival in the extreme cold. The film also touched upon the changing **distribution** of sea ice, which poses a new threat to their existence." },
+                        { level: 'C1', text: "After the earthquake, the aid organization's main goal was the fair **distribution** of food and medical supplies. The logistical challenges were immense, and any internal **conflict** within the team could delay the process. Every survivor was a **victim** of the tragedy, and many were living in **miserable** conditions. The greatest **benefit** the team could provide was clean water and shelter. As winter approached, the temperatures began to **freeze** at night. **Underneath** the rubble of a collapsed building, rescue dogs were still searching for survivors." }
+                    ]
+                },
+                'groupC': {
+                    words: ['slaughter', 'hollow', 'theft', 'punish', 'banish', 'torture'],
+                    stories: [
+                        { level: 'A2', text: "Let me tell you a scary story. Deep in the woods, there is a large, **hollow** tree. Legend says the ghost of an old king lives there. He likes to **torture** campers by making scary noises at night. The story goes that the king was forced to **banish** himself from his own kingdom. This was after the terrible **slaughter** of his royal guards during a surprise attack. A rival stole his crown, and this **theft** made him very angry. Now, as a ghost, he tries to **punish** anyone who gets too close to his tree." },
+                        { level: 'B1', text: "The old legend tells of a cruel king who used to **punish** his people for the smallest mistakes. He ordered the **slaughter** of anyone who opposed him. He would **banish** their families from the kingdom, forcing them to live in exile. The story says the king's heart was **hollow**, filled only with greed. He even accused his own brother of **theft** to take his land. For his enemies, he designed a special prison to **torture** them with endless waiting." },
+                        { level: 'B2', text: "The detective investigated the **theft** of a priceless painting. He knew the goal was not just to recover the art, but to **punish** the criminals responsible. The main suspect was a disgraced art dealer whom the community wished to **banish**. The case took a dark turn when it was linked to the illegal **slaughter** of endangered animals, whose skins were used in other illegal trades. The stolen painting was found cleverly hidden inside a **hollow** sculpture. During interrogation, the detective had to be careful not to mentally **torture** the suspect, but to rely on evidence and facts to get a confession." },
+                        { level: 'C1', text: "In the dystopian society, the primary method of control was psychological **torture**, creating a climate of constant fear. The alleged **theft** of \"state secrets\" was the official justification for the regime's brutal policies. This often led to the public **slaughter** of those deemed enemies of the state. The regime's promises of a perfect society felt utterly **hollow**. For lesser crimes, the state would **banish** dissidents to remote labor camps. The ultimate goal of this system was not rehabilitation, but simply to **punish** any form of independent thought." }
+                    ]
+                },
+                'groupBonus': {
+                    words: ['humankind', 'universe', 'fur', 'enable', 'upright', 'generous', 'conflict', 'distribution', 'benefit', 'slaughter', 'underneath', 'freeze', 'victim', 'miserable', 'hollow', 'furious', 'theft', 'punish', 'banish', 'torture', 'civilization'],
+                    story: { level: 'C2', text: "In the dawn of the **universe**, a **generous** creator god fashioned the first members of **humankind**. He gave them intelligence and the ability to stand **upright**. To **enable** their survival, he covered them in thick **fur** to protect them from the cold. However, another god grew **furious** at this creation, sparking a divine **conflict**. This evil god committed the ultimate **theft**: he stole the heart of the sun, causing the world to **freeze**. The people felt **miserable** and became a **victim** of his cruelty; it was a form of cosmic **torture**. The creator god decided to **punish** this evil deity and **banish** him to a **hollow** dimension. To restore his creation, he gifted them a hidden fire from **underneath** the earth's crust. This would greatly **benefit** them and prevent the **slaughter** of his people by the cold. He also established a fair **distribution** of resources across the lands, setting the stage for the rise of a great **civilization**." }
+                }
+            }
+        };
+
+        const wordDetails = {
+            'L01': {
+                'employ': { pos: 'vt.', translation: '僱用', definition: 'to pay someone to do work or a job', example: 'With his restaurant business growing fast, Mr. Finch decided to employ more people to serve the customers.', example_tw: '隨著餐廳生意快速成長，芬奇先生決定僱用更多人手來服務顧客。', family: ['employer', 'employee', 'employment'] },
+                'employer': { pos: 'n.', translation: '雇主', definition: 'a person or company that pays people to work for them' },
+                'employee': { pos: 'n.', translation: '員工；受僱者', definition: 'someone who is paid to work for someone else' },
+                'employment': { pos: 'n.', translation: '工作；受僱', definition: 'the fact of someone being paid to work for a company or organization' },
+                'corporation': { pos: 'n.', translation: '(大)公司；集團公司', definition: 'a very large company or business', example: 'Most global corporations operate in many countries and prefer employees who can speak more than one language.', example_tw: '大多數的跨國公司在許多國家營運，並且偏好會說一種以上語言的員工。', family: ['corporate'] },
+                'corporate': { pos: 'adj.', translation: '(大)公司的', definition: 'relating to a large company' },
+                'suffer': { pos: 'vi.', translation: '受苦', definition: 'to experience pain or trouble because of something', example: 'Uncle Harry suffers from a heart condition, so the doctors told him to cut down on fatty foods.', example_tw: '哈利叔叔患有心臟病，所以醫生告訴他要減少攝取油膩的食物。' },
+                'terminal': { pos: 'adj.', translation: '末期的', definition: '(of a disease or condition) that can\'t be cured and will lead to death', example: 'When Grandma learned she had terminal cancer, she decided to make the most of the time left.', example_tw: '當奶奶得知她患有末期癌症時，她決定要好好把握剩下的時間。', family: ['terminal_n'] },
+                'terminal_n': { pos: 'n.', translation: '航廈；月臺', definition: 'a building where you can get on and off planes, buses, or ships', example: 'Our flight leaves from Terminal 1, so make sure you don\'t get off the bus at the wrong terminal building.', example_tw: '我們的班機從第一航廈起飛，所以確保你不要在錯誤的航廈大樓下車。'},
+                'illness': { pos: 'n.', translation: '疾病；生病', definition: 'sickness or disease', example: 'These days, many people suffer from illnesses such as diabetes or cancer caused by unhealthy lifestyles.', example_tw: '現今，許多人因不健康的生活方式而罹患如糖尿病或癌症等疾病。', family: ['ill'] },
+                'ill': { pos: 'adj.', translation: '生病的', definition: 'not feeling well, or suffering from a disease' },
+                'tremendously': { pos: 'adv.', translation: '相當大地', definition: 'greatly; extremely', example: 'Aunt Mimi was tremendously thankful when the firefighters rescued her cat from the tree.', example_tw: '當消防員將咪咪阿姨的貓從樹上救下來時，她非常感謝。', family: ['tremendous'] },
+                'tremendous': { pos: 'adj.', translation: '相當大的', definition: 'very great in amount or level, or extremely good' },
+                'laughter': { pos: 'n.', translation: '笑；笑聲', definition: 'the act or sound of laughing', example: 'Every time Dennis tells that funny story, we all burst into laughter.', example_tw: '每次丹尼斯講那個好笑的故事，我們都會爆笑出聲。' },
+                'frighten': { pos: 'vt.', translation: '使驚嚇', definition: 'to scare someone, usually very suddenly', example: 'When the kids came around the corner dressed in zombie costumes for Halloween, they frightened the old lady almost to death.', example_tw: '當孩子們為了萬聖節穿著殭屍服裝從轉角出現時，他們差點把那位老太太嚇死。', family: ['fright'] },
+                'fright': { pos: 'n.', translation: '驚嚇', definition: 'the feeling of fear, especially if sudden' },
+                'contact': { pos: 'n.', translation: '接觸；聯絡', definition: 'the state of people or things touching each other', example: 'When your hand comes into contact with a surface that\'s very hot, your body reacts even more quickly than your brain does!', example_tw: '當你的手接觸到非常燙的表面時，你的身體反應甚至比你的大腦還快！' },
+                'germ': { pos: 'n.', translation: '細菌', definition: 'a very tiny living thing that can cause illness or disease', example: 'Proper cleaning of your contact lenses will kill the germs which may cause a serious eye infection.', example_tw: '適當地清潔你的隱形眼鏡將會殺死可能導致嚴重眼睛感染的細菌。' },
+                'warmth': { pos: 'n.', translation: '熱情；溫暖', definition: 'kindness, passion, or enthusiasm shown by someone', example: 'Agnes felt bad about staying an extra night, but the warmth in Mel\'s smile assured her that she was still welcome.', example_tw: '愛麗絲對於多待一晚感到不好意思，但梅爾微笑中的熱情讓她確信她仍然是受歡迎的。' },
+                'frail': { pos: 'adj.', translation: '虛弱的', definition: 'very weak or very sick', example: 'After falling ill and spending a month in the hospital, the old man was very frail and could hardly stand up.', example_tw: '在生病並住院一個月後，那位老人變得非常虛弱，幾乎站不起來。' },
+                'prompt': { pos: 'vt.', translation: '促使', definition: 'to cause something to occur or someone to do something', example: 'Was it the strange noises or the flashes of light that prompted you to get up and take a look around?', example_tw: '是奇怪的噪音還是閃光促使你起身四處查看的？' },
+                'confine': { pos: 'vt.', translation: '使離不開(床、輪椅等)；侷限', definition: 'to force someone sick or injured to stay in bed or in a wheelchair, etc.', example: 'Despite being confined to a wheelchair after the terrible accident, Lara remained as outgoing as ever.', example_tw: '儘管在可怕的事故後只能待在輪椅上，勞拉依然像以往一樣外向。' },
+                'sparkle': { pos: 'n.', translation: '神采；閃耀', definition: 'lively brightness, usually showing happiness or confidence; a series of bright flashes made by something shiny', example: 'Although he had been confined to the cave for so long, there was still a sparkle in the explorer\'s eyes when he was rescued.', example_tw: '儘管被困在洞穴裡這麼久，當那位探險家獲救時，他的眼中依然閃耀著神采。' },
+                'hug': { pos: 'n.', translation: '擁抱', definition: 'the act of holding someone or something to show warmth or love', example: 'On her return from abroad, Christina gave her sister a nice warm hug.', example_tw: '從國外回來後，克莉絲汀給了她妹妹一個溫暖的擁抱。' },
+                'drowsy': { pos: 'adj.', translation: '昏昏欲睡的', definition: 'feeling sleepy or tremendously tired', example: 'Nicole didn\'t sleep well last night. No wonder she feels so drowsy today.', example_tw: '妮可昨晚沒睡好。難怪她今天這麼昏昏欲睡。' },
+                'stretch': { pos: 'vt.', translation: '伸出(手臂或腿)；伸長', definition: 'to reach out with an arm or leg to get to something', example: 'The book about corporate finance was on the top shelf, so Chuck had to stretch his arm high up to reach it.', example_tw: '那本關於企業金融的書在書架最上層，所以查克必須把手臂伸得很高才拿得到。' },
+                'refuse': { pos: 'vi. vt.', translation: '拒絕', definition: 'to answer no to a request or invitation', example: 'Nurse Wells offered to take the patient for a walk in the garden, but he refused because he felt drowsy.', example_tw: '威爾斯護士提議帶病人到花園散步，但他因為感到昏昏欲睡而拒絕了。', family: ['refusal'] },
+                'refusal': { pos: 'n.', translation: '拒絕', definition: 'the act of refusing to do or accept something' },
+                'hesitate': { pos: 'vi.', translation: '猶豫', definition: 'to pause before doing something because one feels unsure, afraid, or nervous', example: 'When her boyfriend proposed, Kim didn\'t hesitate about the decision at all. She answered "Yes!" right away.', example_tw: '當她男友求婚時，金對這個決定一點也沒有猶豫。她立刻回答了「我願意！」。', family: ['hesitation'] },
+                'hesitation': { pos: 'n.', translation: '猶豫', definition: 'the action of pausing or hesitating before saying or doing something' },
+            },
+            'L02': {
+                'innovative': { pos: 'adj.', translation: '創新的', definition: 'able to come up with new and creative ideas for using or doing something', example: 'Successful inventions often involve people taking an innovative approach to solving a problem.', example_tw: '成功的發明通常涉及人們用創新的方法來解決問題。', family: ['innovate', 'innovation'] },
+                'innovate': { pos: 'vi.', translation: '創新' },
+                'innovation': { pos: 'n.', translation: '新方法' },
+                'promise': { pos: 'vt.', translation: '可望；預示', definition: 'to make something likely to happen or to show signs of something', example: 'The dark clouds promised rain, so we decided to bring umbrellas before heading out for a walk.', example_tw: '烏雲預示著要下雨了，所以我們決定出門散步前帶上雨傘。' },
+                'material': { pos: 'n.', translation: '(活動所需的) 材料', definition: 'things used to take part in a certain activity', example: 'Our art teacher first explained how to make the lanterns, and then handed out some paper, wire, and other materials.', example_tw: '我們的美術老師首先解釋了如何製作燈籠，然後分發了一些紙、鐵絲和其他材料。' },
+                'mention': { pos: 'vt.', translation: '提到', definition: 'to briefly talk or write about something without going into detail', example: 'Jacob mentioned the trip plan to his parents, and they liked the idea.', example_tw: '雅各向父母提到了旅行計畫，他們很喜歡這個主意。' },
+                'structure': { pos: 'n.', translation: '結構體；建築物', definition: 'something that is built by putting together different materials', example: 'Before the workers completed the new building, tests were conducted to see how well the structure could withstand strong winds.', example_tw: '在工人完成新大樓之前，進行了測試以檢視該結構體能多好地承受強風。' },
+                'capable': { pos: 'adj.', translation: '有能力的；能夠', definition: 'being able to do something', example: 'After taking lessons for a year, Martha was capable of playing several songs on the guitar.', example_tw: '上了一年的課後，瑪莎已經能夠用吉他彈奏幾首歌曲了。', family: ['capability'] },
+                'capability': { pos: 'n.', translation: '能力' },
+                'collaborate': { pos: 'vi.', translation: '合作', definition: 'to work with someone else or others for a special purpose', example: 'Throughout the years, Louis Vuitton has collaborated with various artists for new collections.', example_tw: '多年來，路易威登與多位藝術家合作推出新系列。', family: ['collaboration'] },
+                'collaboration': { pos: 'n.', translation: '合作' },
+                'architect': { pos: 'n.', translation: '建築師', definition: 'someone who designs buildings for a living', example: 'The architect promised to design a beautiful building for the corporation\'s new head office.', example_tw: '這位建築師承諾要為公司的新總部設計一棟美麗的建築。', family: ['architecture'] },
+                'architecture': { pos: 'n.', translation: '建築' },
+                'graduate': { pos: 'n.', translation: '大學畢業生', definition: 'someone with a college or university degree', example: 'Debbie\'s new employer is also a graduate of Oxford, so the two shared many fond memories from their college days.', example_tw: '黛比的新雇主也是牛津大學的畢業生，所以兩人分享了許多大學時期的美好回憶。', family: ['graduate_v', 'graduation'] },
+                'graduate_v': { pos: 'vi.', translation: '畢業' },
+                'graduation': { pos: 'n.', translation: '畢業' },
+                'construct': { pos: 'vt.', translation: '建造', definition: 'to build something that is usually large and requires a lot of labor and materials', example: 'Paris\'s famous Eiffel Tower was constructed in just over two years using around 18,000 pieces of iron.', example_tw: '巴黎著名的艾菲爾鐵塔僅用兩年多一點的時間，使用了約18,000塊鐵件建造而成。', family: ['construction', 'constructive'] },
+                'construction': { pos: 'n.', translation: '建築物；建造' },
+                'constructive': { pos: 'adj.', translation: '有建設性的' },
+                'slightly': { pos: 'adv.', translation: '稍微', definition: 'a little bit; somewhat', example: 'It took Janice slightly longer to find a job than the other graduates, but in the end, it was worth the wait.', example_tw: '珍妮絲找工作比其他畢業生花了稍微長一點的時間，但最終這等待是值得的。', family: ['slight'] },
+                'slight': { pos: 'adj.', translation: '細微的' },
+                'rank': { pos: 'vi. vt.', translation: '排序為', definition: 'to compare people or things by placing them in order according to performance, quality, ability, etc.', example: 'On a list of the world\'s best universities, schools such as MIT, Stanford, and Cambridge often rank in the top 1%.', example_tw: '在全球最佳大學名單上，麻省理工學院、史丹佛大學和劍橋大學等學校經常排在前1%。', family: ['ranking'] },
+                'ranking': { pos: 'n.', translation: '排名' },
+                'unique': { pos: 'adj.', translation: '獨特的', definition: 'unlike anything else; very special', example: 'The coconut crab is a unique type of crab that is capable of climbing trees and breaking coconuts open with its claws!', example_tw: '椰子蟹是一種獨特的螃蟹，牠能夠爬樹並用牠的爪子打開椰子！' },
+                'adjust': { pos: 'vt.', translation: '調整', definition: 'to make slight changes to suit the conditions or requirements better', example: 'This software allows you to adjust the color, brightness, and size of your photos.', example_tw: '這個軟體可以讓你調整照片的顏色、亮度和尺寸。', family: ['adjustment'] },
+                'adjustment': { pos: 'n.', translation: '調整' },
+                'rely': { pos: 'vi.', translation: '依賴；信任', definition: 'to use, need, or depend on someone or something', example: 'The small mountain kingdom of Bhutan relies heavily on tourism to keep its domestic economy going.', example_tw: '不丹這個小山國嚴重依賴旅遊業來維持其國內經濟。', family: ['reliable'] },
+                'reliable': { pos: 'adj.', translation: '可信賴的' },
+                'feedback': { pos: 'n.', translation: '回饋意見', definition: 'opinions about something, usually with advice or suggestions on how to make it better', example: 'After receiving a lot of constructive feedback from customers, the company was able to improve their product a great deal.', example_tw: '在收到大量來自顧客的建設性回饋後，公司得以大幅改善他們的產品。' },
+                'element': { pos: 'n.', translation: '要素', definition: 'a basic part or condition that is necessary', example: 'Maintaining the right temperature at all times is a key element in food transportation.', example_tw: '隨時保持正確的溫度是食品運輸中的一個關鍵要素。', family: ['elementary'] },
+                'elementary': { pos: 'adj.', translation: '初級的；基礎的' },
+                'stability': { pos: 'n.', translation: '穩定', definition: 'the condition of not changing much over time', example: 'Water rushed into the hole at the front of the ship and soon the stability of the whole ship was in danger.', example_tw: '水湧入船頭的洞口，很快整艘船的穩定性就岌岌可危了。', family: ['stable'] },
+                'stable': { pos: 'adj.', translation: '穩定的；穩固的' },
+                'route': { pos: 'n.', translation: '途徑；路線', definition: 'a specific road or way taken to reach or get to somewhere', example: 'Since the main road to the beach was under construction, the family had to take a different route.', example_tw: '由於通往海灘的主要道路正在施工，這家人不得不走不同的路線。' },
+                'explore': { pos: 'vt.', translation: '探索', definition: 'to try out or investigate new things, usually in order to find or learn something', example: 'Reports suggest that there might be alien life on Mars, so scientists will need to further explore the planet.', example_tw: '報告顯示火星上可能有外星生命，所以科學家需要進一步探索這顆行星。', family: ['exploration'] },
+                'exploration': { pos: 'n.', translation: '探索；探究' },
+            },
+            'L03': {
+                'humankind': { pos: 'n.', translation: '人類', definition: 'the human race; all people as a whole', example: 'With all the environmental damage it is causing, humankind is destroying planet Earth.', example_tw: '隨著所造成的環境破壞，人類正在摧毀地球。' },
+                'universe': { pos: 'n.', translation: '宇宙', definition: 'stars, planets, moons, and everything else that exists in space', example: 'Compared with other stars in the universe, our sun is actually quite small.', example_tw: '與宇宙中的其他恆星相比，我們的太陽其實相當小。', family: ['universal'] },
+                'universal': { pos: 'adj.', translation: '普遍的' },
+                'fur': { pos: 'n.', translation: '(動物的)毛', definition: 'the soft hair covering animals', example: 'Polar bears are covered in thick fur that protects them from the bitter cold.', example_tw: '北極熊覆蓋著厚厚的毛皮以保護牠們免受嚴寒。' },
+                'enable': { pos: 'vt.', translation: '使能夠', definition: 'to make someone able to do something', example: 'Powerful telescopes enable us to observe distant planets, moons, and stars in this enormous universe.', example_tw: '強大的望遠鏡使我們能夠觀察到這個巨大宇宙中遙遠的行星、月亮和恆星。' },
+                'upright': { pos: 'adv.', translation: '直立地', definition: 'standing straight; vertically', example: 'It\'s better for your back if you sit upright in your chair and don\'t bend over your desk.', example_tw: '如果你挺直坐在椅子上，而不是彎腰趴在桌上，對你的背部比較好。', family: ['upright_adj'] },
+                'upright_adj': { pos: 'adj.', translation: '直立的' },
+                'generous': { pos: 'adj.', translation: '慷慨的', definition: 'taking pleasure in giving freely; not stingy or selfish', example: 'It was very generous of Jen to give her niece all that expensive jewelry.', example_tw: '珍非常慷慨地把所有昂貴的珠寶都給了她的姪女。', family: ['generosity'] },
+                'generosity': { pos: 'n.', translation: '慷慨' },
+                'conflict': { pos: 'n.', translation: '衝突', definition: 'serious argument, fight, or war', example: 'Both nations believed the island belonged to them, so they soon came into conflict with each other.', example_tw: '兩個國家都認為該島嶼屬於他們，所以他們很快就發生了衝突。', family: ['conflict_v'] },
+                'conflict_v': { pos: 'vi.', translation: '(兩種想法等)抵觸' },
+                'distribution': { pos: 'n.', translation: '分配;分布', definition: 'how something is spread or shared among a group or over an area', example: 'The large forest fire has affected the distribution of wild animals within the national park.', example_tw: '大規模的森林大火影響了國家公園內野生動物的分布。', family: ['distribute'] },
+                'distribute': { pos: 'vt.', translation: '分發;分配' },
+                'benefit': { pos: 'n.', translation: '益處', definition: 'a good, useful, or helpful effect; an advantage or gain', example: 'Everyone agreed that free education for all would solve a lot of problems and be of great benefit to society.', example_tw: '所有人都同意，全民免費教育將解決許多問題，並對社會大有裨益。', family: ['benefit_v', 'beneficial'] },
+                'benefit_v': { pos: 'vt. vi.', translation: '對...有益;得益於', definition: 'to help someone or be helped by something', note: "<h5>用法小提示：</h5><p class='text-sm text-left px-2'>及物 (vt.): 「事情」 benefit 「人」。<br>The new library will <b>benefit</b> the students.</p><p class='text-sm text-left px-2'>不及物 (vi.): 「人」 benefit from 「事情」。<br>The students will <b>benefit from</b> the new library.</p>" },
+                'beneficial': { pos: 'adj.', translation: '有利的;有幫助的' },
+                'slaughter': { pos: 'vt.', translation: '宰殺', definition: 'to kill an animal for its meat', example: 'Pigs are often transported to Taipei before being slaughtered so that the meat will be fresh.', example_tw: '豬隻通常在被宰殺前被運到台北，以確保肉質新鮮。', family: ['slaughter_n'] },
+                'slaughter_n': { pos: 'n.', translation: '屠殺' },
+                'underneath': { pos: 'prep.', translation: '在...下', definition: 'below or under (a cover, mask, lid, etc.)', example: 'Every night, the little boy asks his mother to check if any monsters are hiding underneath his bed.', example_tw: '每天晚上，小男孩都會叫媽媽檢查床底下是否躲著怪物。' },
+                'freeze': { pos: 'vi.', translation: '受凍', definition: 'to suffer terrible, often deadly, cold', example: 'If you go out in the snow without a coat and gloves, you\'ll freeze to death.', example_tw: '如果你不穿外套、不戴手套就到雪地裡去，你會凍死的。' },
+                'victim': { pos: 'n.', translation: '受害者', definition: 'a person who suffers or dies because of an accident, crime, attack, or disease', example: 'At the moment, victims of the huge flood are taking shelter in the local school hall.', example_tw: '目前，大洪水的受災者正在當地的學校大廳避難。' },
+                'miserable': { pos: 'adj.', translation: '悲慘的', definition: 'very sad or unhappy due to mental or physical suffering', example: 'Danny felt miserable when he was unable to find the watch that his grandfather had given to him.', example_tw: '當丹尼找不到祖父給他的手錶時，他感到非常難過。', family: ['misery'] },
+                'misery': { pos: 'n.', translation: '慘況' },
+                'hollow': { pos: 'adj.', translation: '中空的', definition: 'empty on the inside; filled with air only', example: 'Water pipes are usually completely hollow inside, so the water can flow through them freely.', example_tw: '水管內部通常是完全中空的，這樣水才能自由地流過。' },
+                'furious': { pos: 'adj.', translation: '暴怒的', definition: 'extremely angry; in a rage', example: 'People were furious at the government for not distributing funds evenly among schools in the area.', example_tw: '民眾對於政府未能在該地區學校間公平分配資金感到非常憤怒。', family: ['fury'] },
+                'fury': { pos: 'n.', translation: '狂怒' },
+                'theft': { pos: 'n.', translation: '偷竊', definition: 'the action of stealing something from someone', example: 'The criminal didn\'t only rob the bank. He also committed a car theft while trying to get away from the police.', example_tw: '那名罪犯不僅搶劫了銀行，還在試圖逃離警方時偷了一輛車。' },
+                'punish': { pos: 'vt.', translation: '懲罰', definition: 'to force someone to suffer because he or she has done something wrong', example: 'Benjamin was punished by his parents for coming home late again.', example_tw: '班傑明因為再次晚歸而受到父母的懲罰。', family: ['punishment'] },
+                'punishment': { pos: 'n.', translation: '懲罰' },
+                'banish': { pos: 'vt.', translation: '放逐', definition: 'to force someone to leave a place or country and never come back', example: 'The prince was banished from the kingdom for trying to kill the king.', example_tw: '王子因試圖殺害國王而被逐出王國。', family: ['banishment'] },
+                'banishment': { pos: 'n.', translation: '放逐' },
+                'torture': { pos: 'vt.', translation: '折磨', definition: 'to force someone to suffer a lot of pain, often on purpose and without any mercy', example: 'Professional athletes torture themselves with long workouts and practice routines in order to become the best.', example_tw: '職業運動員為了成為最頂尖的選手，用長時間的訓練和練習來折磨自己。', family: ['torture_n'] },
+                'torture_n': { pos: 'n.', translation: '折磨' },
+                'civilization': { pos: 'n.', translation: '文明', definition: 'advanced, well-developed, and well-organized human society', example: 'The new port and bridges brought civilization to the remote island.', example_tw: '新的港口和橋樑為這座偏遠的島嶼帶來了文明。' }
+            }
+        };
+
+        const dom = {
+            unitSelect: document.getElementById('unit-select'),
+            groupSelector: document.getElementById('group-selector'),
+            difficultySelector: document.getElementById('difficulty-selector'),
+            storyPassage: document.getElementById('story-passage'),
+            wordOptions: document.getElementById('word-options'),
+            submitBtn: document.getElementById('submitBtn'),
+            clearBtn: document.getElementById('clearBtn'),
+            resultsDiv: document.getElementById('results'),
+            shareBtn: document.getElementById('shareBtn'),
+            analysisContainer: document.getElementById('analysis-container'),
+            incorrectAnswersDiv: document.getElementById('incorrect-answers'),
+            hintModal: document.getElementById('hintModal'),
+            modalContent: document.getElementById('modal-content-inner'),
+            closeModalBtn: document.querySelector('.close-btn'),
+            recordsList: document.getElementById('records-list'),
+            recordsStatus: document.getElementById('records-status'),
+            classSelect: document.getElementById('class-select'),
+            seatNumberInput: document.getElementById('seat-number'),
+            quizArea: document.getElementById('quiz-area'),
+            welcomeMessage: document.getElementById('welcome-message'),
+            bonusGroupBtn: document.getElementById('bonus-group-btn'),
+            shareAchievementsBtn: document.getElementById('share-achievements-btn'),
+            badgeHallContainer: document.getElementById('badge-hall-container'),
+            adminTools: document.getElementById('admin-tools'),
+            adminFillBtn: document.getElementById('adminFillBtn'),
+            devToolsPanel: document.getElementById('dev-tools-panel'),
+        };
+
+        let state = {
+            currentUnit: '',
+            currentGroup: null,
+            currentDifficulty: null,
+            currentWords: [],
+            correctAnswers: {},
+            currentScore: 0,
+            earnedBadgesForSharing: [],
+        };
+
+        const updateBadgesInFirestore = async () => {
+            if (!userId) return;
+            const badgeRef = doc(db, `artifacts/${appId}/public/data/user_badges`, userId);
+            try {
+                await setDoc(badgeRef, { badges: earnedBadges });
+            } catch (e) {
+                console.error("Error updating badges:", e);
+            }
+        };
+        
+        const checkAchievements = async (score) => {
+            const newlyEarned = [];
+            const addBadge = (key) => {
+                let uniqueKey = key;
+                const generalBadges = ['perfect_score', 'high_achiever', 'effortful_learner', 'cute_cat'];
+                if (!generalBadges.includes(key)) {
+                    uniqueKey = `${key}_${state.currentUnit}`;
+                }
+
+                if (!earnedBadges[uniqueKey]) {
+                    const badgeData = allBadges[key];
+                    if (badgeData) {
+                         newlyEarned.push({key, ...badgeData});
+                    }
+                    earnedBadges[uniqueKey] = true;
+                }
+            };
+
+            if (score === 100) addBadge('perfect_score');
+            if (score >= 90) addBadge('high_achiever');
+            if (score >= 60) addBadge('effortful_learner');
+
+            const checkLevelMastery = (unitKey, targetLevel, scoreThreshold, badgeKey) => {
+                if (earnedBadges[`${badgeKey}_${unitKey}`]) return;
+                const scoresForLevel = localScores.filter(s => s.unitKey === unitKey && s.level === targetLevel);
+                const allGroupsInUnit = Object.keys(vocabulary[unitKey]).filter(g => g !== 'groupBonus');
+                const passedGroups = new Set(scoresForLevel.filter(s => s.score >= scoreThreshold).map(s => s.group));
+                if (passedGroups.size === allGroupsInUnit.length) {
+                    addBadge(badgeKey);
+                }
+            };
+
+            checkLevelMastery(state.currentUnit, 'A2', 80, 'a2_explorer');
+            checkLevelMastery(state.currentUnit, 'B1', 80, 'b1_voyager');
+            checkLevelMastery(state.currentUnit, 'B2', 80, 'conqueror');
+            checkLevelMastery(state.currentUnit, 'C1', 80, 'strong_one');
+            checkLevelMastery(state.currentUnit, 'C1', 100, 'english_monster');
+
+            const legendBadgeKey = `legend_${state.currentUnit}`;
+            if (!earnedBadges[legendBadgeKey]) {
+                const allScoresForUnit = localScores.filter(s => s.unitKey === state.currentUnit);
+                const allTests = [];
+                const groups = Object.keys(vocabulary[state.currentUnit]).filter(g => g !== 'groupBonus');
+                
+                let totalTestsInUnit = 0;
+                groups.forEach(g => {
+                    if (vocabulary[state.currentUnit][g].stories) {
+                        totalTestsInUnit += vocabulary[state.currentUnit][g].stories.length;
+                        vocabulary[state.currentUnit][g].stories.forEach(story => {
+                            allTests.push(`${g}-${story.level}`);
+                        });
+                    }
+                });
+
+                const passedAll100 = allTests.every(test => {
+                    const [group, level] = test.split('-');
+                    return allScoresForUnit.some(s => s.group === group && s.level === level && s.score === 100);
+                });
+
+                if (passedAll100) {
+                    addBadge('legend');
+                    updateBonusButtonVisibility();
+                }
+            }
+            
+            if (state.currentGroup === 'groupBonus' && score === 100) {
+                addBadge('alien');
+            }
+
+            if (earnedBadges[`legend_${state.currentUnit}`] && earnedBadges[`alien_${state.currentUnit}`]) {
+                 addBadge('unit_master');
+            }
+            
+            const allUnitKeys = Object.keys(vocabulary);
+            const hasMasteredAllUnits = allUnitKeys.every(unitKey => 
+                earnedBadges[`legend_${unitKey}`] && earnedBadges[`alien_${unitKey}`]
+            );
+
+            if (hasMasteredAllUnits && !earnedBadges['cute_cat']) {
+                addBadge('cute_cat'); 
+            }
+
+            if (newlyEarned.length > 0) {
+                await updateBadgesInFirestore();
+            }
+
+            return newlyEarned;
+        };
+        
+        const updateBonusButtonVisibility = () => {
+             const currentUnitKey = state.currentUnit;
+             if (!currentUnitKey) return;
+             const legendBadgeKey = `legend_${currentUnitKey}`;
+            if (earnedBadges[legendBadgeKey]) {
+                dom.bonusGroupBtn.classList.remove('hidden');
+            } else {
+                dom.bonusGroupBtn.classList.add('hidden');
+            }
+        };
+        
+        const fetchBadges = async () => {
+             if (!userId) return;
+             const badgeRef = doc(db, `artifacts/${appId}/public/data/user_badges`, userId);
+             try {
+                 const docSnap = await getDoc(badgeRef);
+                 if (docSnap.exists()) {
+                     earnedBadges = docSnap.data().badges || {};
+                 } else {
+                     earnedBadges = {};
+                 }
+                 updateBonusButtonVisibility();
+                 renderBadgeHall();
+             } catch (e) {
+                 console.error("Error fetching badges:", e);
+                 earnedBadges = {};
+             }
+        };
+        
+        const renderBadgeHall = () => {
+            const container = dom.badgeHallContainer;
+            if (!container || !state.currentUnit) {
+                 if(container) container.innerHTML = '<p class="text-center text-gray-500 col-span-full">請先選擇一個單元來查看相關徽章。</p>';
+                return;
+            };
+            container.innerHTML = '';
+            
+            const sortedBadges = Object.keys(allBadges).sort((a, b) => {
+                const order = ['effortful_learner', 'high_achiever', 'perfect_score', 'a2_explorer', 'b1_voyager', 'conqueror', 'strong_one', 'english_monster', 'legend', 'alien', 'unit_master', 'cute_cat'];
+                return order.indexOf(a) - order.indexOf(b);
+            });
+
+            sortedBadges.forEach(key => {
+                const badge = allBadges[key];
+
+                let isEarned = false;
+                const generalBadges = ['perfect_score', 'high_achiever', 'effortful_learner', 'cute_cat'];
+                if (generalBadges.includes(key)) {
+                    isEarned = earnedBadges[key] === true;
+                } else {
+                    const uniqueKey = `${key}_${state.currentUnit}`;
+                    isEarned = earnedBadges[uniqueKey] === true;
+                }
+                
+                const badgeHTML = `
+                    <div class="flex items-center p-4 bg-white rounded-lg shadow ${isEarned ? 'opacity-100 ring-2 ring-yellow-400' : 'opacity-40'}">
+                        <div class="text-4xl mr-4">${badge.icon}</div>
+                        <div>
+                            <h3 class="font-bold text-lg ${isEarned ? 'text-yellow-600' : 'text-gray-700'}">${badge.name}</h3>
+                            <p class="text-sm text-gray-500">${badge.description}</p>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += badgeHTML;
+            });
+        };
+        
+        const updateDropdownOptions = () => {
+            const allSelects = Array.from(document.querySelectorAll('.word-select'));
+            const answeredCount = allSelects.filter(s => s.value !== '').length;
+            const totalCount = allSelects.length;
+            dom.submitBtn.disabled = totalCount > 0 && answeredCount < Math.ceil(totalCount / 2);
+
+            const selectedValues = new Set(allSelects.map(s => s.value).filter(v => v));
+            allSelects.forEach((select, index) => {
+                const ownValue = select.value;
+                let optionsHtml = `<option value="">---(${index + 1})---</option>`;
+                state.currentWords.forEach(word => {
+                    if (!selectedValues.has(word) || word === ownValue) {
+                        optionsHtml += `<option value="${word}" ${word === ownValue ? 'selected' : ''}>${word}</option>`;
+                    }
+                });
+                select.innerHTML = optionsHtml;
+            });
+        };
+        
+        const loadQuiz = () => {
+            if (!state.currentUnit || !state.currentGroup || !state.currentDifficulty) return;
+            
+            dom.quizArea.classList.remove('hidden');
+            dom.welcomeMessage.classList.add('hidden');
+            
+            const isBonus = state.currentGroup === 'groupBonus';
+            const unitData = vocabulary[state.currentUnit][state.currentGroup];
+            Object.assign(state, { correctAnswers: {}, earnedBadgesForSharing: [] });
+            
+            dom.storyPassage.innerHTML = '';
+            dom.wordOptions.innerHTML = '';
+            dom.resultsDiv.innerHTML = '';
+            dom.analysisContainer.style.display = 'none';
+            dom.incorrectAnswersDiv.innerHTML = '';
+            dom.shareBtn.classList.add('hidden');
+            dom.submitBtn.disabled = true;
+
+            const selectedStory = isBonus ? unitData.story : unitData.stories.find(s => s.level === state.currentDifficulty);
+            state.currentWords = unitData.words.slice().sort((a, b) => a.localeCompare(b));
+
+            let selectCounter = 0;
+            const processedStory = selectedStory.text.replace(/\*\*(.*?)\*\*/g, (match, word) => {
+                const selectId = `word-select-${selectCounter}`;
+                state.correctAnswers[selectId] = word;
+                return `<select id="${selectId}" class="word-select"><option value="">---(${++selectCounter})---</option></select>`;
+            });
+
+            dom.storyPassage.innerHTML = processedStory;
+            
+            dom.storyPassage.querySelectorAll('.word-select').forEach(select => select.addEventListener('change', updateDropdownOptions));
+            updateDropdownOptions();
+            
+            dom.wordOptions.innerHTML = '';
+            state.currentWords.forEach(word => {
+                const wordBtn = document.createElement('button');
+                wordBtn.className = 'word-pronounceable';
+                wordBtn.textContent = word;
+                wordBtn.addEventListener('click', () => showHint(word));
+                dom.wordOptions.appendChild(wordBtn);
+            });
+
+            renderBadgeHall();
+        };
+        
+        const speak = (text, rate = 1.0) => {
+             if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = rate;
+                window.speechSynthesis.speak(utterance);
+             }
+        };
+        
+        const stopSpeak = () => {
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        };
+
+        const showHint = (word) => {
+            const allWordData = wordDetails[state.currentUnit];
+            if (!allWordData) return;
+            let mainWordKey = word;
+            let wordData = allWordData[word];
+            if (!wordData) {
+                for (const key in allWordData) {
+                    if (allWordData[key].family && allWordData[key].family.includes(word)) {
+                        mainWordKey = key;
+                        wordData = allWordData[word]; 
+                        break;
+                    }
+                }
+            }
+             if (!wordData) return;
+            let familyHtml = '';
+            const mainWordData = allWordData[mainWordKey];
+            if (mainWordData.family && mainWordData.family.length > 0) {
+                 familyHtml += `<details class="mt-4 pt-4 border-t border-gray-200 text-left"><summary class="text-xl font-semibold text-indigo-700 mb-2 cursor-pointer p-2 rounded-lg hover:bg-yellow-100 flex justify-between items-center"><span>單字家族 (Word Family)</span><span class="text-sm font-normal text-gray-500">點擊展開/收合</span></summary><div class="space-y-2 mt-2">`;
+                familyHtml += createFamilyWordHtml(mainWordKey, mainWordData, mainWordKey);
+                mainWordData.family.forEach(familyWordKey => {
+                    const familyWordData = allWordData[familyWordKey];
+                    if (familyWordData) {
+                       familyHtml += createFamilyWordHtml(familyWordKey, familyWordData, mainWordKey);
+                    }
+                });
+                familyHtml += `</div></details>`;
+            }
+            
+            let usageNoteHtml = mainWordData.note ? `<div class="mt-4 text-left p-3 bg-blue-50 border-l-4 border-blue-400">${mainWordData.note}</div>` : '';
+
+            dom.modalContent.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div class="text-left">
+                        <h2 class="text-3xl font-bold text-sky-800" id="modal-word-title"></h2>
+                        <div id="chinese-translation" class="hidden text-xl text-gray-700 my-2"></div>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button id="modal-word-speak-normal" class="text-2xl" title="正常速度">🔊</button>
+                        <button id="modal-word-speak-slow" class="text-2xl" title="慢速">🐢</button>
+                        <button id="modal-word-speak-stop" class="text-2xl" title="停止">🤫</button>
+                    </div>
+                </div>
+                <button id="show-chinese-btn" class="mb-4 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-semibold py-1 px-3 rounded-lg">顯示中文</button>
+                <p class="text-md text-left text-gray-600"><strong>Definition:</strong> (${wordData.pos}) ${wordData.definition}</p>
+                <div class="flex justify-between items-start mt-2">
+                    <div class="text-md text-left text-gray-500 pr-4">
+                        <strong>Example:</strong> <em id="modal-example-text"></em>
+                    </div>
+                    <div class="flex items-center space-x-1 flex-shrink-0">
+                        <button id="modal-example-speak-normal" class="text-2xl" title="正常速度">🔊</button>
+                        <button id="modal-example-speak-slow" class="text-2xl" title="慢速">🐢</button>
+                        <button id="modal-example-speak-stop-example" class="text-2xl" title="停止">🤫</button>
+                    </div>
+                </div>
+                <div id="example-translation-tw" class="hidden text-md text-left text-gray-500 mt-1"><strong>翻譯:</strong> <em id="modal-example-translation-text"></em></div>
+                <button id="show-example-translation-btn" class="mt-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-semibold py-1 px-3 rounded-lg">顯示例句翻譯</button>
+                ${usageNoteHtml}
+                ${familyHtml}
+            `;
+            
+            document.getElementById('modal-word-title').textContent = word;
+            document.getElementById('chinese-translation').textContent = `(${wordData.pos}) ${wordData.translation}`;
+            document.getElementById('modal-example-text').textContent = wordData.example;
+            document.getElementById('modal-example-translation-text').textContent = wordData.example_tw;
+
+            document.getElementById('modal-word-speak-normal').addEventListener('click', () => speak(word, 1.0));
+            document.getElementById('modal-word-speak-slow').addEventListener('click', () => speak(word, 0.7));
+            document.getElementById('modal-word-speak-stop').addEventListener('click', stopSpeak);
+            document.getElementById('modal-example-speak-normal').addEventListener('click', () => speak(wordData.example, 1.0));
+            document.getElementById('modal-example-speak-slow').addEventListener('click', () => speak(wordData.example, 0.7));
+            document.getElementById('modal-example-speak-stop-example').addEventListener('click', stopSpeak);
+
+            document.querySelectorAll('.family-speak-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const wordToSpeak = e.currentTarget.dataset.word;
+                    speak(wordToSpeak);
+                });
+            });
+
+            const setupShowButton = (btnId, targetId) => {
+                document.getElementById(btnId)?.addEventListener('click', (e) => {
+                    document.getElementById(targetId)?.classList.remove('hidden');
+                    e.target.style.display = 'none';
+                });
+            };
+            setupShowButton('show-chinese-btn', 'chinese-translation');
+            setupShowButton('show-example-translation-btn', 'example-translation-tw');
+
+            dom.hintModal.style.display = 'block';
+        };
+        
+        const createFamilyWordHtml = (wordKey, wordData, mainWordKey) => {
+            const displayName = wordKey.replace(/_v|_n|_adj$/, '');
+            let definitionHtml = '';
+            if (wordData.definition && wordKey !== mainWordKey) {
+                 definitionHtml = `<span class="text-sm text-gray-500"> - ${wordData.definition}</span>`;
+            } else if (!wordData.definition) {
+                 definitionHtml = `<span class="text-sm text-gray-500"> - ${wordData.translation}</span>`;
+            }
+
+            return `
+                <div class="p-2 border-b border-gray-100 flex justify-between items-center">
+                    <div>
+                        <strong class="text-indigo-600">${displayName}</strong> 
+                        <span class="text-sm text-gray-500">(${wordData.pos})</span>
+                        ${definitionHtml}
+                    </div>
+                    <button class="family-speak-btn text-xl" data-word="${displayName}">🔊</button>
+                </div>
+            `;
+        };
+
+        const checkAnswers = async () => {
+            let correctCount = 0;
+            const totalCount = Object.keys(state.correctAnswers).length;
+            dom.incorrectAnswersDiv.innerHTML = '<h3 class="text-lg font-bold text-red-600">訂正錯誤：</h3>';
+            let hasIncorrect = false;
+
+            for (const selectId in state.correctAnswers) {
+                const selectElement = document.getElementById(selectId);
+                const correctAnswer = state.correctAnswers[selectId];
+                const selectedAnswer = selectElement.value;
+                selectElement.classList.remove('correct', 'incorrect');
+
+                if (selectedAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                    selectElement.classList.add('correct');
+                    correctCount++;
+                } else {
+                    selectElement.classList.add('incorrect');
+                    hasIncorrect = true;
+                    const wordData = wordDetails[state.currentUnit]?.[correctAnswer.toLowerCase()];
+                    if (wordData) {
+                        dom.incorrectAnswersDiv.innerHTML += `<div class="p-4 bg-red-50 rounded-lg border border-red-200"><p>您選擇了 <strong class="text-red-500">${selectElement.value || "（未選擇）"}</strong>，正確答案是 <strong class="text-green-600">${correctAnswer}</strong>。</p><p class="text-sm text-gray-600">(${wordData.pos}) ${wordData.translation} - ${wordData.definition}</p></div>`;
+                    }
+                }
+                selectElement.disabled = true;
+            }
+
+            state.currentScore = Math.round((correctCount / totalCount) * 100);
+            dom.resultsDiv.innerHTML = `<span class="text-blue-600">答對 ${correctCount} / ${totalCount} 題</span> <span class="text-green-600">分數: ${state.currentScore}</span>`;
+            
+            if (hasIncorrect) dom.analysisContainer.style.display = 'block';
+            
+            dom.submitBtn.disabled = true;
+            dom.shareBtn.classList.remove('hidden');
+            
+            await saveScore(state.currentScore);
+            state.earnedBadgesForSharing = await checkAchievements(state.currentScore);
+            
+            if(state.earnedBadgesForSharing.length > 0) {
+                dom.resultsDiv.innerHTML += `<div class="mt-4 text-yellow-600 font-semibold">恭喜！您獲得了新的徽章！</div>`;
+            }
+            renderBadgeHall();
+        };
+
+        const saveScore = async (score) => {
+            if (!db || !userId) return;
+            const { value: studentClass } = dom.classSelect;
+            const { value: seatNumber } = dom.seatNumberInput;
+            const { options, selectedIndex } = dom.unitSelect;
+            const unitText = options[selectedIndex].text;
+            
+            localScores.push({unitKey: state.currentUnit, group: state.currentGroup, level: state.currentDifficulty, score});
+            
+            if (seatNumber.trim()) {
+                 const newScoreData = {
+                    userId, studentClass, seatNumber: seatNumber.padStart(2, '0'),
+                    unit: unitText,
+                    unitKey: state.currentUnit,
+                    group: state.currentGroup, level: state.currentDifficulty, score,
+                    timestamp: serverTimestamp()
+                };
+                try {
+                    await addDoc(collection(db, `artifacts/${appId}/public/data/scores`), newScoreData);
+                } catch (e) { console.error("Error adding document: ", e); }
+            }
+        };
+
+        const fetchScores = () => {
+            if (!db || !userId) return;
+            dom.recordsStatus.textContent = '正在載入成績...';
+            const q = query(collection(db, `artifacts/${appId}/public/data/scores`), where("userId", "==", userId));
+            
+            onSnapshot(q, (querySnapshot) => {
+                const scores = [];
+                querySnapshot.forEach(doc => scores.push({ id: doc.id, ...doc.data() }));
+                scores.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
+                
+                localScores = scores.map(s => ({unitKey: s.unitKey, group: s.group, level: s.level, score: s.score}));
+                
+                if (localScores.length > 0) {
+                    dom.shareAchievementsBtn.disabled = false;
+                } else {
+                    dom.shareAchievementsBtn.disabled = true;
+                }
+
+                if (scores.length === 0) {
+                    dom.recordsStatus.textContent = '您目前沒有任何成績紀錄。';
+                    dom.recordsList.innerHTML = '';
+                } else {
+                    dom.recordsStatus.textContent = '';
+                    dom.recordsList.innerHTML = scores.map(s => `
+                        <div class="flex flex-wrap justify-between items-center p-3 bg-gray-100 rounded-lg gap-2">
+                            <div><span class="font-semibold">${s.unit} - ${s.group ? s.group.replace('group','Group ') : ''} ${s.level ? `(${s.level})` : ''}</span> - <span class="text-gray-600">${s.studentClass} ${s.seatNumber}</span></div>
+                            <div class="text-lg font-bold ${s.score >= 80 ? 'text-green-600' : 'text-orange-500'}">${s.score}分</div>
+                            <div class="text-sm text-gray-500">${s.timestamp ? s.timestamp.toDate().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' }) : 'N/A'}</div>
+                        </div>`).join('');
+                }
+            }, (error) => { dom.recordsStatus.textContent = '無法載入成績紀錄。'; });
+        };
+        
+        const getEarnedBadgesForImage = () => {
+            const collectedBadges = new Map();
+            const generalBadgeKeys = ['effortful_learner', 'high_achiever', 'perfect_score', 'cute_cat'];
+
+            generalBadgeKeys.forEach(key => {
+                if (earnedBadges[key]) {
+                    const badge = allBadges[key];
+                    if (badge && !collectedBadges.has(badge.name)) {
+                        collectedBadges.set(badge.name, badge);
+                    }
+                }
+            });
+
+            Object.keys(earnedBadges).forEach(key => {
+                if (!generalBadgeKeys.includes(key)) {
+                    const badgeId = key.substring(0, key.lastIndexOf('_'));
+                    const badge = allBadges[badgeId];
+                    if (badge && !collectedBadges.has(badge.name)) {
+                        collectedBadges.set(badge.name, badge);
+                    }
+                }
+            });
+            return Array.from(collectedBadges.values());
+        };
+
+        const drawBadgeSection = (ctx, title, badges, startY, highlight = false) => {
+            if (badges.length === 0) return startY;
+            
+            let currentY = startY;
+            ctx.font = 'bold 28px "Noto Sans TC", sans-serif';
+            ctx.fillStyle = highlight ? '#c2410c' : '#004d40';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, ctx.canvas.width / 2, currentY);
+            currentY += 50;
+            
+            const catBadge = badges.find(b => b.name === "可愛貓貓");
+            const otherBadges = badges.filter(b => b.name !== "可愛貓貓");
+
+            const badgesPerRow = 3;
+            const rowCount = Math.ceil(otherBadges.length / badgesPerRow);
+
+            for (let i = 0; i < rowCount; i++) {
+                const rowBadges = otherBadges.slice(i * badgesPerRow, (i + 1) * badgesPerRow);
+                
+                const badgeDimensions = rowBadges.map(b => ({
+                    badge: b, width: 220, height: 65
+                }));
+                
+                const totalRowWidth = badgeDimensions.reduce((sum, dim) => sum + dim.width, 0) + (rowBadges.length - 1) * 20;
+                let currentX = (ctx.canvas.width - totalRowWidth) / 2;
+                
+                badgeDimensions.forEach(dim => {
+                    const { badge, width, height } = dim;
+                    
+                    ctx.fillStyle = '#ffffff'; 
+                    ctx.strokeStyle = highlight ? '#f59e0b' : '#00796b'; 
+                    ctx.lineWidth = highlight ? 5 : 3;
+                    ctx.beginPath();
+                    if (ctx.roundRect) ctx.roundRect(currentX, currentY, width, height, 20);
+                    else ctx.rect(currentX, currentY, width, height);
+                    ctx.fill();
+                    ctx.stroke();
+                    
+                    ctx.font = '40px sans-serif'; 
+                    ctx.fillStyle = '#004d40';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(badge.icon, currentX + 20, currentY + 47);
+                    
+                    ctx.font = '28px "Noto Sans TC", sans-serif';
+                    ctx.fillText(badge.name, currentX + 75, currentY + 43);
+                    
+                    currentX += width + 20;
+                });
+
+                currentY += 65 + 15;
+            }
+            
+            if (catBadge) {
+                currentY += 10;
+                const width = 300;
+                const height = 80;
+                const startX = (ctx.canvas.width - width) / 2;
+                
+                ctx.fillStyle = '#ffffff'; 
+                ctx.strokeStyle = highlight ? '#f59e0b' : '#00796b'; 
+                ctx.lineWidth = highlight ? 5 : 3;
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(startX, currentY, width, height, 20);
+                else ctx.rect(startX, currentY, width, height);
+                ctx.fill();
+                ctx.stroke();
+                
+                ctx.font = '50px sans-serif'; 
+                ctx.fillStyle = '#004d40';
+                ctx.textAlign = 'left';
+                ctx.fillText(catBadge.icon, startX + 20, currentY + 58);
+                
+                ctx.font = '30px "Noto Sans TC", sans-serif';
+                ctx.fillText(catBadge.name, startX + 85, currentY + 52);
+
+                currentY += height + 15;
+            }
+
+            return currentY + 30;
+        };
+        
+        const shareSingleScore = () => {
+            if (!dom.seatNumberInput.value.trim()) { 
+                dom.modalContent.innerHTML = `<p class="text-red-600 font-semibold">請先輸入有效的班級座號才能分享！</p>`;
+                dom.hintModal.style.display = 'block'; 
+                return; 
+            }
+
+            let allEarnedBadgesForImage = getEarnedBadgesForImage();
+            const newlyEarnedBadges = state.earnedBadgesForSharing.map(b => allBadges[b.key]);
+
+            const newlyEarnedNames = new Set(newlyEarnedBadges.map(b => b.name));
+            allEarnedBadgesForImage = allEarnedBadgesForImage.filter(b => !newlyEarnedNames.has(b.name));
+
+            const canvas = document.getElementById('shareCanvas');
+            let canvasHeight = 420;
+            if (newlyEarnedBadges.length > 0) canvasHeight += 100 + Math.ceil(newlyEarnedBadges.length / 3) * 85 + (newlyEarnedBadges.some(b => b.name === '可愛貓貓') ? 20 : 0);
+            if (allEarnedBadgesForImage.length > 0) canvasHeight += 100 + Math.ceil(allEarnedBadgesForImage.length / 3) * 85 + (allEarnedBadgesForImage.some(b => b.name === '可愛貓貓') ? 20 : 0);
+            canvas.height = canvasHeight;
+            
+            const ctx = canvas.getContext('2d');
+            const { value: studentClass } = dom.classSelect;
+            const seatNumber = dom.seatNumberInput.value.padStart(2, '0');
+            const group = state.currentGroup === 'groupBonus' ? '傳說級' : `Group ${state.currentGroup.slice(-1)}`;
+            const { options, selectedIndex } = dom.unitSelect;
+            const unitText = options[selectedIndex].text;
+            
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#e0f7fa'); 
+            gradient.addColorStop(1, '#b2ebf2');
+            ctx.fillStyle = gradient; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#004d40'; 
+            ctx.font = 'bold 55px "Noto Sans TC", sans-serif';
+            ctx.textAlign = 'center'; 
+            ctx.fillText('成績單', canvas.width / 2, 80);
+            
+            ctx.fillStyle = '#00796b'; 
+            ctx.font = '36px "Noto Sans TC", sans-serif';
+            ctx.fillText(`${studentClass} ${seatNumber}號`, canvas.width / 2, 140);
+            
+            ctx.font = '30px "Noto Sans TC", sans-serif';
+            ctx.fillText(`測驗: ${unitText} - ${group} ${state.currentGroup !== 'groupBonus' ? `(${state.currentDifficulty})` : ''}`, canvas.width / 2, 190);
+            
+            ctx.fillStyle = state.currentScore >= 80 ? '#2e7d32' : (state.currentScore >= 60 ? '#f57f17' : '#c62828');
+            ctx.font = 'bold 110px "Inter", sans-serif'; 
+            ctx.fillText(state.currentScore, canvas.width / 2, 300);
+            ctx.font = 'bold 45px "Noto Sans TC", sans-serif';
+            ctx.fillText('分', canvas.width / 2 + 100, 300);
+
+            let currentY = 350;
+            currentY = drawBadgeSection(ctx, "本次新獲得！", newlyEarnedBadges, currentY, true);
+            currentY = drawBadgeSection(ctx, "已獲得的所有徽章", allEarnedBadgesForImage, currentY);
+            
+            ctx.textAlign = 'center'; 
+            ctx.fillStyle = '#004d40'; 
+            ctx.font = '20px "Noto Sans TC", sans-serif';
+            ctx.fillText(`測驗日期: ${new Date().toLocaleDateString('zh-TW')}`, canvas.width / 2, currentY + 10);
+
+            const dataUrl = canvas.toDataURL('image/png');
+            const newlyEarnedBadgesHtml = newlyEarnedBadges.length > 0 ? `<div class="mt-4 p-3 bg-yellow-50 rounded-lg"><h4 class="text-lg font-semibold text-yellow-800">您本次新獲得的徽章：</h4><div class="flex justify-center flex-wrap gap-2 mt-2">${newlyEarnedBadges.map(badge => `<span class="bg-white border border-yellow-300 rounded-full px-3 py-1 text-sm font-medium text-gray-700">${badge.icon} ${badge.name}</span>`).join('')}</div></div>` : '';
+            dom.modalContent.innerHTML = `<h3 class="text-xl font-semibold mb-4">您的成績單圖片</h3>${newlyEarnedBadgesHtml}<p class="text-gray-600 my-4">請長按 (電腦請按右鍵) 圖片以儲存並分享。</p><p class="text-sm text-blue-600 bg-blue-50 p-2 rounded-md mb-4"><strong>iPhone/iPad 使用者：</strong>請長按圖片，然後選擇「儲存到照片」。圖片會存放在您的「照片」App中。</p><img src="${dataUrl}" alt="成績單圖片" class="w-full rounded-lg shadow-md" /><a href="${dataUrl}" download="單字複習-成績單.png" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-full">下載圖片</a>`;
+            dom.hintModal.style.display = 'block';
+        };
+
+        const shareAchievements = () => {
+             if (!dom.seatNumberInput.value.trim()) { 
+                 dom.modalContent.innerHTML = `<p class="text-red-600 font-semibold">請先輸入班級座號才能分享！</p>`;
+                 dom.hintModal.style.display = 'block'; 
+                 return; 
+             }
+            
+            const allEarnedBadgesForImage = getEarnedBadgesForImage();
+            const totalTests = localScores.length;
+            const highScore = totalTests > 0 ? Math.max(...localScores.map(s => s.score)) : 0;
+            
+            const canvas = document.getElementById('shareCanvas');
+            let canvasHeight = 450;
+            if (allEarnedBadgesForImage.length > 0) canvasHeight += 100 + Math.ceil(allEarnedBadgesForImage.length / 3) * 85 + (allEarnedBadgesForImage.some(b => b.name === '可愛貓貓') ? 20 : 0);
+            canvas.height = canvasHeight;
+            
+            const ctx = canvas.getContext('2d');
+            const { value: studentClass } = dom.classSelect;
+            const seatNumber = dom.seatNumberInput.value.padStart(2, '0');
+
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#f3e8ff'); 
+            gradient.addColorStop(1, '#d8b4fe');
+            ctx.fillStyle = gradient; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#4a044e';
+            ctx.font = 'bold 60px "Noto Sans TC", sans-serif';
+            ctx.textAlign = 'center'; 
+            ctx.fillText('學習成就總覽', canvas.width / 2, 100);
+            
+            ctx.fillStyle = '#6b21a8';
+            ctx.font = '40px "Noto Sans TC", sans-serif';
+            ctx.fillText(`${studentClass} ${seatNumber}號`, canvas.width / 2, 180);
+            
+            ctx.font = 'bold 32px "Inter", sans-serif';
+            ctx.fillStyle = '#3b0764';
+            ctx.fillText(`總完成測驗: ${totalTests}次`, canvas.width / 2, 250);
+            ctx.fillText(`最高分紀錄: ${highScore}分`, canvas.width / 2, 300);
+
+            let currentY = drawBadgeSection(ctx, "我的徽章牆", allEarnedBadgesForImage, 380);
+            
+            ctx.textAlign = 'center'; 
+            ctx.fillStyle = '#4a044e'; 
+            ctx.font = '20px "Noto Sans TC", sans-serif';
+            ctx.fillText(`分享日期: ${new Date().toLocaleDateString('zh-TW')}`, canvas.width / 2, currentY + 10);
+
+            const dataUrl = canvas.toDataURL('image/png');
+            dom.modalContent.innerHTML = `<h3 class="text-xl font-semibold mb-4">您的學習成就總覽</h3><p class="text-gray-600 my-4">請長按 (電腦請按右鍵) 圖片以儲存並分享。</p><p class="text-sm text-blue-600 bg-blue-50 p-2 rounded-md mb-4"><strong>iPhone/iPad 使用者：</strong>請長按圖片，然後選擇「儲存到照片」。圖片會存放在您的「照片」App中。</p><img src="${dataUrl}" alt="學習成就圖片" class="w-full rounded-lg shadow-md" /><a href="${dataUrl}" download="學習成就總覽.png" class="mt-4 inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-full">下載圖片</a>`;
+            dom.hintModal.style.display = 'block';
+        };
+
+        const clearCurrentAnswers = () => {
+            dom.storyPassage.querySelectorAll('.word-select').forEach(select => {
+                select.value = '';
+                select.classList.remove('correct', 'incorrect');
+                select.disabled = false;
+            });
+            dom.resultsDiv.innerHTML = '';
+            dom.analysisContainer.style.display = 'none';
+            dom.incorrectAnswersDiv.innerHTML = '';
+            dom.shareBtn.classList.add('hidden');
+            dom.submitBtn.disabled = true;
+            updateDropdownOptions();
+        };
+
+        const adminFillAnswers = () => {
+            for (const selectId in state.correctAnswers) {
+                const selectElement = document.getElementById(selectId);
+                if (selectElement) {
+                    selectElement.value = state.correctAnswers[selectId];
+                }
+            }
+            updateDropdownOptions();
+        };
+
+        const resetQuizArea = () => {
+            dom.quizArea.classList.add('hidden');
+            dom.welcomeMessage.classList.remove('hidden');
+            state.currentGroup = null;
+            state.currentDifficulty = null;
+            dom.groupSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            dom.difficultySelector.querySelectorAll('.difficulty-btn-wrapper').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('disabled');
+            });
+        };
+
+        dom.unitSelect.addEventListener('change', (e) => {
+            state.currentUnit = e.target.value;
+            updateBonusButtonVisibility();
+            resetQuizArea();
+            renderBadgeHall();
+        });
+
+        dom.groupSelector.addEventListener('click', (e) => {
+            const button = e.target.closest('button');
+            if (button && state.currentUnit) {
+                const group = button.dataset.group;
+                state.currentGroup = group;
+                
+                dom.groupSelector.querySelectorAll('button').forEach(btn => btn.classList.toggle('active', btn.dataset.group === group));
+                
+                if (group === 'groupBonus') {
+                    state.currentDifficulty = 'C2';
+                    dom.difficultySelector.querySelectorAll('.difficulty-btn-wrapper').forEach(btn => {
+                        btn.classList.add('disabled');
+                        btn.classList.remove('active');
+                    });
+                    loadQuiz();
+                } else {
+                    state.currentDifficulty = null;
+                    dom.difficultySelector.querySelectorAll('.difficulty-btn-wrapper').forEach(btn => {
+                        btn.classList.remove('disabled', 'active');
+                    });
+                    dom.quizArea.classList.add('hidden');
+                    dom.welcomeMessage.classList.remove('hidden');
+                }
+            }
+        });
+
+        dom.difficultySelector.addEventListener('click', (e) => {
+            const button = e.target.closest('.difficulty-btn-wrapper');
+            if (button && !button.classList.contains('disabled')) {
+                const level = button.dataset.level;
+                state.currentDifficulty = level;
+                dom.difficultySelector.querySelectorAll('.difficulty-btn-wrapper').forEach(btn => btn.classList.toggle('active', btn.dataset.level === level));
+                loadQuiz();
+            }
+        });
+
+        dom.seatNumberInput.addEventListener('input', (e) => {
+            try {
+                if (btoa(e.target.value) === ADMIN_PASS_B64) {
+                    dom.adminTools.classList.remove('hidden');
+                    dom.devToolsPanel.classList.remove('hidden');
+                } else {
+                    dom.adminTools.classList.add('hidden');
+                    dom.devToolsPanel.classList.add('hidden');
+                }
+            } catch (error) {
+                dom.adminTools.classList.add('hidden');
+                dom.devToolsPanel.classList.add('hidden');
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', async () => await signIn());
+        dom.submitBtn.addEventListener('click', checkAnswers);
+        dom.clearBtn.addEventListener('click', clearCurrentAnswers);
+        dom.shareBtn.addEventListener('click', shareSingleScore);
+        dom.shareAchievementsBtn.addEventListener('click', shareAchievements);
+        dom.adminFillBtn.addEventListener('click', adminFillAnswers);
+
+        dom.closeModalBtn.addEventListener('click', () => { dom.hintModal.style.display = 'none'; stopSpeak(); });
+        window.addEventListener('click', (event) => { if (event.target == dom.hintModal) { dom.hintModal.style.display = 'none'; stopSpeak(); } });
+
+        // Dev Tools Logic
+        const devToolsBtn = document.getElementById('devToolsBtn');
+        if (devToolsBtn) {
+            devToolsBtn.addEventListener('click', () => {
+                dom.devToolsPanel.classList.toggle('hidden');
+            });
+        }
+        
+        const unlockAllBtn = document.getElementById('unlockAllBtn');
+        if(unlockAllBtn) {
+            unlockAllBtn.addEventListener('click', async () => {
+                Object.keys(allBadges).forEach(key => {
+                    const generalBadges = ['perfect_score', 'high_achiever', 'effortful_learner', 'cute_cat'];
+                    if (generalBadges.includes(key)) {
+                        earnedBadges[key] = true;
+                    } else {
+                         Object.keys(vocabulary).forEach(unitKey => {
+                             earnedBadges[`${key}_${unitKey}`] = true;
+                         });
+                    }
+                });
+                await updateBadgesInFirestore();
+                renderBadgeHall();
+                updateBonusButtonVisibility();
+                alert('所有徽章已解鎖！');
+            });
+        }
+        
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        if(clearAllBtn) {
+            clearAllBtn.addEventListener('click', async () => {
+                earnedBadges = {};
+                await updateBadgesInFirestore();
+                renderBadgeHall();
+                updateBonusButtonVisibility();
+                alert('所有徽章已清除！');
+            });
+        }
+        
+        const testAchievementShare = document.getElementById('testAchievementShare');
+        if(testAchievementShare) {
+            testAchievementShare.addEventListener('click', shareAchievements);
+        }
+        
+        const testScoreShare = document.getElementById('testScoreShare');
+        if(testScoreShare) {
+            testScoreShare.addEventListener('click', () => {
+                state.currentScore = 100;
+                state.earnedBadgesForSharing = [
+                    {key: 'perfect_score', ...allBadges.perfect_score},
+                    {key: 'unit_master', ...allBadges.unit_master},
+                    {key: 'cute_cat', ...allBadges.cute_cat}
+                ];
+                state.currentGroup = 'groupBonus';
+                state.currentDifficulty = 'C2';
+                shareSingleScore();
+            });
+        }
+
+        // Polyfills for older browsers
+        if (CanvasRenderingContext2D.prototype.roundRect === undefined) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
+                this.beginPath();
+                this.moveTo(x + radius, y); this.lineTo(x + width - radius, y); this.quadraticCurveTo(x + width, y, x + width, y + radius);
+                this.lineTo(x + width, y + height - radius); this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                this.lineTo(x + radius, y + height); this.quadraticCurveTo(x, y + height, x, y + height - radius);
+                this.lineTo(x, y + radius);
+                this.quadraticCurveTo(x, y, x + radius, y);
+                this.closePath();
+            };
+        }
+    </script>
+</body>
+</html>
+
