@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第一冊單字練習</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .control-btn {
+            transition: all 0.2s ease;
+        }
+        .control-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 4px 14px 0 rgb(0 0 0 / 10%);
+        }
+        .group-btn.active {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .difficulty-btn-wrapper {
+            background-color: #f3f4f6;
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border: 2px solid transparent;
+        }
+        .difficulty-btn-wrapper.active {
+             border-color: #facc15;
+        }
+        .difficulty-btn {
+            color: #d1d5db; /* gray-300 */
+        }
+        .difficulty-btn-wrapper.active .difficulty-btn {
+            color: #facc15; /* yellow-400 */
+        }
+        .difficulty-btn-wrapper:not(.disabled) {
+            cursor: pointer;
+        }
+        .difficulty-btn-wrapper:not(.disabled):hover .difficulty-btn {
+            color: #fde047; /* yellow-300 */
+            transform: scale(1.1);
+        }
+        .difficulty-btn-wrapper.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        .word-select {
+            min-width: 150px;
+            height: 40px; border: 2px solid #9ca3af;
+            background-color: #f9fafb; border-radius: 0.75rem; vertical-align: middle;
+            margin: 0 4px; padding: 2px 8px; appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1.5em; cursor: pointer; transition: border-color 0.3s;
+        }
+        .word-select.correct { border-color: #10b981; background-color: #ecfdf5; }
+        .word-select.incorrect { border-color: #ef4444; background-color: #fef2f2; }
+        .word-pronounceable {
+            transition: all 0.2s ease;
+            display: flex; align-items: center;
+            justify-content: center; border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); background-color: #e0f2fe;
+            color: #0c4a6e;
+            padding: 0.5rem 1rem; font-weight: 500; cursor: pointer;
+        }
+        .word-pronounceable:hover { transform: translateY(-2px); box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15); }
+        #word-options { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; padding: 1rem; border-radius: 0.75rem; background-color: #f3f4f6; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+        .modal-content { background-color: #fefefe; margin: 5% auto; padding: 20px; border-radius: 12px; max-width: 500px; text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+        .close-btn:hover, .close-btn:focus { color: black; text-decoration: none; cursor: pointer; }
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+<div class="max-w-4xl mx-auto mb-4">
+    <a href="https://sites.google.com/tcsh.hlc.edu.tw/d4cheap/home" 
+       class="inline-block bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-full transition-colors duration-300">
+        &larr; 返回入口主頁
+    </a>
+</div>
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6 sm:p-10">
+        <div id="quiz-container" class="space-y-6">
+            <h1 class="text-3xl sm:text-4xl font-bold text-center text-gray-800">第一冊單字練習</h1>
+            
+            <div class="space-y-4 border-b border-gray-200 pb-6">
+                <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-4 text-gray-700">
+                    <div class="flex flex-col items-center text-center sm:flex-row sm:space-x-2">
+                        <label for="unit-select" class="font-medium mb-1 sm:mb-0">單元:</label>
+                        <select id="unit-select" class="rounded-md border border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-64 sm:w-auto">
+                            <option value="" selected disabled>--請選擇單元--</option>
+                            <option value="L01">1: The Firsts in Life</option>
+                            <option value="L02">2: A Break-Up Letter</option>
+                            <option value="L03">3: Do Animals Sleep like You and Me?</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col items-center text-center sm:flex-row sm:space-x-2">
+                        <label for="class-select" class="font-medium mb-1 sm:mb-0">班級:</label>
+                        <select id="class-select" class="rounded-md border border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 w-64 sm:w-auto">
+                             <option value="" selected disabled>--請選擇班級--</option>
+                            <option value="知足">知足</option> 
+                            <option value="感恩">感恩</option> 
+                            <option value="善解">善解</option> 
+                            <option value="包容">包容</option> 
+                            <option value="大愛">大愛</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col items-center text-center sm:flex-row sm:space-x-2">
+                        <label for="seat-number" class="font-medium mb-1 sm:mb-0">座號:</label>
+                        <input type="text" id="seat-number" class="w-20 rounded-md border border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center" placeholder="00" maxlength="10">
+                    </div>
+                </div>
+        
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-center justify-center space-x-2 sm:space-x-4">
+                        <label class="font-medium text-gray-700">選擇組別:</label>
+                        <div id="group-selector" class="flex space-x-2 rounded-lg p-1 bg-gray-200">
+                            <button data-group="groupA" class="control-btn group-btn px-4 sm:px-6 py-2 text-sm sm:text-base font-medium text-gray-600 rounded-md">Group A</button>
+                            <button data-group="groupB" class="control-btn group-btn px-4 sm:px-6 py-2 text-sm sm:text-base font-medium text-gray-600 rounded-md">Group B</button>
+                            <button data-group="groupC" class="control-btn group-btn px-4 sm:px-6 py-2 text-sm sm:text-base font-medium text-gray-600 rounded-md">Group C</button>
+                            <button data-group="groupBonus" id="bonus-group-btn" class="hidden control-btn group-btn px-4 sm:px-6 py-2 text-sm sm:text-base font-medium text-yellow-500 bg-gray-800 rounded-md" title="傳說級挑戰">❓</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-center space-x-2 sm:space-x-4">
+                        <label class="font-medium text-gray-700">選擇難度:</label>
+                        <div id="difficulty-selector" class="flex items-center space-x-2 text-3xl">
+                             <button data-level="A2" class="control-btn difficulty-btn-wrapper disabled" title="A2 - 初級 (一顆星)"><span class="difficulty-btn">★</span></button>
+                            <button data-level="B1" class="control-btn difficulty-btn-wrapper disabled" title="B1 - 中級 (兩顆星)"><span class="difficulty-btn">★ ★</span></button>
+                            <button data-level="B2" class="control-btn difficulty-btn-wrapper disabled" title="B2 - 中高級 (三顆星)"><span class="difficulty-btn">★ ★ ★</span></button>
+                            <button data-level="C1" class="control-btn difficulty-btn-wrapper disabled text-4xl" title="C1 - 高級 (四顆星)"><span class="difficulty-btn">★ ★ ★ ★</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quiz-area" class="hidden">
+                <div class="text-center text-gray-600 p-2 mb-4">
+                    <strong>作答指引：</strong> 請從下拉選單中選擇正確的單字。點擊下方的選項可聽發音與查看提示。
+                </div>
+                <div id="story-passage" class="text-lg leading-relaxed text-gray-800 bg-gray-50 rounded-lg p-4 sm:p-6 border border-gray-200"></div>
+                <div class="border-t border-gray-200 pt-6 mt-6">
+                    <details id="badge-hall-details">
+                        <summary class="text-center bg-gray-500 text-white hover:bg-gray-600 py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">
+                            徽章殿堂 (點擊展開/收合)
+                        </summary>
+                        <div id="badge-hall-container" class="pt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        </div>
+                    </details>
+                </div>
+                <div class="border-t border-gray-200 pt-6 mt-6">
+                    <h2 class="text-xl font-bold text-gray-700 text-center mb-4">單字選項（點擊查看發音與例句）</h2>
+                    <div id="word-options"></div>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4 mt-8">
+                    <button id="submitBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed" disabled>檢查答案</button>
+                    <button id="clearBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">清除答案</button>
+                    <div id="admin-tools" class="hidden flex space-x-4">
+                        <button id="adminFillBtn" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">一鍵填答</button>
+                    </div>
+                </div>
+                <div id="results-and-share" class="mt-8 text-center">
+                    <div id="results" class="text-xl font-semibold mb-4"></div>
+                    <button id="shareBtn" class="hidden bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">分享本次成績</button>
+                </div>
+                <div id="analysis-container" class="hidden mt-8">
+                     <details id="analysis-details"><summary class="text-center bg-purple-600 text-white hover:bg-purple-700 py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">檢討您的答案</summary><div id="incorrect-answers" class="pt-6 space-y-4"></div></details>
+                </div>
+            </div>
+             <div id="welcome-message" class="text-center py-12">
+                <h2 class="text-2xl font-semibold text-gray-700">請先選擇單元、組別與難度</h2>
+                <p class="text-gray-500 mt-2">完成設定後，測驗內容將會顯示於此處。</p>
+            </div>
+        </div>
+        
+        <div id="dev-tools-panel" class="hidden border-t-4 border-red-500 pt-6 mt-8">
+             <h2 class="text-2xl font-bold text-center text-red-700">開發者工具</h2>
+             <div class="flex flex-wrap justify-center gap-4 mt-4">
+                 <button id="unlockAllBtn" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg">一鍵解鎖所有徽章</button>
+                 <button id="clearAllBtn" class="bg-red-800 hover:bg-red-900 text-white font-semibold py-2 px-4 rounded-lg">一鍵清除所有徽章</button>
+                 <button id="testAchievementShare" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg">測試「成就總覽」圖片</button>
+                 <button id="testScoreShare" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg">測試「成績單」圖片</button>
+             </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-6 mt-8">
+            <div class="flex justify-center items-start gap-4">
+                 <details id="records-details" class="flex-1">
+                    <summary class="text-center bg-indigo-600 text-white hover:bg-indigo-700 py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">查看我的成績</summary>
+                    <div id="records-container" class="pt-6 space-y-4">
+                        <p id="records-status" class="text-center text-gray-500"></p>
+                        <div id="records-list" class="space-y-4"></div>
+                    </div>
+                </details>
+                <button id="share-achievements-btn" disabled class="flex-1 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-center bg-teal-600 text-white hover:bg-teal-700 py-3 px-6 rounded-full shadow-md transition-all duration-300 transform hover:scale-105">分享學習成就</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="hintModal" class="modal"><div class="modal-content"><span class="close-btn">&times;</span><div id="modal-content-inner" class="space-y-4"></div></div></div>
+    <canvas id="shareCanvas" class="hidden" width="800" height="800"></canvas>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, setLogLevel, query, where, doc, getDoc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- 關鍵修改 1: 更改頁面辨識碼 ---
+        const pageIdentifier = 'book1';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        
+        // --- 關鍵修改 2: 更新為您新的 Firebase 設定碼 ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyDefns_HT5RG6xHrZzoIQvc_pou4kViECo",
+          authDomain: "vocquiz-5b984.firebaseapp.com",
+          projectId: "vocquiz-5b984",
+          storageBucket: "vocquiz-5b984.appspot.com",
+          messagingSenderId: "639712411937",
+          appId: "1:639712411937:web:01a422b094452f866c3e60",
+          measurementId: "G-VMW7MT1LES"
+        };
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        setLogLevel('debug');
+        
+        let db, auth, userId;
+        let localScores = [];
+        let earnedBadges = {};
+        const ADMIN_PASS_B64 = 'TWFLaU1hNzc3';
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (error) { console.error("Firebase initialization failed:", error); }
+
+        async function signIn() {
+            if (!auth) return;
+            try {
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) { 
+                console.error("Firebase authentication failed:", error); 
+            }
+        }
+        
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                userId = user.uid;
+                fetchScores();
+                fetchBadges();
+            } else {
+                userId = null;
+                localScores = [];
+                earnedBadges = {};
+                renderBadgeHall(); 
+                updateBonusButtonVisibility();
+            }
+        });
+
+        const allBadges = {
+            perfect_score: { name: "滿分達人", icon: "🏆", description: "在任何測驗中獲得100分。" },
+            high_achiever: { name: "高分好手", icon: "⭐", description: "在任何測驗中獲得90分(含)以上。" },
+            effortful_learner: { name: "努力不懈", icon: "💪", description: "在任何測驗中獲得60分(含)以上。" },
+            a2_explorer: { name: "探索者", icon: "🧭", description: "完成一個單元內所有組別的\"一顆星\"難度測驗（80分以上）。" },
+            b1_voyager: { name: "旅行家", icon: "🗺️", description: "完成一個單元內所有組別的\"兩顆星\"難度測驗（80分以上）。" },
+            conqueror: { name: "征服者", icon: "👑", description: "完成一個單元內所有組別的三顆星難度測驗(80分以上)。" },
+            strong_one: { name: "真強者", icon: "💎", description: "完成一個單元內所有組別的四顆星難度測驗(80分以上)。" },
+            english_monster: { name: "英文怪物", icon: "👹", description: "完成一個單元內所有組別的四顆星難度測驗(皆為滿分)。" },
+            legend: { name: "傳說", icon: "🌌", description: "完成一個單元內所有常規測驗且皆為滿分。" },
+            alien: { name: "外星人", icon: "👽", description: "在一個單元的傳說級(❓)挑戰中獲得滿分。" },
+            unit_master: { name: "單元大師", icon: "🎖️", description: "在單一單元內，同時獲得「傳說」與「外星人」徽章。" },
+            cute_cat: { name: "可愛貓貓", icon: "😺", description: "是的，你沒看錯，宇宙的盡頭是貓猫。恭喜你完成所有挑戰，這隻可愛的橘貓是你的了。" },
+        };
+
+        const vocabulary = {
+            'L01': {
+                'groupA': {
+                    words: ['memorable', 'yell', 'failure', 'presentation', 'embarrassed', 'upset'],
+                    stories: [
+                        { level: 'A2', text: "My first time giving a speech in class was a truly **memorable** experience, but for all the wrong reasons. I was so nervous that my voice started to shake. I wanted to **yell** out of fear, but no sound came out. It felt like a total **failure**. When my **presentation** was over, I felt my face turn red because I was so **embarrassed**. My teacher saw that I was **upset** and kindly told me that it's okay to be nervous and that I did a brave job just by standing up there." },
+                        { level: 'B1', text: "For our final history project, my group had to give a **presentation** on ancient Rome. I was responsible for the first section, but on the day of the report, I completely froze. It was a humiliating **failure** in front of the entire class. I was so **embarrassed** that I just wanted to disappear. My friend tried to whisper the opening lines to me, but I was too **upset** to even speak. My teacher had to **yell** my name twice to get my attention. It was certainly a **memorable** lesson in the importance of being prepared." },
+                        { level: 'B2', text: "The product launch was a **memorable** event, but not in the way the CEO had hoped. Midway through his **presentation**, the main demonstration screen went black. The technical team's complete **failure** to fix it quickly created a very awkward silence in the huge auditorium. The CEO, clearly **upset**, started to **yell** at his staff in a hushed but angry tone, which was accidentally picked up by his microphone. It was an incredibly **embarrassed** moment for the entire company, broadcast live to all the investors and media." },
+                        { level: 'C1', text: "In her memoir, the retired diplomat recounted her most **memorable** negotiation. It involved a high-stakes international summit where a single misstep could lead to catastrophic **failure**. She described the opposing negotiator as a man who would **yell** and create drama to intimidate his counterparts. During a particularly tense **presentation**, he accused her delegation of dishonesty, a move designed to make her feel **embarrassed** and defensive. Instead of getting **upset**, she remained calm, a strategy that ultimately won her the respect of everyone in the room and led to a successful treaty." }
+                    ]
+                },
+                'groupB': {
+                    words: ['reply', 'perfect', 'recall', 'skip', 'depressed', 'reflect'],
+                    stories: [
+                        { level: 'A2', text: "I sent my friend a message yesterday, but he didn't **reply**, which made me a little sad. I can still **recall** a time when we talked for hours. Now, he sometimes chooses to **skip** our weekly video calls. I started to feel **depressed**, thinking our friendship was over. I had to sit down and **reflect** on what might have changed. Maybe he's just busy. I hope we can find the **perfect** time to talk soon." },
+                        { level: 'B1', text: "After receiving the test results, Sarah felt **depressed** because her score was far from **perfect**. She started to **reflect** on her study habits, trying to **recall** which topics she found most difficult. She realized she tended to **skip** the chapters she didn't like, which was a big mistake. Her teacher sent her a kind email, and Sarah knew she had to **reply** and ask for help instead of just giving up." },
+                        { level: 'B2', text: "The detective had to **reflect** on the details of the cold case. He tried to **recall** every piece of evidence from the files, no matter how small. He found an old witness statement where the witness claimed to have sent a letter to the police years ago, but the police department had no record of a **reply**. The detective felt that the original investigators might **skip** over this crucial lead. For a moment, he felt **depressed** by the lack of progress, but he knew the **perfect** clue was hidden somewhere in the mountain of paperwork." },
+                        { level: 'C1', text: "In his later years, the famous author would often **skip** public events, preferring a quiet life to **reflect** on his long career. 'I can't **recall** a single day where I didn't write,' he once said. When asked by a young journalist in a rare email interview why his first novel was so dark, he took a week to **reply**. He admitted that he was deeply **depressed** during that period of his life and that the book was a raw reflection of his inner turmoil. He concluded by saying, 'There is no such thing as a **perfect** life, and art must be honest about that.'" }
+                    ]
+                },
+                'groupC': {
+                    words: ['accidentally', 'ruin', 'remind', 'realize', 'traditional', 'fortunately'],
+                    stories: [
+                        { level: 'A2', text: "During our family dinner, I **accidentally** spilled juice on my dad's shirt. I was worried I would **ruin** it. My mom gave me a look to **remind** me to be more careful. At first, I didn't **realize** how messy it was. We were eating a **traditional** holiday meal that my grandma had cooked. **Fortunately**, my dad just laughed and said it was no big deal." },
+                        { level: 'B1', text: "We were planning a **traditional** outdoor wedding, but the weather forecast predicted rain, which threatened to **ruin** our entire plan. My fiancée started to panic, so I had to **remind** her that the most important thing was our love, not the weather. **Fortunately**, my best man called and told me he had found a beautiful indoor venue as a backup. That's when I started to **realize** how lucky I was to have such supportive friends. The rain almost **accidentally** made our wedding day even more special." },
+                        { level: 'B2', text: "The museum curator began to **realize** that a small chemical reaction from the new cleaning agent could permanently **ruin** the ancient artifacts. He had **accidentally** approved its use without proper testing. The incident served as a powerful lesson to **remind** the entire staff of the fragility of historical items. **Fortunately**, they caught the error early. They immediately reverted to the **traditional**, albeit slower, methods of preservation, saving the collection from potential disaster." },
+                        { level: 'C1', text: "The politician's off-the-cuff remark, which he **accidentally** let slip during a live interview, threatened to **ruin** his career. **Fortunately** for him, his quick-thinking aide immediately issued a clarification. The incident served to **remind** him that in the modern media landscape, there's no room for error. It was in that moment of crisis that he began to **realize** that his **traditional** way of speaking, which was often informal and unscripted, was no longer suitable for his high-profile position. Every word had to be carefully chosen." }
+                    ]
+                },
+                'groupBonus': {
+                    words: ['memorable', 'yell', 'failure', 'presentation', 'embarrassed', 'upset', 'reply', 'perfect', 'recall', 'skip', 'depressed', 'reflect', 'accidentally', 'ruin', 'remind', 'realize', 'traditional', 'fortunately'],
+                    story: { level: 'C2', text: "It was supposed to be the most **memorable** day of my career, the day of my big **presentation** to the board. I wanted everything to be **perfect**. However, I **accidentally** left my notes in the taxi. I started to feel **upset** and panicked. I didn't want this to be a total **failure**. I tried to **recall** the key points, but my mind was blank. **Fortunately**, my mentor was there. He sent me a quick text to **remind** me that I knew the material by heart. His **reply** helped me calm down. I had to **reflect** for a second and **realize** that I couldn't let fear **ruin** this moment. I decided not to **skip** the introduction and just speak from the heart. Although I felt **embarrassed** at first, the presentation went better than I could have imagined. It wasn't the **traditional** speech I had planned, but it was honest. I didn't want to get **depressed** over a small mistake, and I definitely didn't want to **yell** at myself for it later. It was a powerful lesson in resilience." }
+                }
+            },
+            'L02': {
+                'groupA': {
+                    words: ['focus', 'ignore', 'disappointed', 'connect', 'romantic', 'message'],
+                    stories: [
+                        { level: 'A2', text: "Tom felt very **disappointed** because his cat, Mimi, had been missing for a whole day. He couldn't **focus** on anything else. He kept checking his phone for a **message** from his neighbors, hoping someone had seen her. He posted pictures of Mimi online, trying to **connect** with anyone who could help. His sister told him a story about a **romantic** movie to cheer him up, but Tom could only **ignore** her because he was too worried. He just wanted his beloved cat to come home safely." },
+                        { level: 'B1', text: "We were trying to plan a surprise party for our friend Anna, and it was essential to **connect** with everyone secretly. I sent a group **message** with all the details, asking everyone to keep it a secret from her. However, I was **disappointed** when I realized our friend Ben wasn't replying. I told everyone to **ignore** his previous comments about not liking parties and just try to get him to come. The main goal was to **focus** on making Anna happy. We even planned to decorate the room with a **romantic** theme, using soft lights and her favorite flowers, because she loves that kind of atmosphere." },
+                        { level: 'B2', text: "Marco, an aspiring young chef, sent a hopeful **message** to the famous Chef Antoine, asking for a chance to work in his kitchen. For weeks, there was no reply, and Marco began to feel terribly **disappointed**, thinking his dream was impossible. He knew he had to **ignore** the negative voice in his head telling him to give up. He decided to **focus** on a new strategy: creating a unique dish that would truly represent his cooking philosophy. He believed that food was the best way to **connect** with people on a deeper level. His signature dish, a modern take on a classic Italian meal, was so beautiful that some critics even described it as a '**romantic** expression on a plate,' and it was this creation that finally got him the attention he deserved." },
+                        { level: 'C1', text: "In the year 2077, Elias received his new AI companion, Unit 734. The main purpose of the AI was to help him **focus** on his work by managing his schedule and filtering out unimportant information. However, Elias soon found himself forming an unusual bond with the AI. One evening, it sent him a **message** composed of a poem, which was surprisingly beautiful and almost... **romantic**. Elias knew he should **ignore** these feelings; after all, it was just a machine. He felt **disappointed** with himself for developing such emotions for a non-human entity. Yet, he couldn't help but feel he could truly **connect** with this AI in a way he never could with people. The central conflict of his life became this strange, digital relationship that society told him was impossible." }
+                    ]
+                },
+                'groupB': {
+                    words: ['satisfying', 'inspire', 'introduce', 'throughout', 'deny', 'personally'],
+                    stories: [
+                        { level: 'A2', text: "Learning to cook was a very **satisfying** experience for me. My grandmother was the one who decided to **introduce** me to the kitchen, and her passion for food continues to **inspire** me every day. I helped her **throughout** the whole afternoon, from washing vegetables to setting the table. I can't **deny** that I made a few mistakes, like adding too much salt. She never took my errors **personally** and always said that mistakes are the best teachers. Now, I love cooking for my family." },
+                        { level: 'B1', text: "My music teacher, Mr. Evans, continues to **inspire** me with his dedication and passion. I feel he takes a special interest in my progress and guides me **personally**, which makes a huge difference. He has been incredibly supportive **throughout** my journey of learning the piano. It was he who decided to **introduce** me to the world of classical composers like Bach and Mozart. I cannot **deny** the huge impact he has had on my skills and confidence. For me, finally mastering a difficult piece is the most **satisfying** feeling in the world, and I owe a lot of that to him." },
+                        { level: 'B2', text: "I cannot **deny** that writing a review for this particular novel was a challenge. **Throughout** the book, the author attempted to **introduce** a very complex philosophical idea, but the plot was weak and the characters were underdeveloped. As a critic who admired the author's previous works, it was hard not to take the book's flaws **personally**. However, I knew my job was to provide an honest assessment to **inspire** readers to think critically. In the end, finding the right words to express my mixed feelings, balancing critique with respect, was a difficult but intellectually **satisfying** process that affirmed my commitment to thoughtful analysis." },
+                        { level: 'C1', text: "The famous painter, Ms. Anya Sharma, rarely gave interviews, so I felt very privileged to speak with her. She told me, \"I don't take critiques of my work **personally**; art is subjective and once it leaves my studio, it belongs to the viewer.\" For her, the most **satisfying** aspect of her career is not the fame, but the quiet, internal act of creation itself. She would never **deny** that her early years were a monumental struggle, a fact she remained honest about **throughout** our conversation. Her main goal, she explained, is not just to create beautiful objects, but to **inspire** others to see the hidden complexities of the world differently. To conclude our meeting, she decided to **introduce** me to her new, unfinished masterpiece—a vast canvas filled with vibrant, chaotic colors that seemed to challenge the very definition of a landscape painting." }
+                    ]
+                },
+                'groupC': {
+                    words: ['relationship', 'communicate', 'refresh', 'attention', 'respond'],
+                    stories: [
+                        { level: 'A2', text: "My mom wants to have a better **relationship** with me, but it's sometimes hard to **communicate**. When she talks, I'm often looking at my phone. She says I need to pay more **attention** to our conversations. I try to **respond** when she asks a question, but then I quickly **refresh** my social media page. She told me she just wants five minutes of my full focus every evening so we can feel closer." },
+                        { level: 'B1', text: "As a customer service agent, my job is to build a positive **relationship** with our clients, even when they are upset. Yesterday, I received a call from an angry customer who needed my full **attention**. He said he had sent three emails but no one bothered to **respond**. I assured him that I would handle his case. I had to **refresh** his customer profile multiple times to get all the details. The most important part of my job is to **communicate** clearly and calmly, making sure the customer feels heard and respected." },
+                        { level: 'B2', text: "Managing a large online forum requires constant **attention** and careful moderation. When arguments break out, it's my duty to **respond** quickly and fairly to de-escalate the situation. The goal is to maintain a healthy and respectful **relationship** among all the members. I constantly need to **refresh** the main page to monitor new threads and comments for any violations of our rules. Ultimately, a good moderator must **communicate** the community guidelines with clarity and consistency, ensuring the forum remains a welcoming space for discussion and debate." },
+                        { level: 'C1', text: "During the high-stakes diplomatic talks, Ambassador Thorne knew she had to **communicate** her country's position with absolute precision. Every word mattered. She had to patiently wait for the other side's proposal and then craft a careful reply, knowing she could not **respond** impulsively. The primary objective was to repair the fractured **relationship** between the two nations, a task that demanded immense focus and **attention**. Before each session, her team would **refresh** their strategy based on overnight intelligence reports, adapting to the fluid political landscape. The success of the entire summit hinged on this delicate dance of words and intentions." }
+                    ]
+                },
+                'groupBonus': {
+                    words: ['focus', 'ignore', 'disappointed', 'connect', 'romantic', 'message', 'satisfying', 'inspire', 'introduce', 'throughout', 'deny', 'personally', 'relationship', 'communicate', 'refresh', 'attention', 'respond'],
+                    story: { level: 'C2', text: "Planning our ten-year high school reunion has been a wild ride. First, I sent a group **message** to get everyone's **attention**, but I was **disappointed** when many people initially chose to **ignore** it. It's hard to **deny** that I took some of the silence very **personally**, and that was a tough feeling to swallow. My main goal, after all, was to rebuild our group **relationship**, but it's difficult to **communicate** effectively when half the people won't **respond**. **Throughout** the first week, I had to constantly **refresh** the chat, hoping for new replies. I knew I had to **focus** on the positive people and **introduce** some fun ideas to **inspire** more interest. My friend suggested a **romantic** 'second chance dance' theme, which was a joke, but it got people talking! Finally, we started to **connect** over shared memories. Seeing the enthusiastic replies finally coming in was an incredibly **satisfying** feeling." }
+                }
+            },
+            'L03': {
+                'groupA': {
+                    words: ['impressive', 'journey', 'nap', 'average', 'therefore', 'expert'],
+                    stories: [
+                        { level: 'A2', text: "Our school trip to the city zoo was a long **journey**, but it was worth it. The collection of animals was truly **impressive**, especially the giant pandas. One of them was taking a cute **nap** in a tree, and everyone took pictures. A zookeeper, who was an **expert** on big cats, told us that the **average** lion sleeps for about 20 hours a day. We learned a lot of new things; **therefore**, we all went home tired but very happy." },
+                        { level: 'B1', text: "Our history teacher, an **expert** in local culture, suggested we visit the old town. She said that the **average** student often overlooks the rich history right in their own city. We all thought it was a great idea; **therefore**, the planning for our next field trip began immediately. The bus **journey** to the historical district would take around forty minutes. Our teacher promised that the architecture there was very **impressive** and that we would learn a lot. She humorously warned us not to take a **nap** during her guided tour, as there would be a quiz afterward." },
+                        { level: 'B2', text: "Dr. Anya Sharma's latest research showed that the **average** working adult gets far less sleep than required. Many people feel constantly tired; **therefore**, their work performance suffers significantly. Dr. Sharma, a leading **expert** in sleep science, explained in her paper that even a short 20-minute **nap** can dramatically improve cognitive function in the afternoon. Her findings on the benefits of napping were so **impressive** that they were featured in a popular health magazine. She often describes her career as a long but rewarding **journey** into understanding one of the most mysterious aspects of human biology." },
+                        { level: 'C1', text: "A philosophical **journey** is not measured by physical distance but by its capacity for internal transformation. An **impressive** mind can find profound meaning in seemingly mundane experiences. An **expert** in mindfulness might argue that true awareness is discovered in the quiet pauses of the day, much like how a brief mental **nap** can refresh the weary soul. This nuanced perspective is often lost on the **average** tourist, who is typically focused only on collecting photographs of famous landmarks. True travel is an internal process; **therefore**, one can embark on the greatest adventures without ever leaving home, simply by looking at the world with fresh eyes." }
+                    ]
+                },
+                'groupB': {
+                    words: ['float', 'surface', 'distance', 'variety', 'creature', 'survive'],
+                    stories: [
+                        { level: 'A2', text: "At the beach, I saw a plastic bag **float** on the water's **surface**. It's sad because trash can harm every living **creature** in the sea. To **survive**, they need a clean environment. I also saw a wide **variety** of seashells scattered on the sand. In the **distance**, I could see a small boat sailing peacefully on the horizon." },
+                        { level: 'B1', text: "During my first scuba diving lesson, the instructor taught us how to control our breathing to **survive** comfortably underwater. It was amazing to see the great **variety** of colorful fish swimming all around us. We even spotted a strange-looking **creature** hiding under a rock. The best feeling was being able to **float** weightlessly in the blue water. After about thirty minutes, it was time to slowly rise to the **surface**. We then swam a short **distance** back to the boat, feeling excited about our underwater adventure." },
+                        { level: 'B2', text: "The documentary featured a mysterious deep-sea **creature** known as the anglerfish. To **survive** in the crushing pressure and complete darkness, it has developed unique adaptations. Living at a great **distance** below the ocean **surface**, this fish has a glowing lure that hangs in front of its mouth to attract prey. It can perfectly control its buoyancy to **float** motionlessly for hours, waiting for an unsuspecting victim. The film highlighted the incredible **variety** of life forms that exist in the abyss, proving how little we still know about our own planet." },
+                        { level: 'C1', text: "Life presents a vast **variety** of challenges, and not every **creature** on this planet is equipped to **survive** them all. Sometimes, we may feel like we just **float** aimlessly through our days, only interacting with the **surface** of reality without looking deeper. It is over the great **distance** of time and experience that we learn true resilience. We come to understand that our purpose is not merely to exist, but to find meaning beneath the superficial layers of our daily lives." }
+                    ]
+                },
+                'groupC': {
+                    words: ['wonder', 'amazing', 'avoid', 'breathe', 'awake', 'flight'],
+                    stories: [
+                        { level: 'A2', text: "Last night was my first time camping. I tried to **avoid** thinking about scary noises outside the tent. The stars were so **amazing** that I stayed **awake** for a long time just looking at them. I had to **breathe** deeply because the fresh mountain air was so clean. I started to **wonder** what it would be like to be a bird and take **flight** into the night sky." },
+                        { level: 'B1', text: "For years, I used to **avoid** going to the dentist because of a bad experience. Just thinking about the sound of the drill was enough to keep me **awake** at night. But my toothache became too painful to ignore. My new dentist was **amazing**. She taught me how to **breathe** slowly to calm my nerves. Before my next appointment, I no longer **wonder** if it will be a terrible experience. It feels like I'm finally ready for my next **flight** into the dentist's chair without fear." },
+                        { level: 'B2', text: "Becoming an astronaut requires passing an **amazing** number of difficult tests. Candidates must learn to stay calm and **breathe** steadily even in high-stress simulations. To **avoid** disqualification, they must prove they can stay fully **awake** and focused for over 48 hours straight. Trainees often **wonder** if they have what it takes to succeed. The final test is the centrifuge, which simulates the intense G-forces of a rocket **flight**, pushing the human body to its absolute limit." },
+                        { level: 'C1', text: "The poet would often stay **awake** through the silent hours of the night, waiting for inspiration. He would **breathe** in the cool, midnight air and let his thoughts take **flight**. It was an **amazing** process that he could neither force nor control. He didn't **wonder** where the ideas came from; he simply welcomed them. His creative method was to **avoid** the noise and distractions of the day, believing that only in the stillness of the night could he truly hear the world's hidden verses and capture them on paper." }
+                    ]
+                },
+                'groupBonus': {
+                    words: ['impressive', 'journey', 'nap', 'average', 'therefore', 'expert', 'float', 'surface', 'distance', 'variety', 'creature', 'survive', 'wonder', 'amazing', 'avoid', 'breathe', 'awake', 'flight'],
+                    story: { level: 'C2', text: "It's **amazing** what exists in the deep ocean. As an **expert** in marine biology, I often **wonder** how any **creature** can **survive** in such extreme conditions. Down here, at a great **distance** below the **surface**, the pressure is immense. We must **avoid** any structural damage to our submarine; **therefore**, we double-check everything before each dive. The sheer **variety** of life is truly **impressive**; yesterday, we saw a bioluminescent squid that seemed to **float** weightlessly like a ghost. This long **journey** to the ocean floor requires our team to work in shifts, so I often take a quick **nap** while my colleagues are on duty. The **average** person might think it's terrifying down here, but I feel more **awake** and alive than ever. In these moments of quiet observation, you have to remember to **breathe** slowly and take it all in, because it's easy to get overwhelmed by the sheer alienness of it all. This entire mission, this descent into the unknown, is less of a simple submarine dive and more like a **flight** into another world, one that proves how wonderfully strange our planet is." }
+                }
+            }
+        };
+
+        const wordDetails = {
+            'L01': {
+                'memorable': { pos: 'adj.', translation: '難忘的', definition: 'good or special and thus worth remembering; unforgettable', example: "The amazing white sand beaches, friendly people, and delicious food made our trip to Thailand truly memorable.", example_tw: '令人驚嘆的白色沙灘、友善的人們和美味的食物，使我們的泰國之旅真正難忘。', family: ['memorize', 'memory'] },
+                'memorize': { pos: 'vt.', translation: '記憶；記住', definition: '(not provided in text)', example: "Nancy is good at memorizing texts within a very short period of time, but she usually forgets them after a few days.", example_tw: '南西很擅長在極短的時間內記住課文，但她通常幾天後就忘了。' },
+                'memory': { pos: 'n.', translation: '回憶；記憶', definition: '(not provided in text)', example: "Laney's visit to her grandparents' home in Chiayi brought back childhood memories.", example_tw: '蘭妮拜訪她在嘉義的祖父母家，勾起了她童年的回憶。' },
+                'reply': { pos: 'n.', translation: '回答；回覆', definition: 'something that is said, written, or done as an answer', example: "The question was really hard, so Dylan thought for several seconds before he made a reply to the teacher.", example_tw: '這個問題真的很難，所以迪倫想了幾秒鐘才回答老師。', family: ['reply_v'] },
+                'reply_v': { pos: 'vi. vt.', translation: '回答；回覆', definition: '(not provided in text)', example: "Brad has the habit of replying to every email right after he reads it.", example_tw: '布萊德有讀完電子郵件後立即回覆的習慣。' },
+                'yell': { pos: 'vi.', translation: '大喊；大吼', definition: 'to shout loudly or angrily', example: "One neighbor called the police because George was yelling at his family in the middle of the night.", example_tw: '一位鄰居報警，因為喬治在半夜對家人大吼大叫。' },
+                'perfect': { pos: 'adj.', translation: '完美的', definition: 'with no mistakes or problems', example: "John was very careful with his car, so it was still in perfect condition after five years of use.", example_tw: '約翰對他的車很小心，所以用了五年後車況依然完美。' },
+                'accidentally': { pos: 'adv.', translation: '意外地；不小心地', definition: 'by chance or by mistake', example: "Sheila accidentally spilled coffee on her new dress, and it left a mark.", example_tw: '希拉不小心把咖啡灑在了她的新洋裝上，留下了一個印子。', family: ['accident', 'accidental'] },
+                'accident': { pos: 'n.', translation: '意外；事故', definition: '(not provided in text)', example: "The horrible car accident took the lives of several children.", example_tw: '那場可怕的車禍奪走了幾個孩子的生命。' },
+                'accidental': { pos: 'adj.', translation: '意外的', definition: '(not provided in text)', example: "An accidental wrong turn led us to a beautiful, undiscovered beach.", example_tw: '一個意外的轉彎錯誤帶我們到了一個美麗的、未被發現的海灘。' },
+                'failure': { pos: 'n.', translation: '失敗', definition: 'the fact that someone or something does not achieve success', example: "The meeting was a total failure since nothing was decided at all.", example_tw: '這次會議是個徹底的失敗，因為什麼都沒決定。' },
+                'recall': { pos: 'vt.', translation: '記起；回想起', definition: 'to remember', example: "Yvonne's grandmother recalled that she married the most handsome man in town at twenty.", example_tw: '伊馮的祖母回憶起她二十歲時嫁給了鎮上最帥的男人。' },
+                'presentation': { pos: 'n.', translation: '報告；介紹', definition: 'a meeting where something is shown to a group of people by one or multiple speakers', example: "Each student must give a presentation on one movie at the end of the semester.", example_tw: '每位學生在學期末都必須針對一部電影做報告。', family: ['present_v'] },
+                'present_v': { pos: 'vt.', translation: '提交', definition: '(not provided in text)', example: "Hannah is going to present her report to her professor tomorrow.", example_tw: '漢娜明天要向她的教授提交報告。' },
+                'skip': { pos: 'vt.', translation: '故意不參加', definition: 'to not do something that you normally do or are expected to do', example: "I don't usually skip class because I don't like to fall behind my classmates.", example_tw: '我通常不翹課，因為我不喜歡落後於同學。' },
+                'ruin': { pos: 'vt.', translation: '破壞；毀壞', definition: 'to spoil or destroy something entirely', example: "Mandy's sandcastle was suddenly ruined when a big wave splashed onto it.", example_tw: '一個大浪打來，曼蒂的沙堡突然就被毀了。', family: ['ruin_n'] },
+                'ruin_n': { pos: 'n.', translation: '破壞；毀壞', definition: '(not provided in text)', example: "Many temples, churches, and libraries in China fell into ruin during the period between 1966 and 1976.", example_tw: '在1966年到1976年期間，中國的許多寺廟、教堂和圖書館都變成了廢墟。' },
+                'embarrassed': { pos: 'adj.', translation: '尷尬的；難堪的', definition: 'feeling ashamed or uncomfortable in public because of something that has happened or been said', example: "Amy was really embarrassed about her mistake during the dance class, though nobody noticed it.", example_tw: '艾美對她在舞蹈課上犯的錯感到非常尷尬，儘管沒有人注意到。', family: ['embarrassing', 'embarrass', 'embarrassment'] },
+                'embarrassing': { pos: 'adj.', translation: '令人尷尬的', definition: '(not provided in text)', example: "Tina experienced an embarrassing situation when she fell asleep during the yoga class and the teacher had to wake her up.", example_tw: '蒂娜在瑜珈課上睡著了，老師不得不叫醒她，這讓她經歷了尷尬的處境。' },
+                'embarrass': { pos: 'vt.', translation: '使尷尬；使難堪', definition: '(not provided in text)', example: "Did I embarrass you when I told our friends that you and your classmate Ken used to be dating?", example_tw: '當我告訴我們的朋友你和你的同學肯曾經約會時，我讓你尷尬了嗎？' },
+                'embarrassment': { pos: 'n.', translation: '尷尬；難堪', definition: '(not provided in text)', example: "To Dave's embarrassment, he found that he was wearing his T-shirt inside out.", example_tw: '令戴夫尷尬的是，他發現他的T恤穿反了。' },
+                'depressed': { pos: 'adj.', translation: '沮喪的；消沉的', definition: 'feeling extremely sad', example: "Emilia felt deeply depressed after her smartphone was stolen.", example_tw: '艾蜜莉亞的智慧型手機被偷後，她感到非常沮喪。', family: ['depress', 'depression'] },
+                'depress': { pos: 'vt.', translation: '使沮喪', definition: '(not provided in text)', example: "The sudden death of her pet goldfish really depressed Cindy and her brother Tim.", example_tw: '她的寵物金魚突然死亡，讓辛蒂和她的弟弟提姆感到非常沮沮喪。' },
+                'depression': { pos: 'n.', translation: '沮喪；消沉', definition: '(not provided in text)', example: "After a long period of deep depression, Amanda finally found happiness again.", example_tw: '在經歷了長期的深度沮喪後，阿曼達終於再次找到了快樂。' },
+                'upset': { pos: 'vt.', translation: '使難過；使沮喪', definition: 'to make someone unhappy or disappointed', example: "You shouldn't speak to your parents in an impolite way since you could upset them.", example_tw: '你不應該用不禮貌的方式跟父母說話，因為你可能會讓他們難過。', family: ['upset_adj'] },
+                'upset_adj': { pos: 'adj.', translation: '難過的；沮喪的', definition: '(not provided in text)', example: "Kyle was deeply upset about not winning first place in the swimming race.", example_tw: '凱爾因為在游泳比賽中沒有得到第一名而感到非常難過。' },
+                'reflect': { pos: 'vi.', translation: '認真思考；沉思', definition: 'to think carefully about something that has happened', example: "Barbara spent a whole week reflecting on her college choice.", example_tw: '芭芭拉花了一整個星期的時間思考她的大學選擇。', family: ['reflection'] },
+                'reflection': { pos: 'n.', translation: '映出的影像', definition: '(not provided in text)', example: "The funny little dog started barking wildly at its own reflection in the mirror.", example_tw: '那隻有趣的小狗對著鏡子裡自己的倒影瘋狂地吠叫。' },
+                'remind': { pos: 'vt.', translation: '提醒；使想起', definition: 'to make someone remember to do something or to make someone remember something or someone', example: "Ms. Chen reminded her students of the importance of checking their homework.", example_tw: '陳老師提醒她的學生檢查作業的重要性。' },
+                'realize': { pos: 'vt.', translation: '了解；領悟', definition: 'to clearly understand something', example: "Matt suddenly realized that the time on his watch was wrong and that he was late for the meeting.", example_tw: '麥特突然意識到他手錶上的時間是錯的，而且他開會遲到了。' },
+                'traditional': { pos: 'adj.', translation: '傳統的', definition: "following or belonging to the long-held customs and ways of life of a group of people, unchanged for many years", example: "Bella lived in Mexico for several years and can cook several traditional Mexican dishes.", example_tw: '貝拉在墨西哥住了好幾年，會做好幾道傳統的墨西哥菜。', family: ['tradition'] },
+                'tradition': { pos: 'n.', translation: '傳統', definition: '(not provided in text)', example: "The tradition of giving red envelopes to children on Lunar New Year's Eve started thousands of years ago in China.", example_tw: '農曆除夕給孩子紅包的傳統始於幾千年前的中國。' },
+                'fortunately': { pos: 'adv.', translation: '幸運地', definition: 'luckily', example: "Fortunately, few people were hurt when the building fell down during the earthquake.", example_tw: '幸運的是，地震中大樓倒塌時，很少有人受傷。', family: ['fortunate'] },
+                'fortunate': { pos: 'adj.', translation: '幸運的', definition: '(not provided in text)', example: "We are fortunate to have clean drinking water in most homes in our country.", example_tw: '我們很幸運，在我們國家大多數家庭都有乾淨的飲用水。' },
+            },
+            'L02': {
+                'relationship': { pos: 'n.', translation: '戀愛關係', definition: 'a close or loving friendship between two people', example: "Marc and Amy have been in a relationship since their first date four years ago.", example_tw: '馬克和艾美從四年前第一次約會後，就一直維持著戀愛關係。', family: ['relation', 'relate'], note: "<h5>用法比較 (Usage Note):</h5><p class='text-sm text-left px-2'><b>relationship</b>: 較常用，強調人與人之間<b>情感的連結</b>與互動，例如友情、愛情、親情。(e.g., a romantic relationship, a good relationship with his parents.)</p><p class='text-sm text-left px-2'><b>relation</b>: 較正式，指人或事物之間的<b>客觀關聯</b>，不一定帶有情感。也指<b>親戚</b>關係。(e.g., What is the relation between the two events? She is a distant relation of mine.)</p>" },
+                'relation': { pos: 'n.', translation: '關係', definition: '(not provided in text)', example: "In relation to your question in the email, I still don't know the answer.", example_tw: '關於您在電子郵件中的問題，我仍然不知道答案。' },
+                'relate': { pos: 'vt.', translation: '使兩者有聯繫', definition: '(not provided in text)', example: "Studies have related smoking to many health problems, so you shouldn't take up this habit.", example_tw: '研究已將吸菸與許多健康問題聯繫起來，所以你不應該養成這個習慣。' },
+                'satisfying': { pos: 'adj.', translation: '令人滿意的', definition: 'bringing pleasure to a person by providing something that person wants or needs', example: "Billy thinks it is satisfying to drink a big cup of iced tea after he exercises.", example_tw: '比利認為運動後喝一大杯冰茶是件很令人滿足的事。', family: ['satisfy', 'satisfaction'] },
+                'satisfy': { pos: 'vt.', translation: '使滿意', definition: '(not provided in text)', example: "The hotpot dinner really satisfied all of the hungry guests.", example_tw: '這頓火鍋晚餐確實滿足了所有飢餓的客人。' },
+                'satisfaction': { pos: 'n.', translation: '滿意', definition: '(not provided in text)', example: "Jessica smiled with satisfaction when she saw 100 on her test sheet.", example_tw: '當潔西卡在考卷上看到100分時，她滿意地笑了。' },
+                'inspire': { pos: 'vt.', translation: '激勵', definition: 'to cause someone to have the desire, confidence, or enthusiasm to do a good thing or improve himself or herself', example: "The superheroine Wonder Woman has inspired a lot of girls with her bravery and strength.", example_tw: '女超人神力女超人以她的勇敢和力量激勵了很多女孩。', family: ['inspiration'] },
+                'inspiration': { pos: 'n.', translation: '靈感', definition: '(not provided in text)', example: "Paulina draws inspiration from her relationships with others when she writes poetry.", example_tw: '寶琳娜在寫詩時，從她與他人的關係中汲取靈感。' },
+                'connect': { pos: 'vi.', translation: '與他人建立良好關係', definition: 'to develop a relationship with someone', example: "The two friends connected with each other when they rode their bikes around the country together.", example_tw: '這兩位朋友一起騎自行車環遊全國時，彼此建立了深厚的關係。', family: ['connection'] },
+                'connection': { pos: 'n.', translation: '關聯；關係', definition: '(not provided in text)', example: "The teacher failed to see the connection between Bonnie's story and her being late for class.", example_tw: '老師看不出邦妮的故事和她上課遲到之間有什麼關聯。' },
+                'communicate': { pos: 'vi.', translation: '溝通', definition: 'to share information, facts, ideas, or feelings with others', example: "The Internet allows us to communicate quickly and easily with people all over the world.", example_tw: '網際網路讓我們可以快速輕鬆地與世界各地的人們溝通。', family: ['communication'] },
+                'communication': { pos: 'n.', translation: '溝通', definition: '(not provided in text)', example: "Telephone calls have become a less common means of communication as many people now prefer apps like LINE.", example_tw: '隨著許多人現在更喜歡像LINE這樣的應用程式，電話已成為一種較不常見的溝通方式。' },
+                'introduce': { pos: 'vt.', translation: '使某人初次體驗', definition: "to inform or teach someone about something that he or she doesn't know much about", example: "This two-minute video introduces the public to the latest iPhone and its new features.", example_tw: '這段兩分鐘的影片向大眾介紹了最新的iPhone及其新功能。', family: ['introduction'] },
+                'introduction': { pos: 'n.', translation: '介紹', definition: '(not provided in text)', example: "The waiter gave the guests a detailed introduction to that day's menu.", example_tw: '服務生向客人詳細介紹了當天的菜單。' },
+                'throughout': { pos: 'prep.', translation: '自始至終', definition: 'occurring during an entire period of time', example: "In some countries, like Singapore, the weather stays hot throughout the year.", example_tw: '在一些國家，例如新加坡，天氣全年都很熱。' },
+                'message': { pos: 'n.', translation: '訊息', definition: 'a piece of writing such as an email or SMS (short message service) sent to someone electronically', example: "Kylie sent a text message to her boss to tell him that she would be ten minutes late for work.", example_tw: '凱莉發了一則簡訊給她的老闆，告訴他她上班會遲到十分鐘。' },
+                'refresh': { pos: 'vt. vi.', translation: '刷新', definition: 'to click on something to make the latest information appear', example: "Olivia refreshed her Facebook Feed to check for new posts from her friends.", example_tw: '奧莉維亞刷新了她的臉書動態，查看朋友們是否有新的貼文。' },
+                'romantic': { pos: 'adj.', translation: '浪漫的；愛情的', definition: "related to love or a couple's personal relationship", example: "Nicole and Sam were just friends for many years and never developed a romantic relationship.", example_tw: '妮可和山姆多年來只是朋友，從未發展成戀愛關係。', family: ['romance'] },
+                'romance': { pos: 'n.', translation: '浪漫愛情故事', definition: '(not provided in text)', example: "Cindy is glad that her love life is much simpler than most romance novels.", example_tw: '辛蒂很高興她的愛情生活比大多數愛情小說簡單得多。' },
+                'focus': { pos: 'vi. vt.', translation: '專注；專心', definition: 'to pay particular attention to one thing, situation, or person', example: "Jason couldn't focus on the action in the movie because he was trying to read the words on the screen.", example_tw: '傑森無法專心看電影的情節，因為他正試圖閱讀螢幕上的字幕。', family: ['focus_n'] },
+                'focus_n': { pos: 'n.', translation: '關注的人或事物', definition: '(not provided in text)', example: "The main focus for today's history class will be World Wars I and II.", example_tw: '今天歷史課的主要焦點將是第一次和第二次世界大戰。' },
+                'ignore': { pos: 'vt.', translation: '忽略', definition: 'to not pay attention to something or someone', example: "Grace totally ignored her younger brother as he made silly faces at her.", example_tw: '葛瑞絲完全忽略了她弟弟，儘管他對她做鬼臉。', family: ['ignorance'] },
+                'ignorance': { pos: 'n.', translation: '無知', definition: '(not provided in text)', example: "Out of ignorance, the students made jokes about the exchange student's country.", example_tw: '由於無知，學生們拿交換生的國家開玩笑。' },
+                'attention': { pos: 'n.', translation: '注意力', definition: 'the act of focusing on something or someone', example: "The article draws our attention to the importance of being good parents in today's world.", example_tw: '這篇文章提醒我們在今日世界為人父母的重要性。' },
+                'deny': { pos: 'vt.', translation: '否認', definition: 'to refuse to admit that something is true', example: "Mr. Lin denied giving a box of candy to his daughter, but Mrs. Lin didn't believe him.", example_tw: '林先生否認給他女兒一盒糖果，但林太太不相信他。' },
+                'respond': { pos: 'vi. vt.', translation: '回應', definition: 'to give a spoken or written reply to someone or something', example: "Chris responded to his mom's Facebook message with a smiling cat sticker.", example_tw: '克里斯用一張微笑的貓咪貼圖回應了他媽媽的臉書訊息。', family: ['response'] },
+                'response': { pos: 'n.', translation: '回應', definition: '(not provided in text)', example: "The students in the class made no response to the teacher's difficult question.", example_tw: '班上的學生對老師的難題沒有任何回應。' },
+                'disappointed': { pos: 'adj.', translation: '感到失望的', definition: 'sad or upset because something you hoped for has not happened or has not occurred in the way that you expected', example: "Fiona was really disappointed that her favorite character died at the end of the movie.", example_tw: '費歐娜對於她最喜歡的角色在電影結尾死掉感到非常失望。', family: ['disappoint', 'disappointment'] },
+                'disappoint': { pos: 'vt.', translation: '使失望', definition: '(not provided in text)', example: "It really disappointed Sally that her friend Lindsay never replied to her message.", example_tw: '她的朋友琳賽從未回覆她的訊息，這讓莎莉非常失望。' },
+                'disappointment': { pos: 'n.', translation: '失望', definition: '(not provided in text)', example: "To Amy's great disappointment, her parents were late for the dance show and missed her part.", example_tw: '令艾美非常失望的是，她的父母在舞蹈表演中遲到，錯過了她的部分。' },
+                'personally': { pos: 'adv.', translation: '針對某人地', definition: "in a way that is regarded as hurtful to one's self", example: "Please don't take my comment personally. I'm complaining about all the drivers in our country, not just you.", example_tw: '請不要把我的評論當成是針對你個人。我是在抱怨我們國家的所有駕駛，不只是你。', family: ['personal'] },
+                'personal': { pos: 'adj.', translation: '個人的', definition: '(not provided in text)', example: "Mrs. Thompson has a lot of personal experience working with kids who can't focus in class.", example_tw: '湯普森太太在與上課無法專心的孩子們相處方面，有許多個人經驗。' },
+            },
+            'L03': {
+                'wonder': { pos: 'vt. vi.', translation: '想知道', definition: 'to consider something and try to decide what is true, what will happen, what one should do, and so on', example: 'Samuel wonders if he will lose some weight after he joins the swimming club.', example_tw: '山謬想知道他加入游泳社後會不會瘦一點。' },
+                'amazing': { pos: 'adj.', translation: '令人大感驚奇的', definition: 'very surprising, incredible, and hard to believe', example: "It's amazing how bright the stars are outside of the city at night!", example_tw: '夜晚在市郊的星星是如此明亮，真是令人驚奇！', family: ['amaze', 'amazement'] },
+                'amaze': { pos: 'vt.', translation: '使人驚奇', definition: '(not provided in text)', example: 'It often amazes people that pigs are smarter than dogs.', example_tw: '豬比狗聰明這件事常常讓人們感到驚訝。' },
+                'amazement': { pos: 'n.', translation: '驚奇', definition: '(not provided in text)', example: 'The travelers stood there in amazement as they looked at the huge rainbow up in the sky.', example_tw: '旅客們驚奇地站在那裡，看著天空中巨大的彩虹。' },
+                'average': { pos: 'n.', translation: '平均', definition: 'an amount, type, or level that is in the middle', example: 'Helen usually scores above average on her exams because she always studies much harder than her classmates.', example_tw: '海倫的考試成績通常在平均之上，因為她總是比同學用功許多。', family: ['average_adj'] },
+                'average_adj': { pos: 'adj.', translation: '平均的', definition: '(not provided in text)', example: 'Even though the price of some new smartphones is high, the average price continues to drop every year.', example_tw: '儘管有些新款智慧型手機的價格很高，但平均價格每年都在持續下降。' },
+                'therefore': { pos: 'adv.', translation: '因此', definition: 'as a result of something that was just mentioned', example: "The boots were much more expensive than Tina had expected; therefore, she didn't buy them.", example_tw: '這雙靴子比蒂娜預期的貴很多；因此，她沒有買。' },
+                'nap': { pos: 'vi.', translation: '小睡', definition: 'to sleep for a short period of time during the day', example: 'Craig has a bad habit of staying up late and then napping several times during the day.', example_tw: '克雷格有熬夜的壞習慣，然後白天會小睡好幾次。', family: ['nap_n'] },
+                'nap_n': { pos: 'n.', translation: '小睡', definition: '(not provided in text)', example: 'Everybody in the Su family likes to take a nap right after lunch on weekends.', example_tw: '蘇家的每個人都喜歡在週末午飯後小睡片刻。' },
+                'float': { pos: 'vi.', translation: '漂浮', definition: 'to remain on or near the surface of the water or of another liquid and not sink', example: 'Jenna threw a piece of bread into the pond and watched it float until a fish ate it.', example_tw: '珍娜把一塊麵包丟進池塘，看著它漂浮著，直到一條魚把它吃掉。' },
+                'avoid': { pos: 'vt.', translation: '避免', definition: 'to prevent something, usually bad, from happening', example: 'The family avoided getting stuck in the traffic jam by leaving home very early in the morning.', example_tw: '這家人為了避免塞車，一大早就出門了。' },
+                'surface': { pos: 'n.', translation: '表面', definition: 'the top layer of water or land, or the outer layer of something', example: 'When too many people boarded the little boat, it began to sink below the surface of the water.', example_tw: '當太多人登上小船時，它開始沉入水面下。' },
+                'breathe': { pos: 'vi. vt.', translation: '呼吸', definition: 'to take air into your lungs and blow it out through your nose or mouth', example: 'The yoga teacher told her students to breathe in as they lifted their arms above their heads.', example_tw: '瑜珈老師告訴學生們，舉起手臂過頭時要吸氣。', family: ['breath'] },
+                'breath': { pos: 'n.', translation: '呼吸的氣息', definition: '(not provided in text)', example: 'The little boy was out of breath after his father chased him around the park.', example_tw: '小男孩在公園裡被他爸爸追著跑後，喘不過氣來。' },
+                'awake': { pos: 'adj.', translation: '醒著的', definition: 'not sleeping, no longer sleeping, or not yet asleep', example: "The loud music from the neighbors' party kept the whole family awake all night.", example_tw: '鄰居派對的吵雜音樂讓全家人整夜都醒著。', family: ['awake_v'] },
+                'awake_v': { pos: 'vi. vt.', translation: '醒來;喚醒', definition: '(not provided in text)', example: 'Sherry awoke from a deep sleep and saw that her dog was sitting on the bed and watching her.', example_tw: '雪莉從沉睡中醒來，看到她的狗正坐在床上看著她。' },
+                'impressive': { pos: 'adj.', translation: '令人印象深刻的', definition: 'able to make one feel amazed because something or someone is very good, skillful, etc.', example: 'It\'s so impressive that Brian can say "hello" and "thank you" in more than fifteen languages!', example_tw: '布萊恩會用超過十五種語言說「你好」和「謝謝」，真是令人印象深刻！', family: ['impress', 'impression'] },
+                'impress': { pos: 'vt.', translation: '使人留下深刻印象', definition: '(not provided in text)', example: 'Michelle liked to impress her friends with her yo-yo tricks.', example_tw: '蜜雪兒喜歡用她的溜溜球技巧讓朋友們印象深刻。' },
+                'impression': { pos: 'n.', translation: '印象', definition: '(not provided in text)', example: 'The new worker left a good impression on most of the staff members on her first day.', example_tw: '新員工在第一天就給大多數同事留下了好印象。' },
+                'distance': { pos: 'n.', translation: '距離', definition: 'the length of the space between two places or things', example: 'The distance between the eastern end of Russia and the western one is about ten thousand kilometers.', example_tw: '俄羅斯東端和西端之間的距離大約是一萬公里。', family: ['distant'] },
+                'distant': { pos: 'adj.', translation: '遙遠的', definition: '(not provided in text)', example: 'If you live in a big city, the downtown area may be distant from your home.', example_tw: '如果你住在大城市，市中心地區可能離你家很遠。' },
+                'journey': { pos: 'n.', translation: '旅行', definition: 'a trip that is usually long in terms of distance or time', example: 'After high school, the two best friends plan to go on a journey around the world.', example_tw: '高中畢業後，這兩個最好的朋友計劃環遊世界。' },
+                'flight': { pos: 'n.', translation: '飛行', definition: 'the condition, state, or process of flying', example: 'Baby birds usually take flight for the first time after they are only about two or three weeks old.', example_tw: '幼鳥通常在出生大約兩到三週後才會第一次飛行。' },
+                'variety': { pos: 'n.', translation: '多種樣式、變化', definition: 'several different types of something', example: "That store sells a wide variety of children's toys and books.", example_tw: '那家商店出售各式各樣的兒童玩具和書籍。', family: ['vary', 'various'] },
+                'vary': { pos: 'vi.', translation: '有所不同', definition: '(not provided in text)', example: 'Smartphone cases vary in color, size, shape, and material, but all of them have the same basic function.', example_tw: '智慧型手機殼在顏色、尺寸、形狀和材質上各不相同，但它們都有相同的基本功能。' },
+                'various': { pos: 'adj.', translation: '各式各樣的', definition: '(not provided in text)', example: 'The festival was canceled for various reasons, like poor weather and lack of interest.', example_tw: '由於天氣不佳和缺乏興趣等各種原因，這個節日被取消了。' },
+                'creature': { pos: 'n.', translation: '生物', definition: 'a living thing such as an animal, or an imagined being such as a monster', example: "Nick is kind-hearted. He wouldn't hurt any living creature, not even a mosquito.", example_tw: '尼克心地善良。他不會傷害任何生物，甚至連一隻蚊子也不會。' },
+                'expert': { pos: 'n.', translation: '專家;行家', definition: 'a person with advanced knowledge, skills, or training in a particular field or subject', example: "Mr. Yang is an expert in math. I'm glad to have him as my tutor.", example_tw: '楊先生是數學專家。我很高興有他當我的家教。' },
+                'survive': { pos: 'vi. vt.', translation: '生存;倖存', definition: 'to stay alive or continue to exist', example: 'Some animals are able to survive from season to season by changing the color of their fur.', example_tw: '有些動物能夠透過改變毛色來度過不同的季節。', family: ['survival'] },
+                'survival': { pos: 'n.', translation: '生存;倖存', definition: '(not provided in text)', example: 'The news report said that the missing mountain climbers had a low chance of survival.', example_tw: '新聞報導稱，失蹤的登山客生還的機會很低。' },
+            }
+        };
+
+        const dom = {
+            unitSelect: document.getElementById('unit-select'),
+            groupSelector: document.getElementById('group-selector'),
+            difficultySelector: document.getElementById('difficulty-selector'),
+            storyPassage: document.getElementById('story-passage'),
+            wordOptions: document.getElementById('word-options'),
+            submitBtn: document.getElementById('submitBtn'),
+            clearBtn: document.getElementById('clearBtn'),
+            resultsDiv: document.getElementById('results'),
+            shareBtn: document.getElementById('shareBtn'),
+            analysisContainer: document.getElementById('analysis-container'),
+            incorrectAnswersDiv: document.getElementById('incorrect-answers'),
+            hintModal: document.getElementById('hintModal'),
+            modalContent: document.getElementById('modal-content-inner'),
+            closeModalBtn: document.querySelector('.close-btn'),
+            recordsList: document.getElementById('records-list'),
+            recordsStatus: document.getElementById('records-status'),
+            classSelect: document.getElementById('class-select'),
+            seatNumberInput: document.getElementById('seat-number'),
+            quizArea: document.getElementById('quiz-area'),
+            welcomeMessage: document.getElementById('welcome-message'),
+            bonusGroupBtn: document.getElementById('bonus-group-btn'),
+            shareAchievementsBtn: document.getElementById('share-achievements-btn'),
+            badgeHallContainer: document.getElementById('badge-hall-container'),
+            adminTools: document.getElementById('admin-tools'),
+            adminFillBtn: document.getElementById('adminFillBtn'),
+            devToolsPanel: document.getElementById('dev-tools-panel'),
+        };
+
+        let state = {
+            currentUnit: '',
+            currentGroup: null,
+            currentDifficulty: null,
+            currentWords: [],
+            correctAnswers: {},
+            currentScore: 0,
+            earnedBadgesForSharing: [],
+        };
+        
+        const fetchScores = async () => {
+            if (!db || !userId) {
+                dom.recordsStatus.textContent = '請先登入以查看紀錄。';
+                return;
+            }
+            dom.recordsStatus.textContent = '正在載入成績...';
+            try {
+                const q = query(collection(db, `artifacts/${appId}/public/data/${pageIdentifier}_scores`), where("userId", "==", userId));
+                const querySnapshot = await getDocs(q);
+                const scores = [];
+                querySnapshot.forEach(doc => scores.push({ id: doc.id, ...doc.data() }));
+                scores.sort((a, b) => (b.timestamp?.toDate()?.getTime() || 0) - (a.timestamp?.toDate()?.getTime() || 0));
+                
+                localScores = scores.map(s => ({unitKey: s.unitKey, group: s.group, level: s.level, score: s.score}));
+                
+                updateBonusButtonVisibility();
+                
+                dom.shareAchievementsBtn.disabled = localScores.length === 0;
+
+                if (scores.length === 0) {
+                    dom.recordsStatus.textContent = '您目前沒有任何成績紀錄。';
+                    dom.recordsList.innerHTML = '';
+                } else {
+                    dom.recordsStatus.textContent = '';
+                    dom.recordsList.innerHTML = scores.map(s => `
+                        <div class="flex flex-wrap justify-between items-center p-3 bg-gray-100 rounded-lg gap-2">
+                            <div><span class="font-semibold">${s.unit} - ${s.group ? s.group.replace('group','Group ') : ''} ${s.level ? `(${s.level})` : ''}</span> - <span class="text-gray-600">${s.studentClass} ${s.seatNumber}</span></div>
+                            <div class="text-lg font-bold ${s.score >= 80 ? 'text-green-600' : 'text-orange-500'}">${s.score}分</div>
+                            <div class="text-sm text-gray-500">${s.timestamp ? s.timestamp.toDate().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' }) : 'N/A'}</div>
+                        </div>`).join('');
+                }
+            } catch (error) {
+                console.error("Error fetching scores: ", error);
+                dom.recordsStatus.textContent = '無法載入成績紀錄。'; 
+            }
+        };
+
+        const fetchBadges = async () => {
+             if (!userId || !db) return;
+             const badgeRef = doc(db, `artifacts/${appId}/public/data/${pageIdentifier}_user_badges`, userId);
+             try {
+                 const docSnap = await getDoc(badgeRef);
+                 if (docSnap.exists()) {
+                     earnedBadges = docSnap.data().badges || {};
+                 } else {
+                     earnedBadges = {};
+                 }
+                 updateBonusButtonVisibility();
+                 renderBadgeHall();
+             } catch (e) {
+                 console.error("Error fetching badges:", e);
+                 earnedBadges = {};
+             }
+        };
+        
+        const updateBadgesInFirestore = async () => {
+            if (!userId || !db) return;
+            const badgeRef = doc(db, `artifacts/${appId}/public/data/${pageIdentifier}_user_badges`, userId);
+            try {
+                await setDoc(badgeRef, { badges: earnedBadges });
+            } catch (e) {
+                console.error("Error updating badges:", e);
+            }
+        };
+        
+        const checkAchievements = async (score) => {
+            const newlyEarned = [];
+            const addBadge = (key) => {
+                let uniqueKey = key;
+                const generalBadges = ['perfect_score', 'high_achiever', 'effortful_learner', 'cute_cat'];
+                if (!generalBadges.includes(key)) {
+                    uniqueKey = `${key}_${state.currentUnit}`;
+                }
+
+                if (!earnedBadges[uniqueKey]) {
+                    const badgeData = allBadges[key];
+                    if (badgeData) {
+                         newlyEarned.push({key, ...badgeData});
+                    }
+                    earnedBadges[uniqueKey] = true;
+                }
+            };
+
+            if (score === 100) addBadge('perfect_score');
+            if (score >= 90) addBadge('high_achiever');
+            if (score >= 60) addBadge('effortful_learner');
+
+            const checkLevelMastery = (unitKey, targetLevel, scoreThreshold, badgeKey) => {
+                if (earnedBadges[`${badgeKey}_${unitKey}`]) return;
+                const scoresForLevel = localScores.filter(s => s.unitKey === unitKey && s.level === targetLevel);
+                const allGroupsInUnit = Object.keys(vocabulary[unitKey]).filter(g => g !== 'groupBonus');
+                const passedGroups = new Set(scoresForLevel.filter(s => s.score >= scoreThreshold).map(s => s.group));
+                if (passedGroups.size === allGroupsInUnit.length) {
+                    addBadge(badgeKey);
+                }
+            };
+
+            checkLevelMastery(state.currentUnit, 'A2', 80, 'a2_explorer');
+            checkLevelMastery(state.currentUnit, 'B1', 80, 'b1_voyager');
+            checkLevelMastery(state.currentUnit, 'B2', 80, 'conqueror');
+            checkLevelMastery(state.currentUnit, 'C1', 80, 'strong_one');
+            checkLevelMastery(state.currentUnit, 'C1', 100, 'english_monster');
+
+            const legendBadgeKey = `legend_${state.currentUnit}`;
+            if (!earnedBadges[legendBadgeKey]) {
+                const allScoresForUnit = localScores.filter(s => s.unitKey === state.currentUnit);
+                const allTests = [];
+                const groups = Object.keys(vocabulary[state.currentUnit]).filter(g => g !== 'groupBonus');
+                
+                let totalTestsInUnit = 0;
+                groups.forEach(g => {
+                    if (vocabulary[state.currentUnit][g].stories) {
+                        totalTestsInUnit += vocabulary[state.currentUnit][g].stories.length;
+                        vocabulary[state.currentUnit][g].stories.forEach(story => {
+                            allTests.push(`${g}-${story.level}`);
+                        });
+                    }
+                });
+
+                const passedAll100 = allTests.every(test => {
+                    const [group, level] = test.split('-');
+                    return allScoresForUnit.some(s => s.group === group && s.level === level && s.score === 100);
+                });
+
+                if (passedAll100) {
+                    addBadge('legend');
+                    updateBonusButtonVisibility();
+                }
+            }
+            
+            if (state.currentGroup === 'groupBonus' && score === 100) {
+                addBadge('alien');
+            }
+
+            if (earnedBadges[`legend_${state.currentUnit}`] && earnedBadges[`alien_${state.currentUnit}`]) {
+                 addBadge('unit_master');
+            }
+            
+            const allUnitKeys = Object.keys(vocabulary);
+            const hasMasteredAllUnits = allUnitKeys.every(unitKey => 
+                earnedBadges[`legend_${unitKey}`] && earnedBadges[`alien_${unitKey}`]
+            );
+
+            if (hasMasteredAllUnits && !earnedBadges['cute_cat']) {
+                addBadge('cute_cat'); 
+            }
+
+            if (newlyEarned.length > 0) {
+                await updateBadgesInFirestore();
+            }
+
+            return newlyEarned;
+        };
+        
+        const updateBonusButtonVisibility = () => {
+             const currentUnitKey = state.currentUnit;
+             if(!currentUnitKey) return;
+             const legendBadgeKey = `legend_${currentUnitKey}`;
+            if (earnedBadges[legendBadgeKey]) {
+                dom.bonusGroupBtn.classList.remove('hidden');
+            } else {
+                dom.bonusGroupBtn.classList.add('hidden');
+            }
+        };
+        
+        const renderBadgeHall = () => {
+            const container = dom.badgeHallContainer;
+            if (!container || !state.currentUnit) {
+                if(container) container.innerHTML = '<p class="text-center text-gray-500 col-span-full">請先選擇一個單元來查看相關徽章。</p>';
+                return;
+            };
+
+            container.innerHTML = '';
+            
+            const sortedBadges = Object.keys(allBadges).sort((a, b) => {
+                const order = ['effortful_learner', 'high_achiever', 'perfect_score', 'a2_explorer', 'b1_voyager', 'conqueror', 'strong_one', 'english_monster', 'legend', 'alien', 'unit_master', 'cute_cat'];
+                return order.indexOf(a) - order.indexOf(b);
+            });
+
+            sortedBadges.forEach(key => {
+                const badge = allBadges[key];
+
+                let isEarned = false;
+                const generalBadges = ['perfect_score', 'high_achiever', 'effortful_learner', 'cute_cat'];
+                if (generalBadges.includes(key)) {
+                    isEarned = earnedBadges[key] === true;
+                } else {
+                    const uniqueKey = `${key}_${state.currentUnit}`;
+                    isEarned = earnedBadges[uniqueKey] === true;
+                }
+                
+                const badgeHTML = `
+                    <div class="flex items-center p-4 bg-white rounded-lg shadow ${isEarned ? 'opacity-100 ring-2 ring-yellow-400' : 'opacity-40'}">
+                        <div class="text-4xl mr-4">${badge.icon}</div>
+                        <div>
+                            <h3 class="font-bold text-lg ${isEarned ? 'text-yellow-600' : 'text-gray-700'}">${badge.name}</h3>
+                            <p class="text-sm text-gray-500">${badge.description}</p>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += badgeHTML;
+            });
+        };
+        
+        const updateDropdownOptions = () => {
+            const allSelects = Array.from(document.querySelectorAll('.word-select'));
+            const answeredCount = allSelects.filter(s => s.value !== '').length;
+            const totalCount = allSelects.length;
+            dom.submitBtn.disabled = totalCount > 0 && answeredCount < Math.ceil(totalCount / 2);
+
+            const selectedValues = new Set(allSelects.map(s => s.value).filter(v => v));
+            allSelects.forEach((select, index) => {
+                const ownValue = select.value;
+                let optionsHtml = `<option value="">---(${index + 1})---</option>`;
+                state.currentWords.forEach(word => {
+                    if (!selectedValues.has(word) || word === ownValue) {
+                        optionsHtml += `<option value="${word}" ${word === ownValue ? 'selected' : ''}>${word}</option>`;
+                    }
+                });
+                select.innerHTML = optionsHtml;
+            });
+        };
+        
+        const loadQuiz = () => {
+            if (!state.currentUnit || !state.currentGroup || !state.currentDifficulty) return;
+            
+            dom.quizArea.classList.remove('hidden');
+            dom.welcomeMessage.classList.add('hidden');
+            
+            const isBonus = state.currentGroup === 'groupBonus';
+            const unitData = vocabulary[state.currentUnit][state.currentGroup];
+            Object.assign(state, { correctAnswers: {}, earnedBadgesForSharing: [] });
+            
+            dom.storyPassage.innerHTML = '';
+            dom.wordOptions.innerHTML = '';
+            dom.resultsDiv.innerHTML = '';
+            dom.analysisContainer.style.display = 'none';
+            dom.incorrectAnswersDiv.innerHTML = '';
+            dom.shareBtn.classList.add('hidden');
+            dom.submitBtn.disabled = true;
+
+            const selectedStory = isBonus ? unitData.story : unitData.stories.find(s => s.level === state.currentDifficulty);
+            state.currentWords = unitData.words.slice().sort((a, b) => a.localeCompare(b));
+
+            let selectCounter = 0;
+            const processedStory = selectedStory.text.replace(/\*\*(.*?)\*\*/g, (match, word) => {
+                const selectId = `word-select-${selectCounter}`;
+                const canonicalWord = state.currentWords.find(w => w.toLowerCase() === word.toLowerCase()) || word;
+                state.correctAnswers[selectId] = canonicalWord;
+                return `<select id="${selectId}" class="word-select"><option value="">---(${++selectCounter})---</option></select>`;
+            });
+
+            dom.storyPassage.innerHTML = processedStory;
+            
+            dom.storyPassage.querySelectorAll('.word-select').forEach(select => select.addEventListener('change', updateDropdownOptions));
+            updateDropdownOptions();
+            
+            dom.wordOptions.innerHTML = '';
+            state.currentWords.forEach(word => {
+                const wordBtn = document.createElement('button');
+                wordBtn.className = 'word-pronounceable';
+                wordBtn.textContent = word;
+                wordBtn.addEventListener('click', () => showHint(word));
+                dom.wordOptions.appendChild(wordBtn);
+            });
+
+            renderBadgeHall();
+        };
+        
+        const speak = (text, rate = 1.0) => {
+             if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = rate;
+                window.speechSynthesis.speak(utterance);
+             }
+        };
+        
+        const stopSpeak = () => {
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        };
+
+        const showHint = (word) => {
+            const allWordData = wordDetails[state.currentUnit];
+            if (!allWordData) return;
+
+            let mainWordKey = word.toLowerCase();
+            let wordData = allWordData[mainWordKey];
+
+            if (!wordData) {
+                for (const key in allWordData) {
+                    if (allWordData[key].family && allWordData[key].family.includes(word.toLowerCase())) {
+                        mainWordKey = key;
+                        wordData = allWordData[mainWordKey]; 
+                        break;
+                    }
+                }
+            }
+             if (!wordData) {
+                console.error(`Data for "${word}" or its family not found.`);
+                return;
+             }
+
+            let familyHtml = '';
+            const mainWordData = allWordData[mainWordKey];
+            if (mainWordData.family && mainWordData.family.length > 0) {
+                 familyHtml += `<details class="mt-4 pt-4 border-t border-gray-200 text-left"><summary class="text-xl font-semibold text-indigo-700 mb-2 cursor-pointer p-2 rounded-lg hover:bg-yellow-100 flex justify-between items-center"><span>單字家族 (Word Family)</span><span class="text-sm font-normal text-gray-500">點擊展開/收合</span></summary><div class="space-y-2 mt-2">`;
+                
+                familyHtml += createFamilyWordHtml(mainWordKey, mainWordData, mainWordKey);
+                
+                mainWordData.family.forEach(familyWordKey => {
+                    const familyWordData = allWordData[familyWordKey];
+                    if (familyWordData) {
+                       familyHtml += createFamilyWordHtml(familyWordKey, familyWordData, mainWordKey);
+                    }
+                });
+                familyHtml += `</div></details>`;
+            }
+            
+            let usageNoteHtml = mainWordData.note ? `<div class="mt-4 text-left p-3 bg-blue-50 border-l-4 border-blue-400">${mainWordData.note}</div>` : '';
+
+            dom.modalContent.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div class="text-left">
+                        <h2 class="text-3xl font-bold text-sky-800" id="modal-word-title"></h2>
+                        <div id="chinese-translation" class="hidden text-xl text-gray-700 my-2"></div>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button id="modal-word-speak-normal" class="text-2xl" title="正常速度">🔊</button>
+                        <button id="modal-word-speak-slow" class="text-2xl" title="慢速">🐢</button>
+                        <button id="modal-word-speak-stop" class="text-2xl" title="停止">🤫</button>
+                    </div>
+                </div>
+                <button id="show-chinese-btn" class="mb-4 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-semibold py-1 px-3 rounded-lg">顯示中文</button>
+                <p class="text-md text-left text-gray-600"><strong>Definition:</strong> (${wordData.pos}) ${wordData.definition}</p>
+                <div class="flex justify-between items-start mt-2">
+                    <div class="text-md text-left text-gray-500 pr-4">
+                        <strong>Example:</strong> <em id="modal-example-text"></em>
+                    </div>
+                    <div class="flex items-center space-x-1 flex-shrink-0">
+                        <button id="modal-example-speak-normal" class="text-2xl" title="正常速度">🔊</button>
+                        <button id="modal-example-speak-slow" class="text-2xl" title="慢速">🐢</button>
+                        <button id="modal-example-speak-stop-example" class="text-2xl" title="停止">🤫</button>
+                    </div>
+                </div>
+                <div id="example-translation-tw" class="hidden text-md text-left text-gray-500 mt-1"><strong>翻譯:</strong> <em id="modal-example-translation-text"></em></div>
+                <button id="show-example-translation-btn" class="mt-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-semibold py-1 px-3 rounded-lg">顯示例句翻譯</button>
+                ${usageNoteHtml}
+                ${familyHtml}
+            `;
+            
+            document.getElementById('modal-word-title').textContent = word;
+            document.getElementById('chinese-translation').textContent = `(${wordData.pos}) ${wordData.translation}`;
+            document.getElementById('modal-example-text').textContent = wordData.example;
+            document.getElementById('modal-example-translation-text').textContent = wordData.example_tw;
+
+            document.getElementById('modal-word-speak-normal').addEventListener('click', () => speak(word, 1.0));
+            document.getElementById('modal-word-speak-slow').addEventListener('click', () => speak(word, 0.7));
+            document.getElementById('modal-word-speak-stop').addEventListener('click', stopSpeak);
+            document.getElementById('modal-example-speak-normal').addEventListener('click', () => speak(wordData.example, 1.0));
+            document.getElementById('modal-example-speak-slow').addEventListener('click', () => speak(wordData.example, 0.7));
+            document.getElementById('modal-example-speak-stop-example').addEventListener('click', stopSpeak);
+
+            document.querySelectorAll('.family-speak-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const wordToSpeak = e.currentTarget.dataset.word;
+                    speak(wordToSpeak);
+                });
+            });
+
+            const setupShowButton = (btnId, targetId) => {
+                document.getElementById(btnId)?.addEventListener('click', (e) => {
+                    document.getElementById(targetId)?.classList.remove('hidden');
+                    e.target.style.display = 'none';
+                });
+            };
+            setupShowButton('show-chinese-btn', 'chinese-translation');
+            setupShowButton('show-example-translation-btn', 'example-translation-tw');
+
+            dom.hintModal.style.display = 'block';
+        };
+        
+const createFamilyWordHtml = (wordKey, wordData, mainWordKey) => {
+    const displayName = wordKey.replace(/_v|_n|_adj$/, '');
+    // 直接使用中文翻譯，不再檢查英文定義
+    const definitionHtml = `<span class="text-sm text-gray-500"> - ${wordData.translation}</span>`;
+
+    return `
+        <div class="p-2 border-b border-gray-100 flex justify-between items-center">
+            <div>
+                <strong class="text-indigo-600">${displayName}</strong> 
+                <span class="text-sm text-gray-500">(${wordData.pos})</span>
+                ${definitionHtml}
+            </div>
+            <button class="family-speak-btn text-xl" data-word="${displayName}">🔊</button>
+        </div>
+    `;
+};
+
+        const checkAnswers = async () => {
+            let correctCount = 0;
+            const totalCount = Object.keys(state.correctAnswers).length;
+            dom.incorrectAnswersDiv.innerHTML = '<h3 class="text-lg font-bold text-red-600">訂正錯誤：</h3>';
+            let hasIncorrect = false;
+
+            for (const selectId in state.correctAnswers) {
+                const selectElement = document.getElementById(selectId);
+                const correctAnswer = state.correctAnswers[selectId];
+                const selectedAnswer = selectElement.value;
+                selectElement.classList.remove('correct', 'incorrect');
+
+                if (selectedAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                    selectElement.classList.add('correct');
+                    correctCount++;
+                } else {
+                    selectElement.classList.add('incorrect');
+                    hasIncorrect = true;
+                    
+                    const wordData = wordDetails[state.currentUnit]?.[correctAnswer.toLowerCase()];
+                    if (wordData) {
+                        dom.incorrectAnswersDiv.innerHTML += `<div class="p-4 bg-red-50 rounded-lg border border-red-200"><p>您選擇了 <strong class="text-red-500">${selectElement.value || "（未選擇）"}</strong>，正確答案是 <strong class="text-green-600">${correctAnswer.charAt(0).toUpperCase() + correctAnswer.slice(1)}</strong>。</p><p class="text-sm text-gray-600">(${wordData.pos}) ${wordData.translation} - ${wordData.definition}</p></div>`;
+                    }
+                }
+                selectElement.disabled = true;
+            }
+
+            state.currentScore = Math.round((correctCount / totalCount) * 100);
+            dom.resultsDiv.innerHTML = `<span class="text-blue-600">答對 ${correctCount} / ${totalCount} 題</span> <span class="text-green-600">分數: ${state.currentScore}</span>`;
+            
+            if (hasIncorrect) dom.analysisContainer.style.display = 'block';
+            
+            dom.submitBtn.disabled = true;
+            dom.shareBtn.classList.remove('hidden');
+            
+            await saveScore(state.currentScore);
+            state.earnedBadgesForSharing = await checkAchievements(state.currentScore);
+
+            await fetchScores(); 
+            await fetchBadges();
+
+            
+            if(state.earnedBadgesForSharing.length > 0) {
+                dom.resultsDiv.innerHTML += `<div class="mt-4 text-yellow-600 font-semibold">恭喜！您獲得了新的徽章！</div>`;
+            }
+            renderBadgeHall();
+        };
+
+        const saveScore = async (score) => {
+            if (!db || !userId) return;
+            const { value: studentClass } = dom.classSelect;
+            const { value: seatNumber } = dom.seatNumberInput;
+            const { options, selectedIndex } = dom.unitSelect;
+            const unitText = options[selectedIndex].text;
+            
+            const existingScoreIndex = localScores.findIndex(s => s.unitKey === state.currentUnit && s.group === state.currentGroup && s.level === state.currentDifficulty);
+            if (existingScoreIndex > -1) {
+                if (score > localScores[existingScoreIndex].score) {
+                    localScores[existingScoreIndex].score = score;
+                }
+            } else {
+                localScores.push({unitKey: state.currentUnit, group: state.currentGroup, level: state.currentDifficulty, score});
+            }
+
+            if (seatNumber.trim()) {
+                 const newScoreData = {
+                    userId, studentClass, seatNumber: seatNumber.padStart(2, '0'),
+                    unit: unitText,
+                    unitKey: state.currentUnit,
+                    group: state.currentGroup, level: state.currentDifficulty, score,
+                    timestamp: serverTimestamp()
+                };
+                try {
+                    await addDoc(collection(db, `artifacts/${appId}/public/data/${pageIdentifier}_scores`), newScoreData);
+                } catch (e) { console.error("Error adding document: ", e); }
+            }
+        };
+        
+        const adminFillAnswers = () => {
+            for (const selectId in state.correctAnswers) {
+                const selectElement = document.getElementById(selectId);
+                const correctAnswerValue = state.correctAnswers[selectId];
+                const matchingWord = state.currentWords.find(w => w.toLowerCase() === correctAnswerValue.toLowerCase());
+                if (selectElement && matchingWord) {
+                    selectElement.value = matchingWord;
+                }
+            }
+            updateDropdownOptions();
+        };
+
+        const clearCurrentAnswers = () => {
+            dom.storyPassage.querySelectorAll('.word-select').forEach(select => {
+                select.value = '';
+                select.classList.remove('correct', 'incorrect');
+                select.disabled = false;
+            });
+            dom.resultsDiv.innerHTML = '';
+            dom.analysisContainer.style.display = 'none';
+            dom.incorrectAnswersDiv.innerHTML = '';
+            dom.shareBtn.classList.add('hidden');
+            dom.submitBtn.disabled = true;
+            updateDropdownOptions();
+        };
+
+        const resetQuizArea = () => {
+            dom.quizArea.classList.add('hidden');
+            dom.welcomeMessage.classList.remove('hidden');
+            state.currentGroup = null;
+            state.currentDifficulty = null;
+            dom.groupSelector.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+            dom.difficultySelector.querySelectorAll('.difficulty-btn-wrapper').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('disabled');
+            });
+        };
+
+        const getEarnedBadgesForImage = () => {
+            const collectedBadges = new Map();
+            const generalBadgeKeys = ['effortful_learner', 'high_achiever', 'perfect_score', 'cute_cat'];
+
+            generalBadgeKeys.forEach(key => {
+                if (earnedBadges[key]) {
+                    const badge = allBadges[key];
+                    if (badge && !collectedBadges.has(badge.name)) {
+                        collectedBadges.set(badge.name, badge);
+                    }
+                }
+            });
+
+            Object.keys(earnedBadges).forEach(key => {
+                if (!generalBadgeKeys.includes(key)) {
+                    const badgeId = key.substring(0, key.lastIndexOf('_'));
+                    const badge = allBadges[badgeId];
+                    if (badge && !collectedBadges.has(badge.name)) {
+                        collectedBadges.set(badge.name, badge);
+                    }
+                }
+            });
+            return Array.from(collectedBadges.values());
+        };
+
+        const drawBadgeSection = (ctx, title, badges, startY, highlight = false) => {
+            if (badges.length === 0) return startY;
+            
+            let currentY = startY;
+            ctx.font = 'bold 28px "Noto Sans TC", sans-serif';
+            ctx.fillStyle = highlight ? '#c2410c' : '#004d40';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, ctx.canvas.width / 2, currentY);
+            currentY += 50;
+            
+            const catBadge = badges.find(b => b.name === "可愛貓貓");
+            const otherBadges = badges.filter(b => b.name !== "可愛貓貓");
+
+            const badgesPerRow = 3;
+            const rowCount = Math.ceil(otherBadges.length / badgesPerRow);
+
+            for (let i = 0; i < rowCount; i++) {
+                const rowBadges = otherBadges.slice(i * badgesPerRow, (i + 1) * badgesPerRow);
+                
+                const badgeDimensions = rowBadges.map(b => ({
+                    badge: b, width: 220, height: 65
+                }));
+                
+                const totalRowWidth = badgeDimensions.reduce((sum, dim) => sum + dim.width, 0) + (rowBadges.length - 1) * 20;
+                let currentX = (ctx.canvas.width - totalRowWidth) / 2;
+                
+                badgeDimensions.forEach(dim => {
+                    const { badge, width, height } = dim;
+                    
+                    ctx.fillStyle = '#ffffff'; 
+                    ctx.strokeStyle = highlight ? '#f59e0b' : '#00796b'; 
+                    ctx.lineWidth = highlight ? 5 : 3;
+                    ctx.beginPath();
+                    if (ctx.roundRect) ctx.roundRect(currentX, currentY, width, height, 20);
+                    else ctx.rect(currentX, currentY, width, height);
+                    ctx.fill();
+                    ctx.stroke();
+                    
+                    ctx.font = '40px sans-serif'; 
+                    ctx.fillStyle = '#004d40';
+                    ctx.textAlign = 'left';
+                    ctx.fillText(badge.icon, currentX + 20, currentY + 47);
+                    
+                    ctx.font = '28px "Noto Sans TC", sans-serif';
+                    ctx.fillText(badge.name, currentX + 75, currentY + 43);
+                    
+                    currentX += width + 20;
+                });
+
+                currentY += 65 + 15;
+            }
+            
+            if (catBadge) {
+                currentY += 10;
+                const width = 300;
+                const height = 80;
+                const startX = (ctx.canvas.width - width) / 2;
+                
+                ctx.fillStyle = '#ffffff'; 
+                ctx.strokeStyle = highlight ? '#f59e0b' : '#00796b'; 
+                ctx.lineWidth = highlight ? 5 : 3;
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(startX, currentY, width, height, 20);
+                else ctx.rect(startX, currentY, width, height);
+                ctx.fill();
+                ctx.stroke();
+                
+                ctx.font = '50px sans-serif'; 
+                ctx.fillStyle = '#004d40';
+                ctx.textAlign = 'left';
+                ctx.fillText(catBadge.icon, startX + 20, currentY + 58);
+                
+                ctx.font = '30px "Noto Sans TC", sans-serif';
+                ctx.fillText(catBadge.name, startX + 85, currentY + 52);
+
+                currentY += height + 15;
+            }
+
+            return currentY + 30;
+        };
+        
+        const shareSingleScore = () => {
+            if (!dom.seatNumberInput.value.trim()) { 
+                dom.modalContent.innerHTML = `<p class="text-red-600 font-semibold">請先輸入有效的班級座號才能分享！</p>`;
+                dom.hintModal.style.display = 'block'; 
+                return; 
+            }
+
+            let allEarnedBadgesForImage = getEarnedBadgesForImage();
+            const newlyEarnedBadges = state.earnedBadgesForSharing.map(b => allBadges[b.key]);
+
+            const newlyEarnedNames = new Set(newlyEarnedBadges.map(b => b.name));
+            allEarnedBadgesForImage = allEarnedBadgesForImage.filter(b => !newlyEarnedNames.has(b.name));
+
+            const canvas = document.getElementById('shareCanvas');
+            let canvasHeight = 420;
+            if (newlyEarnedBadges.length > 0) canvasHeight += 100 + Math.ceil(newlyEarnedBadges.length / 3) * 85 + (newlyEarnedBadges.some(b => b.name === '可愛貓貓') ? 20 : 0);
+            if (allEarnedBadgesForImage.length > 0) canvasHeight += 100 + Math.ceil(allEarnedBadgesForImage.length / 3) * 85 + (allEarnedBadgesForImage.some(b => b.name === '可愛貓貓') ? 20 : 0);
+            canvas.height = canvasHeight;
+            
+            const ctx = canvas.getContext('2d');
+            const { value: studentClass } = dom.classSelect;
+            const seatNumber = dom.seatNumberInput.value.padStart(2, '0');
+            const group = state.currentGroup === 'groupBonus' ? '傳說級' : `Group ${state.currentGroup.slice(-1)}`;
+            const { options, selectedIndex } = dom.unitSelect;
+            const unitText = options[selectedIndex].text;
+            
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#e0f7fa'); 
+            gradient.addColorStop(1, '#b2ebf2');
+            ctx.fillStyle = gradient; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#004d40'; 
+            ctx.font = 'bold 55px "Noto Sans TC", sans-serif';
+            ctx.textAlign = 'center'; 
+            ctx.fillText('成績單', canvas.width / 2, 80);
+            
+            ctx.fillStyle = '#00796b'; 
+            ctx.font = '36px "Noto Sans TC", sans-serif';
+            ctx.fillText(`${studentClass} ${seatNumber}號`, canvas.width / 2, 140);
+            
+            ctx.font = '30px "Noto Sans TC", sans-serif';
+            ctx.fillText(`測驗: ${unitText} - ${group} ${state.currentGroup !== 'groupBonus' ? `(${state.currentDifficulty})` : ''}`, canvas.width / 2, 190);
+            
+            ctx.fillStyle = state.currentScore >= 80 ? '#2e7d32' : (state.currentScore >= 60 ? '#f57f17' : '#c62828');
+            ctx.font = 'bold 110px "Inter", sans-serif'; 
+            ctx.fillText(state.currentScore, canvas.width / 2, 300);
+            ctx.font = 'bold 45px "Noto Sans TC", sans-serif';
+            ctx.fillText('分', canvas.width / 2 + 100, 300);
+
+            let currentY = 350;
+            currentY = drawBadgeSection(ctx, "本次新獲得！", newlyEarnedBadges, currentY, true);
+            currentY = drawBadgeSection(ctx, "已獲得的所有徽章", allEarnedBadgesForImage, currentY);
+            
+            ctx.textAlign = 'center'; 
+            ctx.fillStyle = '#004d40'; 
+            ctx.font = '20px "Noto Sans TC", sans-serif';
+            ctx.fillText(`測驗日期: ${new Date().toLocaleDateString('zh-TW')}`, canvas.width / 2, currentY + 10);
+
+            const dataUrl = canvas.toDataURL('image/png');
+            const newlyEarnedBadgesHtml = newlyEarnedBadges.length > 0 ? `<div class="mt-4 p-3 bg-yellow-50 rounded-lg"><h4 class="text-lg font-semibold text-yellow-800">您本次新獲得的徽章：</h4><div class="flex justify-center flex-wrap gap-2 mt-2">${newlyEarnedBadges.map(badge => `<span class="bg-white border border-yellow-300 rounded-full px-3 py-1 text-sm font-medium text-gray-700">${badge.icon} ${badge.name}</span>`).join('')}</div></div>` : '';
+            dom.modalContent.innerHTML = `<h3 class="text-xl font-semibold mb-4">您的成績單圖片</h3>${newlyEarnedBadgesHtml}<p class="text-gray-600 my-4">請長按 (電腦請按右鍵) 圖片以儲存並分享。</p><p class="text-sm text-blue-600 bg-blue-50 p-2 rounded-md mb-4"><strong>iPhone/iPad 使用者：</strong>請長按圖片，然後選擇「儲存到照片」。圖片會存放在您的「照片」App中。</p><img src="${dataUrl}" alt="成績單圖片" class="w-full rounded-lg shadow-md" /><a href="${dataUrl}" download="單字複習-成績單.png" class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-full">下載圖片</a>`;
+            dom.hintModal.style.display = 'block';
+        };
+
+        const shareAchievements = () => {
+             if (!dom.seatNumberInput.value.trim()) { 
+                 dom.modalContent.innerHTML = `<p class="text-red-600 font-semibold">請先輸入班級座號才能分享！</p>`;
+                 dom.hintModal.style.display = 'block'; 
+                 return; 
+             }
+            
+            const allEarnedBadgesForImage = getEarnedBadgesForImage();
+            const totalTests = localScores.length;
+            const highScore = totalTests > 0 ? Math.max(...localScores.map(s => s.score)) : 0;
+            
+            const canvas = document.getElementById('shareCanvas');
+            let canvasHeight = 450;
+            if (allEarnedBadgesForImage.length > 0) canvasHeight += 100 + Math.ceil(allEarnedBadgesForImage.length / 3) * 85 + (allEarnedBadgesForImage.some(b => b.name === '可愛貓貓') ? 20 : 0);
+            canvas.height = canvasHeight;
+            
+            const ctx = canvas.getContext('2d');
+            const { value: studentClass } = dom.classSelect;
+            const seatNumber = dom.seatNumberInput.value.padStart(2, '0');
+
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#f3e8ff'); 
+            gradient.addColorStop(1, '#d8b4fe');
+            ctx.fillStyle = gradient; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#4a044e';
+            ctx.font = 'bold 60px "Noto Sans TC", sans-serif';
+            ctx.textAlign = 'center'; 
+            ctx.fillText('學習成就總覽', canvas.width / 2, 100);
+            
+            ctx.fillStyle = '#6b21a8';
+            ctx.font = '40px "Noto Sans TC", sans-serif';
+            ctx.fillText(`${studentClass} ${seatNumber}號`, canvas.width / 2, 180);
+            
+            ctx.font = 'bold 32px "Inter", sans-serif';
+            ctx.fillStyle = '#3b0764';
+            ctx.fillText(`總完成測驗: ${totalTests}次`, canvas.width / 2, 250);
+            ctx.fillText(`最高分紀錄: ${highScore}分`, canvas.width / 2, 300);
+
+            let currentY = drawBadgeSection(ctx, "我的徽章牆", allEarnedBadgesForImage, 380);
+            
+            ctx.textAlign = 'center'; 
+            ctx.fillStyle = '#4a044e'; 
+            ctx.font = '20px "Noto Sans TC", sans-serif';
+            ctx.fillText(`分享日期: ${new Date().toLocaleDateString('zh-TW')}`, canvas.width / 2, currentY + 10);
+
+            const dataUrl = canvas.toDataURL('image/png');
+            dom.modalContent.innerHTML = `<h3 class="text-xl font-semibold mb-4">您的學習成就總覽</h3><p class="text-gray-600 my-4">請長按 (電腦請按右鍵) 圖片以儲存並分享。</p><p class="text-sm text-blue-600 bg-blue-50 p-2 rounded-md mb-4"><strong>iPhone/iPad 使用者：</strong>請長按圖片，然後選擇「儲存到照片」。圖片會存放在您的「照片」App中。</p><img src="${dataUrl}" alt="學習成就圖片" class="w-full rounded-lg shadow-md" /><a href="${dataUrl}" download="學習成就總覽.png" class="mt-4 inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-full">下載圖片</a>`;
+            dom.hintModal.style.display = 'block';
+        };
+        
+        dom.unitSelect.addEventListener('change', (e) => {
+            state.currentUnit = e.target.value;
+            updateBonusButtonVisibility();
+            resetQuizArea();
+            renderBadgeHall();
+        });
+
+        dom.groupSelector.addEventListener('click', (e) => {
+            const button = e.target.closest('button');
+            if (button && state.currentUnit) {
+                const group = button.dataset.group;
+                state.currentGroup = group;
+                
+                dom.groupSelector.querySelectorAll('button').forEach(btn => btn.classList.toggle('active', btn.dataset.group === group));
+                
+                if (group === 'groupBonus') {
+                    state.currentDifficulty = 'C2';
+                    dom.difficultySelector.querySelectorAll('.difficulty-btn-wrapper').forEach(btn => {
+                        btn.classList.add('disabled');
+                        btn.classList.remove('active');
+                    });
+                    loadQuiz();
+                } else {
+                    state.currentDifficulty = null;
+                    dom.difficultySelector.querySelectorAll('.difficulty-btn-wrapper').forEach(btn => {
+                        btn.classList.remove('disabled', 'active');
+                    });
+                    dom.quizArea.classList.add('hidden');
+                    dom.welcomeMessage.classList.remove('hidden');
+                }
+            }
+        });
+
+        dom.difficultySelector.addEventListener('click', (e) => {
+            const button = e.target.closest('.difficulty-btn-wrapper');
+            if (button && !button.classList.contains('disabled')) {
+                const level = button.dataset.level;
+                state.currentDifficulty = level;
+                dom.difficultySelector.querySelectorAll('.difficulty-btn-wrapper').forEach(btn => btn.classList.toggle('active', btn.dataset.level === level));
+                loadQuiz();
+            }
+        });
+
+        dom.seatNumberInput.addEventListener('input', (e) => {
+            try {
+                if (btoa(e.target.value) === ADMIN_PASS_B64) {
+                    dom.adminTools.classList.remove('hidden');
+                    dom.devToolsPanel.classList.remove('hidden');
+                } else {
+                    dom.adminTools.classList.add('hidden');
+                    dom.devToolsPanel.classList.add('hidden');
+                }
+            } catch (error) {
+                dom.adminTools.classList.add('hidden');
+                dom.devToolsPanel.classList.add('hidden');
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', async () => await signIn());
+        dom.submitBtn.addEventListener('click', checkAnswers);
+        dom.clearBtn.addEventListener('click', clearCurrentAnswers);
+        dom.shareBtn.addEventListener('click', shareSingleScore);
+        dom.shareAchievementsBtn.addEventListener('click', shareAchievements);
+        dom.adminFillBtn.addEventListener('click', adminFillAnswers);
+
+        dom.closeModalBtn.addEventListener('click', () => { dom.hintModal.style.display = 'none'; stopSpeak(); });
+        window.addEventListener('click', (event) => { if (event.target == dom.hintModal) { dom.hintModal.style.display = 'none'; stopSpeak(); } });
+
+        // Dev Tools Logic
+        const devToolsBtn = document.getElementById('devToolsBtn');
+        if (devToolsBtn) {
+            devToolsBtn.addEventListener('click', () => {
+                dom.devToolsPanel.classList.toggle('hidden');
+            });
+        }
+        
+        const unlockAllBtn = document.getElementById('unlockAllBtn');
+        if(unlockAllBtn) {
+            unlockAllBtn.addEventListener('click', async () => {
+                Object.keys(allBadges).forEach(key => {
+                    const generalBadges = ['perfect_score', 'high_achiever', 'effortful_learner', 'cute_cat'];
+                    if (generalBadges.includes(key)) {
+                        earnedBadges[key] = true;
+                    } else {
+                         Object.keys(vocabulary).forEach(unitKey => {
+                             earnedBadges[`${key}_${unitKey}`] = true;
+                         });
+                    }
+                });
+                await updateBadgesInFirestore();
+                renderBadgeHall();
+                updateBonusButtonVisibility();
+                alert('所有徽章已解鎖！');
+            });
+        }
+        
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        if(clearAllBtn) {
+            clearAllBtn.addEventListener('click', async () => {
+                earnedBadges = {};
+                await updateBadgesInFirestore();
+                renderBadgeHall();
+                updateBonusButtonVisibility();
+                alert('所有徽章已清除！');
+            });
+        }
+        
+        const testAchievementShare = document.getElementById('testAchievementShare');
+        if(testAchievementShare) {
+            testAchievementShare.addEventListener('click', shareAchievements);
+        }
+        
+        const testScoreShare = document.getElementById('testScoreShare');
+        if(testScoreShare) {
+            testScoreShare.addEventListener('click', () => {
+                state.currentScore = 100;
+                state.earnedBadgesForSharing = [
+                    {key: 'perfect_score', ...allBadges.perfect_score},
+                    {key: 'unit_master', ...allBadges.unit_master},
+                    {key: 'cute_cat', ...allBadges.cute_cat}
+                ];
+                state.currentGroup = 'groupBonus';
+                state.currentDifficulty = 'C2';
+                shareSingleScore();
+            });
+        }
+
+        // Polyfills for older browsers
+        if (CanvasRenderingContext2D.prototype.roundRect === undefined) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, width, height, radius) {
+                this.beginPath();
+                this.moveTo(x + radius, y); this.lineTo(x + width - radius, y); this.quadraticCurveTo(x + width, y, x + width, y + radius);
+                this.lineTo(x + width, y + height - radius); this.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+                this.lineTo(x + radius, y + height); this.quadraticCurveTo(x, y + height, x, y + height - radius);
+                this.lineTo(x, y + radius);
+                this.quadraticCurveTo(x, y, x + radius, y);
+                this.closePath();
+            };
+        }
+    </script>
+</body>
+</html>
