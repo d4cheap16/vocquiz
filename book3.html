@@ -214,9 +214,13 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, setLogLevel, query, where, onSnapshot, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, setLogLevel, query, where, onSnapshot, doc, getDoc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
+        // --- FIX: Added a unique identifier for this page's data ---
+        const pageIdentifier = 'book3';
+
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // --- FIX: Reverted to a hardcoded config for GitHub Pages deployment ---
         const firebaseConfig = {
             apiKey: "AIzaSyDF4TY-2_z4rX7d_1l_6yW_Kmv-Y3a5PjY",
             authDomain: "d4cheap.firebaseapp.com",
@@ -261,6 +265,8 @@
                 userId = null;
                 localScores = [];
                 earnedBadges = {};
+                renderBadgeHall(); 
+                updateBonusButtonVisibility();
             }
         });
 
@@ -587,6 +593,7 @@
                 const allScoresForUnit = localScores.filter(s => s.unitKey === state.currentUnit);
                 const allTests = [];
                 const groups = Object.keys(vocabulary[state.currentUnit]).filter(g => g !== 'groupBonus');
+                const levels = ['A2', 'B1', 'B2', 'C1'];
                 
                 let totalTestsInUnit = 0;
                 groups.forEach(g => {
@@ -597,7 +604,7 @@
                         });
                     }
                 });
-
+                
                 const passedAll100 = allTests.every(test => {
                     const [group, level] = test.split('-');
                     return allScoresForUnit.some(s => s.group === group && s.level === level && s.score === 100);
@@ -635,7 +642,7 @@
         
         const updateBonusButtonVisibility = () => {
              const currentUnitKey = state.currentUnit;
-             if (!currentUnitKey) return;
+             if(!currentUnitKey) return;
              const legendBadgeKey = `legend_${currentUnitKey}`;
             if (earnedBadges[legendBadgeKey]) {
                 dom.bonusGroupBtn.classList.remove('hidden');
@@ -665,9 +672,10 @@
         const renderBadgeHall = () => {
             const container = dom.badgeHallContainer;
             if (!container || !state.currentUnit) {
-                 if(container) container.innerHTML = '<p class="text-center text-gray-500 col-span-full">請先選擇一個單元來查看相關徽章。</p>';
+                if(container) container.innerHTML = '<p class="text-center text-gray-500 col-span-full">請先選擇一個單元來查看相關徽章。</p>';
                 return;
             };
+
             container.innerHTML = '';
             
             const sortedBadges = Object.keys(allBadges).sort((a, b) => {
@@ -743,7 +751,7 @@
             let selectCounter = 0;
             const processedStory = selectedStory.text.replace(/\*\*(.*?)\*\*/g, (match, word) => {
                 const selectId = `word-select-${selectCounter}`;
-                state.correctAnswers[selectId] = word;
+                state.correctAnswers[selectId] = word.toLowerCase(); 
                 return `<select id="${selectId}" class="word-select"><option value="">---(${++selectCounter})---</option></select>`;
             });
 
@@ -781,23 +789,32 @@
         const showHint = (word) => {
             const allWordData = wordDetails[state.currentUnit];
             if (!allWordData) return;
+
+            // Find the main word key if the clicked word is a derivative
             let mainWordKey = word;
             let wordData = allWordData[word];
+
             if (!wordData) {
                 for (const key in allWordData) {
                     if (allWordData[key].family && allWordData[key].family.includes(word)) {
                         mainWordKey = key;
-                        wordData = allWordData[word]; 
+                        wordData = allWordData[word];
                         break;
                     }
                 }
             }
              if (!wordData) return;
+
+
             let familyHtml = '';
             const mainWordData = allWordData[mainWordKey];
             if (mainWordData.family && mainWordData.family.length > 0) {
                  familyHtml += `<details class="mt-4 pt-4 border-t border-gray-200 text-left"><summary class="text-xl font-semibold text-indigo-700 mb-2 cursor-pointer p-2 rounded-lg hover:bg-yellow-100 flex justify-between items-center"><span>單字家族 (Word Family)</span><span class="text-sm font-normal text-gray-500">點擊展開/收合</span></summary><div class="space-y-2 mt-2">`;
+                
+                // Add the main word to the list first
                 familyHtml += createFamilyWordHtml(mainWordKey, mainWordData, mainWordKey);
+                
+                // Add other family members
                 mainWordData.family.forEach(familyWordKey => {
                     const familyWordData = allWordData[familyWordKey];
                     if (familyWordData) {
@@ -851,6 +868,7 @@
             document.getElementById('modal-example-speak-slow').addEventListener('click', () => speak(wordData.example, 0.7));
             document.getElementById('modal-example-speak-stop-example').addEventListener('click', stopSpeak);
 
+            // Add event listeners for family word pronunciation
             document.querySelectorAll('.family-speak-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const wordToSpeak = e.currentTarget.dataset.word;
@@ -873,6 +891,7 @@
         const createFamilyWordHtml = (wordKey, wordData, mainWordKey) => {
             const displayName = wordKey.replace(/_v|_n|_adj$/, '');
             let definitionHtml = '';
+            // Only show definition for family members, not the main word itself in the family list
             if (wordData.definition && wordKey !== mainWordKey) {
                  definitionHtml = `<span class="text-sm text-gray-500"> - ${wordData.definition}</span>`;
             } else if (!wordData.definition) {
@@ -909,7 +928,8 @@
                 } else {
                     selectElement.classList.add('incorrect');
                     hasIncorrect = true;
-                    const wordData = wordDetails[state.currentUnit]?.[correctAnswer.toLowerCase()];
+                    
+                    const wordData = wordDetails[state.currentUnit]?.[correctAnswer];
                     if (wordData) {
                         dom.incorrectAnswersDiv.innerHTML += `<div class="p-4 bg-red-50 rounded-lg border border-red-200"><p>您選擇了 <strong class="text-red-500">${selectElement.value || "（未選擇）"}</strong>，正確答案是 <strong class="text-green-600">${correctAnswer}</strong>。</p><p class="text-sm text-gray-600">(${wordData.pos}) ${wordData.translation} - ${wordData.definition}</p></div>`;
                     }
@@ -952,28 +972,31 @@
                     timestamp: serverTimestamp()
                 };
                 try {
-                    await addDoc(collection(db, `artifacts/${appId}/public/data/scores`), newScoreData);
+                    // --- FIX: Use pageIdentifier for unique collection ---
+                    await addDoc(collection(db, `artifacts/${appId}/public/data/${pageIdentifier}_scores`), newScoreData);
                 } catch (e) { console.error("Error adding document: ", e); }
             }
         };
 
+        // --- FIX: Corrected the score fetching logic ---
         const fetchScores = () => {
-            if (!db || !userId) return;
+            if (!db || !userId) {
+                dom.recordsStatus.textContent = '請先登入以查看紀錄。';
+                return;
+            }
             dom.recordsStatus.textContent = '正在載入成績...';
-            const q = query(collection(db, `artifacts/${appId}/public/data/scores`), where("userId", "==", userId));
+            const q = query(collection(db, `artifacts/${appId}/public/data/${pageIdentifier}_scores`), where("userId", "==", userId));
             
             onSnapshot(q, (querySnapshot) => {
                 const scores = [];
                 querySnapshot.forEach(doc => scores.push({ id: doc.id, ...doc.data() }));
-                scores.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
+                scores.sort((a, b) => (b.timestamp?.toDate()?.getTime() || 0) - (a.timestamp?.toDate()?.getTime() || 0));
                 
                 localScores = scores.map(s => ({unitKey: s.unitKey, group: s.group, level: s.level, score: s.score}));
                 
-                if (localScores.length > 0) {
-                    dom.shareAchievementsBtn.disabled = false;
-                } else {
-                    dom.shareAchievementsBtn.disabled = true;
-                }
+                updateBonusButtonVisibility();
+                
+                dom.shareAchievementsBtn.disabled = localScores.length === 0;
 
                 if (scores.length === 0) {
                     dom.recordsStatus.textContent = '您目前沒有任何成績紀錄。';
@@ -987,7 +1010,10 @@
                             <div class="text-sm text-gray-500">${s.timestamp ? s.timestamp.toDate().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' }) : 'N/A'}</div>
                         </div>`).join('');
                 }
-            }, (error) => { dom.recordsStatus.textContent = '無法載入成績紀錄。'; });
+            }, (error) => { 
+                console.error("Error fetching scores: ", error);
+                dom.recordsStatus.textContent = '無法載入成績紀錄。'; 
+            });
         };
         
         const getEarnedBadgesForImage = () => {
