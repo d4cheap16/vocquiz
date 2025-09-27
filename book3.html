@@ -113,10 +113,11 @@
                             <option value="善解">善解</option> 
                             <option value="包容">包容</option> 
                             <option value="大愛">大愛</option>
+                            <option value="外校">友校師生</option>
                         </select>
                     </div>
                     <div class="flex flex-col items-center text-center sm:flex-row sm:space-x-2">
-                        <label for="seat-number" class="font-medium mb-1 sm:mb-0">座號:</label>
+                        <label for="seat-number" id="seat-number-label" class="font-medium mb-1 sm:mb-0">座號:</label>
                         <input type="text" id="seat-number" class="w-20 rounded-md border border-gray-300 py-2 px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center" placeholder="00" maxlength="10">
                     </div>
                 </div>
@@ -1284,6 +1285,22 @@ const createFamilyWordHtml = (wordKey, wordData, mainWordKey) => {
             });
             resetQuizArea();
         });
+
+// 監聽班級選單的變化
+dom.classSelect.addEventListener('change', (e) => {
+    const seatNumberLabel = document.getElementById('seat-number-label');
+    const seatNumberInput = dom.seatNumberInput;
+
+    if (e.target.value === '外校') {
+        // 如果選擇了外校，就更改提示文字
+        seatNumberLabel.textContent = '您的代稱:';
+        seatNumberInput.placeholder = 'Nickname';
+    } else {
+        // 如果是選擇校內班級，就改回原本的文字
+        seatNumberLabel.textContent = '座號:';
+        seatNumberInput.placeholder = '00';
+    }
+});
 
         dom.groupSelector.addEventListener('click', (e) => {
             const button = e.target.closest('button');
