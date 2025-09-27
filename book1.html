@@ -113,7 +113,6 @@
                             <option value="包容">包容</option> 
                             <option value="大愛">大愛</option>
                             <option value="外校">友校師生</option>
-
                         </select>
                     </div>
                     <div class="flex flex-col items-center text-center sm:flex-row sm:space-x-2">
@@ -1287,7 +1286,7 @@ dom.classSelect.addEventListener('change', (e) => {
 
     if (e.target.value === '外校') {
         // 如果選擇了外校，就更改提示文字
-        seatNumberLabel.textContent = '您的代稱:';
+        seatNumberLabel.textContent = '暱稱:';
         seatNumberInput.placeholder = 'Nickname';
     } else {
         // 如果是選擇校內班級，就改回原本的文字
