@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>VoCat</title>
+    
+    <!-- 社群媒體預覽卡片 (Open Graph Meta Tags) -->
+    <meta name="description" content="Learn high school vocabulary in a fun way!">
+    <meta property="og:title" content="VoCat">
+    <meta property="og:description" content="Learn high school vocabulary in a fun way!">
+    <meta property="og:image" content="https://d4cheap16.github.io/vp/GB.jpg">
+    <meta property="og:url" content="https://d4cheap16.github.io/vp/">
+    <meta property="og:type" content="website">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- 引入兩種字體：像素風格 和 Noto Sans TC -->
@@ -88,7 +97,7 @@
             animation: dropInLogo 1.5s ease-out 0.5s forwards, blinkLogo 0.8s step-end 2s;
         }
         .boot-logo img {
-            width: 30%; /* 讓貓貓的寬度佔螢幕的一半，看起來很巨大 */
+            width: 10%; /* 讓貓貓的寬度佔螢幕的一半，看起來很巨大 */
             height: auto;
             display: flex;
             justify-content: center;
@@ -220,7 +229,7 @@
             bottom: 45%; /* 定位到螢幕下方外殼 */
             left: 11%;
             width: 80%;
-            text-align: justify;
+            text-align: left;
             font-size: clamp(9px, 2.2vw, 11px);
             color: #444; /* 深灰色文字 */
             opacity: 0; /* 動畫結束後顯示 */
@@ -314,6 +323,9 @@
                                     <li><a href="https://forms.gle/zxU34XhghWkukZrz8" target="_blank">高二上一段</a></li>
                                 </ul>
                             </li>
+                            <li>
+                                <a href="mailto:chenweistar@gmail.com?subject=VoCat Feedback">Mail Me</a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -334,7 +346,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             // --- 更新後的格言列表 ---
             const quotes = [
-                "The secret of getting ahead is getting started.",
                 "Every expert was once a beginner.",
                 "Don't stop until you're proud.",
                 "The harder you work, the luckier you get.",
@@ -357,7 +368,7 @@
 
             // --- 選單互動與音效 ---
             const categories = document.querySelectorAll('.menu-category > a');
-            const subMenuItems = document.querySelectorAll('.sub-menu a');
+            const actionLinks = document.querySelectorAll('.sub-menu a, .menu-list > li:not(.menu-category) > a');
             const audioOpen = document.getElementById('audio-open');
             const audioSelect = document.getElementById('audio-select');
 
@@ -381,7 +392,7 @@
                 });
             });
 
-            subMenuItems.forEach(item => {
+            actionLinks.forEach(item => {
                 item.addEventListener('click', function() {
                     audioSelect.currentTime = 0;
                     audioSelect.play();
