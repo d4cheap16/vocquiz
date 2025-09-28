@@ -202,8 +202,10 @@
 
         /* --- 新增螢幕底部格言樣式 --- */
         .screen-footer {
+            margin: 0; 
+            padding: 0;
             position: absolute;
-            bottom: 49%; /* 定位到螢幕下方外殼 */
+            bottom: 45%; /* 定位到螢幕下方外殼 */
             left: 12%;
             width: 80%;
             text-align: justify;
@@ -211,7 +213,12 @@
             color: #444; /* 深灰色文字 */
             opacity: 0; /* 動畫結束後顯示 */
             animation: fadeInMenu 0.5s ease-in 4.5s forwards;
-            line-height: 1.5; 
+            line-height: 1.6; 
+        }
+
+        .screen-footer p {
+            margin: 0; 
+            padding: 0;
         }
 
         .site-footer {
