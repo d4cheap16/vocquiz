@@ -90,6 +90,9 @@
         .boot-logo img {
             width: 50%; /* 讓貓貓的寬度佔螢幕的一半，看起來很巨大 */
             height: auto;
+            display: flex;
+            justify-content: center;
+
         }  
 
         @keyframes dropInLogo {
@@ -108,7 +111,7 @@
         /* --- 主選單 (初始隱藏) --- */
         .main-menu {
             opacity: 0;
-            animation: fadeInMenu 0.5s ease-in 4.5s forwards;
+            animation: fadeInMenu 0.5s ease-in 3.5s forwards;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -220,7 +223,7 @@
             font-size: clamp(9px, 2.2vw, 11px);
             color: #444; /* 深灰色文字 */
             opacity: 0; /* 動畫結束後顯示 */
-            animation: fadeInMenu 0.5s ease-in 4.5s forwards;
+            animation: fadeInMenu 0.5s ease-in 3s forwards;
             line-height: 1.6; 
         }
 
