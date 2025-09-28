@@ -23,7 +23,7 @@
             overflow: hidden;
             background-color: var(--body-bg);
             /* 預設字體設為 Noto Sans TC */
-            font-family: 'Noto Sans TC', 'Press Start 2P', cursive;
+            font-family: 'Press Start 2P', 'Noto Sans TC', cursive; sans-serif;
         }
 
         .container {
@@ -74,7 +74,7 @@
             padding-bottom: 2%;
             border-bottom: 2px solid var(--screen-text);
             margin-bottom: 3%;
-            font-family: 'Press Start 2P', cursive;
+            font-family: 'Press Start 2P', 'Noto Sans TC', cursive; sans-serif;
             font-size: clamp(10px, 3vw, 14px);
             letter-spacing: -1px;
             flex-shrink: 0;
@@ -131,9 +131,8 @@
         }
 
         .sub-menu a {
-            font-size: clamp(12px, 2.7vw, 16px);
-            /* 統一子選單英文字體為像素風格 */
-            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(11px, 2.7vw, 13px);
+            font-family: 'Press Start 2P', 'Noto Sans TC', cursive; sans-serif;
         }
         
         .sub-menu a::before {
@@ -160,7 +159,8 @@
 
     <div class="container">
         <div class="gameboy-wrapper">
-            <img src="https://docs.google.com/drawings/d/e/2PACX-1vR-f2Y_15Hl5Oh3o2Gk4aFwDg_2-3G1E14gW4yG1p-3b3CQTZzCjM4jHwA6lB8gY_K9X0P0q8zY3e_N/pub?w=1440&h=1080" alt="Game Boy background" class="gameboy-image">
+            <!-- 連結到和 index.html 放在同一個資料夾的圖片 -->
+            <img src="GB01.png" alt="Game Boy background" class="gameboy-image">
             <div class="gameboy-screen">
                 <div class="screen-header">
                     <p>Vocadeventure</p>
@@ -169,7 +169,6 @@
                     <li class="menu-category">
                         <a href="#">課文單字</a>
                         <ul class="sub-menu">
-                            <!-- 移除 status span -->
                             <li><a href="book1.html" target="_self">Book 1</a></li>
                             <li><a href="book2.html" target="_self">Book 2</a></li>
                             <li><a href="book3.html" target="_self">Book 3</a></li>
@@ -180,8 +179,13 @@
                     <li class="menu-category">
                         <a href="#">高頻單字</a>
                         <ul class="sub-menu">
-                             <!-- 移除 status span -->
-                            <li><a href="high_freq.html" target="_self">High Freq</a></li>
+                            <li><a href="high_freq.html" target="_self">Expert Mode</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-category">
+                        <a href="#">文法練習</a>
+                        <ul class="sub-menu">
+                            <li><a href="#" target="_self">Coming Soon...</a></li>
                         </ul>
                     </li>
                 </ul>
