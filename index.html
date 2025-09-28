@@ -92,7 +92,7 @@
             height: auto;
             display: flex;
             justify-content: center;
-
+	    align-items: center; /* <-- 請加上這一行 */
         }  
 
         @keyframes dropInLogo {
@@ -223,7 +223,7 @@
             font-size: clamp(9px, 2.2vw, 11px);
             color: #444; /* 深灰色文字 */
             opacity: 0; /* 動畫結束後顯示 */
-            animation: fadeInMenu 0.5s ease-in 3s forwards;
+            animation: fadeInMenu 0.5s ease-in 2.5s forwards;
             line-height: 1.6; 
         }
 
