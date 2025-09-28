@@ -2,49 +2,214 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>英文單字練習網</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Vocadeventure</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- 引入兩種字體：像素風格 和 Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500&family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
+        :root {
+            --screen-bg: #9bbc0f;
+            --screen-text: #0f380f;
+            --body-bg: #d3d3d3; /* Light gray for wider screens */
         }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--body-bg);
+            /* 預設字體設為 Noto Sans TC */
+            font-family: 'Noto Sans TC', 'Press Start 2P', cursive;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .gameboy-wrapper {
+            position: relative;
+            max-width: 450px;
+            width: 100%;
+            aspect-ratio: 1000 / 1602;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .gameboy-image {
+            display: block;
+            width: 100%;
+            height: 100%;
+            user-select: none;
+        }
+
+        .gameboy-screen {
+            position: absolute;
+            top: 12%; 
+            left: 11%;
+            width: 79%;
+            height: 31%;
+            background-color: var(--screen-bg);
+            color: var(--screen-text);
+            padding: 3%;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            border-radius: 2px;
+        }
+
+        .screen-header {
+            text-align: center;
+            padding-bottom: 2%;
+            border-bottom: 2px solid var(--screen-text);
+            margin-bottom: 3%;
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(10px, 3vw, 14px);
+            letter-spacing: -1px;
+            flex-shrink: 0;
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .menu-list li {
+            margin-bottom: 2%;
+        }
+        
+        .menu-list a {
+            color: var(--screen-text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 2.5%;
+            font-size: clamp(10px, 2.8vw, 14px);
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        /* 主分類連結樣式 */
+        .menu-category > a {
+            font-weight: bold;
+            justify-content: space-between;
+        }
+        
+        .menu-category > a::after {
+            content: '▼';
+            font-size: 80%;
+            transition: transform 0.2s;
+        }
+
+        .menu-category.open > a::after {
+            transform: rotate(180deg);
+        }
+        
+        /* 子選單樣式 */
+        .sub-menu {
+            list-style: none;
+            padding-left: 10px;
+            margin: 5px 0;
+            display: none;
+        }
+
+        .menu-category.open .sub-menu {
+            display: block;
+        }
+
+        .sub-menu a {
+            font-size: clamp(12px, 2.7vw, 16px);
+            /* 統一子選單英文字體為像素風格 */
+            font-family: 'Press Start 2P', cursive;
+        }
+        
+        .sub-menu a::before {
+            content: '▶';
+            margin-right: 8%;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .menu-list a:hover,
+        .menu-list a:focus {
+            background-color: var(--screen-text);
+            color: var(--screen-bg);
+        }
+
+        .sub-menu a:hover::before,
+        .sub-menu a:focus::before {
+            opacity: 1;
+        }
+
     </style>
 </head>
-<body class="bg-amber-50">
-    <div class="relative flex items-center justify-center min-h-screen p-4">
-        <div class="flex flex-col items-center">
-            <!-- 主要白色區塊 -->
-            <div class="text-center p-8 sm:p-12 bg-white shadow-2xl rounded-xl max-w-lg w-full">
-                <h1 class="text-3xl sm:text-4xl font-bold text-amber-900 mb-4">歡迎來到單字練習網</h1>
-                <p class="text-gray-600 mb-8 text-lg">
-                    請點擊下方返回首頁，選擇要複習的單元。
-                </p>
-                <a href="https://sites.google.com/tcsh.hlc.edu.tw/d4cheap/home" class="inline-flex items-center justify-center bg-amber-500 text-white font-bold py-3 px-8 rounded-full hover:bg-amber-600 transition-transform transform hover:scale-105 shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                    返回首頁
-                </a>
-            </div>
+<body>
 
-            <!-- 移出並縮小字體的格言 -->
-            <blockquote class="mt-8 text-center max-w-lg px-4">
-                <p class="text-base italic text-amber-800/70">"The beautiful thing about learning is that no one can take it away from you."</p>
-                <cite class="block text-right text-amber-700/60 mt-2 text-sm">- B.B. King</cite>
-            </blockquote>
+    <div class="container">
+        <div class="gameboy-wrapper">
+            <img src="https://docs.google.com/drawings/d/e/2PACX-1vR-f2Y_15Hl5Oh3o2Gk4aFwDg_2-3G1E14gW4yG1p-3b3CQTZzCjM4jHwA6lB8gY_K9X0P0q8zY3e_N/pub?w=1440&h=1080" alt="Game Boy background" class="gameboy-image">
+            <div class="gameboy-screen">
+                <div class="screen-header">
+                    <p>Vocadeventure</p>
+                </div>
+                <ul class="menu-list">
+                    <li class="menu-category">
+                        <a href="#">課文單字</a>
+                        <ul class="sub-menu">
+                            <!-- 移除 status span -->
+                            <li><a href="book1.html" target="_self">Book 1</a></li>
+                            <li><a href="book2.html" target="_self">Book 2</a></li>
+                            <li><a href="book3.html" target="_self">Book 3</a></li>
+                            <li><a href="book4.html" target="_self">Book 4</a></li>
+                            <li><a href="book5.html" target="_self">Book 5</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-category">
+                        <a href="#">高頻單字</a>
+                        <ul class="sub-menu">
+                             <!-- 移除 status span -->
+                            <li><a href="high_freq.html" target="_self">High Freq</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
-
-        <footer class="absolute bottom-4 text-center w-full text-amber-800/60 text-sm">
-            <div class="flex items-center justify-center space-x-2">
-                <span>系統調整：辰緯</span>
-                <span>協作：Google Gemini</span>
-            </div>
-        </footer>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const categories = document.querySelectorAll('.menu-category > a');
+
+            categories.forEach(category => {
+                category.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const parentLi = this.parentElement;
+                    parentLi.classList.toggle('open');
+                    
+                    const allCategories = document.querySelectorAll('.menu-category');
+                    allCategories.forEach(c => {
+                        if (c !== parentLi && c.classList.contains('open')) {
+                            c.classList.remove('open');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+
 </body>
 </html>
 
