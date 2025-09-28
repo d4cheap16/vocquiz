@@ -117,7 +117,10 @@
         }
 
         .screen-header {
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+         gap: 8px; /* 貓貓和標題的間距 */
             padding-bottom: 2%;
             border-bottom: 2px solid var(--screen-text);
             margin-bottom: 3%;
@@ -125,7 +128,10 @@
             letter-spacing: -1px;
             flex-shrink: 0;
         }
-        
+        .header-cat {
+           height: 1.2em; /* 讓貓貓的高度跟文字差不多 */
+            width: auto;
+        }        
         .menu-wrapper {
             overflow-y: auto;
             flex-grow: 1;
@@ -272,7 +278,9 @@
                 <!-- 主選單畫面 (初始隱藏) -->
                 <div class="main-menu">
                     <div class="screen-header">
-                        <p>Vocadeventure</p>
+                    <img src="CatL.png" alt="左貓" class="header-cat">
+                    <p>Vocadeventure</p>
+                <img src="CatR.png" alt="右貓" class="header-cat">
                     </div>
                     <div class="menu-wrapper">
                         <ul class="menu-list">
