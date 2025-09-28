@@ -84,11 +84,13 @@
         }
 
         .boot-logo {
-            color: var(--screen-text);
-            font-size: clamp(12px, 3.5vw, 16px);
             opacity: 0;
             animation: dropInLogo 1.5s ease-out 0.5s forwards, blinkLogo 0.8s step-end 2.5s;
         }
+        .boot-logo img {
+            width: 50%; /* 讓貓貓的寬度佔螢幕的一半，看起來很巨大 */
+            height: auto;
+        }  
 
         @keyframes dropInLogo {
             0% { transform: translateY(-100%); opacity: 1; }
@@ -131,7 +133,7 @@
         .header-cat {
            height: 2em; /* 讓貓貓的高度跟文字差不多 */
             width: auto;
-        }        
+}        
         .menu-wrapper {
             overflow-y: auto;
             flex-grow: 1;
@@ -272,7 +274,7 @@
                 
                 <!-- 開機動畫畫面 -->
                 <div class="boot-screen">
-                    <div class="boot-logo">VoCat</div>
+                    <div class="boot-logo"><img src="Cat.png" alt="開機貓貓"></div>
                 </div>
 
                 <!-- 主選單畫面 (初始隱藏) -->
@@ -401,6 +403,4 @@
 
 </body>
 </html>
-
-
 
