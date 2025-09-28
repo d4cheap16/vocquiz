@@ -80,15 +80,15 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            animation: fadeOutBoot 1s ease-in 3.5s forwards;
+            animation: fadeOutBoot 1s ease-in 3s forwards;
         }
 
         .boot-logo {
             opacity: 0;
-            animation: dropInLogo 1.5s ease-out 0.5s forwards, blinkLogo 0.8s step-end 2.5s;
+            animation: dropInLogo 1.5s ease-out 0.5s forwards, blinkLogo 0.8s step-end 3.5s;
         }
         .boot-logo img {
-            width: 50%; /* 讓貓貓的寬度佔螢幕的一半，看起來很巨大 */
+            width: 40%; /* 讓貓貓的寬度佔螢幕的一半，看起來很巨大 */
             height: auto;
             display: flex;
             justify-content: center;
@@ -112,7 +112,7 @@
         /* --- 主選單 (初始隱藏) --- */
         .main-menu {
             opacity: 0;
-            animation: fadeInMenu 0.5s ease-in 3.5s forwards;
+            animation: fadeInMenu 0.5s ease-in 4s forwards;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -224,7 +224,7 @@
             font-size: clamp(9px, 2.2vw, 11px);
             color: #444; /* 深灰色文字 */
             opacity: 0; /* 動畫結束後顯示 */
-            animation: fadeInMenu 0.5s ease-in 2.5s forwards;
+            animation: fadeInMenu 0.5s ease-in 1s forwards;
             line-height: 1.6; 
         }
 
@@ -262,7 +262,7 @@
         }
 
         .footer-logo {
-            height: 1em;
+            height: 2em;
             width: auto;
             margin-left: 4px;
             vertical-align: middle;
