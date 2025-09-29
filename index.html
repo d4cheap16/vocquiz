@@ -280,20 +280,81 @@
         /* --- Gameboy 按鈕樣式 --- */
         .gb-button {
             position: absolute;
-            border-radius: 50%; /* 讓點擊區域變圓形 */
-            transition: background-color 0.2s; /* 加上一個簡單的過渡效果 */
+            transition: background-color 0.2s;
         }
 
         .gb-button:hover {
-            background-color: rgba(0, 0, 0, 0.2); /* 滑鼠移上去時顯示半透明黑色 */
+            background-color: rgba(0, 0, 0, 0.2);
             cursor: pointer;
         }
 
+        #btn-a, #btn-b {
+            border-radius: 50%; /* 圓形按鈕 A & B */
+        }
+
+        #btn-select, #btn-start {
+            border-radius: 25px; /* 橢圓形按鈕 Select & Start */
+        }
+
+        #btn-up, #btn-down, #btn-left, #btn-right {
+             border-radius: 2px;
+        }
+
+        /* --- 按鈕位置 (待微調) --- */
         #btn-a {
-            top: 61.5%;
-            left: 75%;
+            top: 60%;
+            left: 79%;
+            width: 14%;
+            height: 9%;
+        }
+
+        #btn-b {
+            top: 66%;
+            left: 68%;
+            width: 14%;
+            height: 9%;
+        }
+
+        #btn-select {
+            top: 80%;
+            left: 35%;
             width: 13%;
-            height: 8%;
+            height: 4%;
+        }
+
+        #btn-start {
+            top: 80%;
+            left: 52%;
+            width: 13%;
+            height: 4%;
+        }
+
+        #btn-up {
+            top: 62%;
+            left: 20%;
+            width: 9%;
+            height: 6%;
+        }
+
+        #btn-down {
+            top: 72%;
+            left: 20%;
+            width: 9%;
+            height: 6%;
+        }
+
+        #btn-left {
+            top: 67%;
+            left: 14%;
+            width: 7%;
+            height: 9%;
+        }
+
+        #btn-right {
+            top: 67%;
+            left: 28%;
+            width: 7%;
+            height: 9%;
         }
     </style>
 </head>
@@ -353,6 +414,13 @@
 
             <!-- Gameboy 按鈕 -->
             <a href="#" id="btn-a" class="gb-button"></a>
+            <a href="#" id="btn-b" class="gb-button"></a>
+            <a href="#" id="btn-select" class="gb-button"></a>
+            <a href="#" id="btn-start" class="gb-button"></a>
+            <a href="#" id="btn-up" class="gb-button"></a>
+            <a href="#" id="btn-down" class="gb-button"></a>
+            <a href="#" id="btn-left" class="gb-button"></a>
+            <a href="#" id="btn-right" class="gb-button"></a>
 
         </div>
     </div>
@@ -423,6 +491,49 @@
                 bootScreen.style.display = 'none';
                 document.querySelector('.gameboy-screen').style.overflowY = 'auto';
             });
+
+            // --- Gameboy 按鈕互動 ---
+            const buttonA = document.getElementById('btn-a');
+            buttonA.addEventListener('click', function(event) {
+                event.preventDefault(); // 防止點擊 '#' 時頁面跳轉
+                
+                audioSelect.currentTime = 0;
+                audioSelect.play();
+
+                // 您可以在這裡加入想要的彩蛋功能！
+                // 例如：跳出一個隱藏的訊息、更換主題顏色等等。
+                console.log("A 按鈕被點擊了！未來可以在此處觸發彩蛋。"); 
+            });
+
+            // --- 為其他按鈕加上監聽器 ---
+            const buttonB = document.getElementById('btn-b');
+            const buttonSelect = document.getElementById('btn-select');
+            const buttonStart = document.getElementById('btn-start');
+            const buttonUp = document.getElementById('btn-up');
+            const buttonDown = document.getElementById('btn-down');
+            const buttonLeft = document.getElementById('btn-left');
+            const buttonRight = document.getElementById('btn-right');
+
+            const allButtons = [
+                { el: buttonB, name: 'B' },
+                { el: buttonSelect, name: 'Select' },
+                { el: buttonStart, name: 'Start' },
+                { el: buttonUp, name: 'Up' },
+                { el: buttonDown, name: 'Down' },
+                { el: buttonLeft, name: 'Left' },
+                { el: buttonRight, name: 'Right' }
+            ];
+
+            allButtons.forEach(btn => {
+                if (btn.el) {
+                    btn.el.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        audioSelect.currentTime = 0;
+                        audioSelect.play();
+                        console.log(`${btn.name} 按鈕被點擊了！`);
+                    });
+                }
+            });
         });
     </script>
     
@@ -436,6 +547,4 @@
 
 </body>
 </html>
-
-
 
