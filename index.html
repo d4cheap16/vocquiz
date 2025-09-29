@@ -276,6 +276,25 @@
             margin-left: 4px;
             vertical-align: middle;
         }
+
+        /* --- Gameboy 按鈕樣式 --- */
+        .gb-button {
+            position: absolute;
+            border-radius: 50%; /* 讓點擊區域變圓形 */
+            transition: background-color 0.2s; /* 加上一個簡單的過渡效果 */
+        }
+
+        .gb-button:hover {
+            background-color: rgba(0, 0, 0, 0.2); /* 滑鼠移上去時顯示半透明黑色 */
+            cursor: pointer;
+        }
+
+        #btn-a {
+            top: 61.5%;
+            left: 75%;
+            width: 13%;
+            height: 8%;
+        }
     </style>
 </head>
 <body>
@@ -331,6 +350,10 @@
             <div class="screen-footer">
                 <p id="quote-text">Loading quote...</p>
             </div>
+
+            <!-- Gameboy 按鈕 -->
+            <a href="#" id="btn-a" class="gb-button"></a>
+
         </div>
     </div>
     
@@ -413,31 +436,6 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
