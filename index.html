@@ -74,15 +74,15 @@
             position: absolute;
             top: 9%; 
             left: 9%;
-            width: 82%;
-            height: 35%;
+            width: 80%;
+            height: 37%;
             background-color: var(--screen-bg);
             color: var(--screen-text);
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            clip-path: inset(0 round 9px 9px 40% 9px);
+            clip-path: inset(0 round 9px 9px 18% 9px);
         }
         
         /* --- 開機動畫區塊 --- */
@@ -724,8 +724,8 @@
                 },
                 drawBlockyDino: function(ctx, color) {
                     const dinoX = this.dino.x; const dinoY = this.dino.y; const s = this.pixelScale; ctx.fillStyle = color;
-                    ctx.fillRect(dinoX, dinoY + s * 2, s * 7, s * 3);
-                    ctx.fillRect(dinoX + s * 6, dinoY, s * 5, s * 5);
+                    ctx.fillRect(dinoX, dinoY + s * 2, s * 5, s * 3);
+                    ctx.fillRect(dinoX + s * 4, dinoY, s * 5, s * 5);
                     ctx.fillRect(dinoX - s * 3, dinoY + s * 3, s * 4, s * 2);
                     const isRunningFrame1 = Math.floor(this.score / 6) % 2 === 0;
                     if (this.gameOver) {
