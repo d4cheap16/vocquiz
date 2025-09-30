@@ -11,18 +11,18 @@
     <meta name="description" content="Learn high school vocabulary in a fun way!">
     <meta property="og:title" content="VoCat">
     <meta property="og:description" content="Learn high school vocabulary in a fun way!">
-    <meta property="og:image" content="https://d4cheap16.github.io/vp/GB.jpg">
-    <meta property="og:url" content="https://d4cheap16.github.io/vp/">
+    <meta property="og:image" content="[https://d4cheap16.github.io/vp/GB.jpg](https://d4cheap16.github.io/vp/GB.jpg)">
+    <meta property="og:url" content="[https://d4cheap16.github.io/vp/](https://d4cheap16.github.io/vp/)">
     <meta property="og:type" content="website">
 
     <!-- 網站圖示 (Favicon & Apple Touch Icon) -->
-    <link rel="icon" href="https://d4cheap16.github.io/vp/favicon.png" type="image/jpeg">
-    <link rel="apple-touch-icon" href="https://d4cheap16.github.io/vp/favicon.png">
+    <link rel="icon" href="[https://d4cheap16.github.io/vp/favicon.png](https://d4cheap16.github.io/vp/favicon.png)" type="image/jpeg">
+    <link rel="apple-touch-icon" href="[https://d4cheap16.github.io/vp/favicon.png](https://d4cheap16.github.io/vp/favicon.png)">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
+    <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
     <!-- 引入兩種字體：像素風格 和 Noto Sans TC -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="[https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500&family=Press+Start+2P&display=swap](https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500&family=Press+Start+2P&display=swap)" rel="stylesheet">
     <style>
         :root {
             --screen-bg: #9bbc0f;
@@ -291,14 +291,14 @@
                                 <a href="#">高頻單字</a>
                                 <ul class="sub-menu">
                                     <li><a href="high_freq.html" target="_self">Expert Mode</a></li>
-                                    <li><a href="https://forms.gle/oDeaR87M4xSkaixE6" target="_blank">高一上一段</a></li>
+                                    <li><a href="[https://forms.gle/oDeaR87M4xSkaixE6](https://forms.gle/oDeaR87M4xSkaixE6)" target="_blank">高一上一段</a></li>
                                 </ul>
                             </li>
                             <li class="menu-category">
                                 <a href="#">文法練習</a>
                                 <ul class="sub-menu">
-                                    <li><a href="https://forms.gle/mVhyunhWvFi1TgNt5" target="_blank">高一上一段</a></li>
-                                    <li><a href="https://forms.gle/zxU34XhghWkukZrz8" target="_blank">高二上一段</a></li>
+                                    <li><a href="[https://forms.gle/mVhyunhWvFi1TgNt5](https://forms.gle/mVhyunhWvFi1TgNt5)" target="_blank">高一上一段</a></li>
+                                    <li><a href="[https://forms.gle/zxU34XhghWkukZrz8](https://forms.gle/zxU34XhghWkukZrz8)" target="_blank">高二上一段</a></li>
                                 </ul>
                             </li>
                         </ul>
@@ -744,7 +744,7 @@
                     ctx.fillRect(dinoX + s * 6, dinoY, s * 5, s * 5);
                     
                     // 尾巴
-                    ctx.fillRect(dinoX - s * 3, dinoY + s * 3, s * 3, s * 4);
+                    ctx.fillRect(dinoX - s * 3, dinoY + s * 3, s * 4, s * 2);
 
                     // 根據跑步狀態，切換腳的位置來製造動畫感
                     const isRunningFrame1 = Math.floor(this.score / 6) % 2 === 0;
@@ -806,7 +806,8 @@
 
                 handleButtonPress(key);
 
-                if (['Left', 'Right', 'Down'].includes(key)) {
+                // **FIX**: Only set interval for continuous movement IF THE GAME IS ACTIVE.
+                if (gameManager.isGameActive && ['Left', 'Right', 'Down'].includes(key)) {
                     moveInterval = setInterval(() => {
                         handleButtonPress(key);
                     }, 100);
