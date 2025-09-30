@@ -605,8 +605,8 @@
                     } 
                     if (rowCount > 0) {
                         this.player.score += rowCount * 10;
-                         // 每50分增加一次難度
-                        if (Math.floor(this.player.score / 50) > Math.floor((this.player.score - rowCount * 10) / 50)) {
+                         // 每60分增加一次難度
+                        if (Math.floor(this.player.score / 60) > Math.floor((this.player.score - rowCount * 10) / 60)) {
                            this.dropInterval = Math.max(150, this.dropInterval - 50);
                         }
                         this.updateScore();
@@ -617,7 +617,7 @@
             const dinoGame = {
                 dino: {}, obstacles: [], score: 0, highScore: 0, gameOver: false, spawnTimer: 0,
                 retryOption: 'YES', isPaused: false, pauseOption: 'NO',
-                pixelScale: 2,
+                pixelScale: 3,
                 sprites: {
                     run1: [[0,0,0,0,1,1,1,1,1,1,0,0],[0,0,0,1,1,1,1,1,1,1,1,0],[0,0,0,1,1,1,1,1,0,0,0,0],[0,0,1,1,1,1,0,0,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[1,1,1,1,1,1,1,1,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[0,0,0,1,1,1,0,0,0,0,0,0],[0,0,0,1,1,0,0,0,0,0,0,0],[0,0,1,1,0,0,0,0,0,0,0,0]],
                     run2: [[0,0,0,0,1,1,1,1,1,1,0,0],[0,0,0,1,1,1,1,1,1,1,1,0],[0,0,0,1,1,1,1,1,0,0,0,0],[0,0,1,1,1,1,0,0,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[1,1,1,1,1,1,1,1,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[0,0,0,1,1,1,0,0,0,0,0,0],[0,0,0,0,0,1,1,0,0,0,0,0],[0,0,0,0,0,0,1,1,0,0,0,0]],
@@ -632,7 +632,7 @@
                     canvas.height = canvas.clientHeight; canvas.width = canvas.clientWidth;
                     context.setTransform(1, 0, 0, 1, 0, 0); 
                     const spriteHeight = this.sprites.run1.length;
-                    this.dino = { x: 50, y: canvas.height - (spriteHeight * this.pixelScale), dy: 0, gravity: 0.6, jumpPower: -10, onGround: true };
+                    this.dino = { x: 50, y: canvas.height - (spriteHeight * this.pixelScale), dy: 0, gravity: 0.6, jumpPower: -13, onGround: true };
                     this.obstacles = []; this.score = 0; this.spawnTimer = 0;
                     this.updateScore(); this.update();
                 },
@@ -669,11 +669,11 @@
                         }
                         this.spawnTimer--;
                         if (this.spawnTimer <= 0) { 
-                            const type = Math.random() > 0.4 ? 1 : 2; // 1 for small, 2 for large
-                            const height = type === 1 ? 20 : 30;
-                            const width = type === 1 ? 10 : 15;
+                            const type = Math.random() > 0.5 ? 1 : 2; // 1 for small, 2 for large
+                            const height = type === 1 ? 25 : 45;
+                            const width = type === 1 ? 12 : 23;
                             this.obstacles.push({ x: canvas.width, width: width, height: height, type: type }); 
-                            this.spawnTimer = 90 + Math.random() * 50; 
+                            this.spawnTimer = 80 + Math.random() * 50; 
                         }
                         
                         const dinoHitbox = { x: this.dino.x, y: this.dino.y, width: this.sprites.run1[0].length * this.pixelScale, height: this.sprites.run1.length * this.pixelScale };
