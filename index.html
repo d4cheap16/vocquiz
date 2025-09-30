@@ -330,6 +330,9 @@
             const context = canvas.getContext('2d');
             const scoreElement = document.getElementById('game-score');
 
+            // 修正 3：用圓點取代箭頭
+            const SELECTOR_CHAR = '•';
+
             function drawGameOverScreen(ctx, cvs, selectedOption) {
                 const textColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
                 ctx.fillStyle = 'rgba(155, 188, 15, 0.75)';
@@ -339,16 +342,32 @@
                 ctx.font = `clamp(18px, 6vw, 24px) 'Press Start 2P'`;
                 ctx.fillText('GAME OVER', cvs.width / 2, cvs.height / 2 - 20);
                 ctx.font = `clamp(9px, 2.5vw, 10px) 'Press Start 2P'`;
-                const retryText = "RETRY";
-                const yesText = "YES";
-                const noText = "NO";
                 const textY = cvs.height / 2 + 20;
                 if (selectedOption === 'YES') {
-                    ctx.fillText(`${retryText}   ▶ ${yesText} / ${noText}`, cvs.width / 2, textY);
+                    ctx.fillText(`RETRY   ${SELECTOR_CHAR} YES / NO`, cvs.width / 2, textY);
                 } else {
-                    ctx.fillText(`${retryText}     ${yesText} / ▶ ${noText}`, cvs.width / 2, textY);
+                    ctx.fillText(`RETRY     YES / ${SELECTOR_CHAR} NO`, cvs.width / 2, textY);
                 }
             }
+            
+            // 新增 2：繪製暫停/退出選單的通用函式
+            function drawQuitMenuScreen(ctx, cvs, selectedOption) {
+                const textColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
+                ctx.fillStyle = 'rgba(155, 188, 15, 0.75)';
+                ctx.fillRect(0, 0, cvs.width, cvs.height);
+                ctx.fillStyle = textColor;
+                ctx.textAlign = 'center';
+                ctx.font = `clamp(14px, 5vw, 18px) 'Press Start 2P'`;
+                ctx.fillText('QUIT GAME?', cvs.width / 2, cvs.height / 2 - 20);
+                ctx.font = `clamp(9px, 2.5vw, 10px) 'Press Start 2P'`;
+                const textY = cvs.height / 2 + 20;
+                 if (selectedOption === 'YES') {
+                    ctx.fillText(`${SELECTOR_CHAR} YES / NO`, cvs.width / 2, textY);
+                } else {
+                    ctx.fillText(`  YES / ${SELECTOR_CHAR} NO`, cvs.width / 2, textY);
+                }
+            }
+
 
             const gameManager = {
                 activeGame: null,
@@ -382,38 +401,37 @@
                 arena: [], player: { pos: {x: 0, y: 0}, matrix: null, score: 0 },
                 COLS: 10, ROWS: 20, BLOCK_SIZE: 0, xOffset: 0,
                 dropCounter: 0, dropInterval: 1000, lastTime: 0, gameOver: false,
-                retryOption: 'YES',
+                isPaused: false, pauseOption: 'NO', retryOption: 'YES',
                 start: function() {
                     cancelAnimationFrame(gameManager.animationFrameId);
-                    this.gameOver = false;
-                    this.retryOption = 'YES';
+                    this.gameOver = false; this.isPaused = false;
+                    this.retryOption = 'YES'; this.pauseOption = 'NO';
                     const screenHeight = canvas.clientHeight;
                     const screenWidth = canvas.clientWidth;
-                    
-                    this.ROWS = 20;
-                    this.BLOCK_SIZE = screenHeight / this.ROWS;
+                    this.ROWS = 20; this.BLOCK_SIZE = screenHeight / this.ROWS;
                     this.COLS = 10;
                     this.xOffset = (screenWidth / this.BLOCK_SIZE - this.COLS) / 2;
-
-                    canvas.height = screenHeight;
-                    canvas.width = screenWidth;
-                    
+                    canvas.height = screenHeight; canvas.width = screenWidth;
                     this.arena = this.createMatrix(this.COLS, this.ROWS);
-                    this.player.score = 0;
-                    this.updateScore();
-                    this.playerReset();
+                    this.player.score = 0; this.updateScore(); this.playerReset();
                     this.update();
                 },
                 end: function() { cancelAnimationFrame(gameManager.animationFrameId); },
                 handleInput: function(key) {
                     if (this.gameOver) {
-                        if (key === 'Left' || key === 'Right') {
-                            this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES';
-                        } else if (key === 'A') {
+                        if (key === 'Left' || key === 'Right') { this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES'; } 
+                        else if (key === 'A') {
                             if (this.retryOption === 'YES') this.start();
                             else gameManager.endGame();
                         }
+                    } else if (this.isPaused) {
+                        if (key === 'Left' || key === 'Right') { this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; }
+                        else if (key === 'A') {
+                            if (this.pauseOption === 'YES') gameManager.endGame();
+                            else this.isPaused = false;
+                        } else if (key === 'Start') { this.isPaused = false; }
                     } else {
+                        if (key === 'Start') { this.isPaused = true; this.pauseOption = 'NO'; return; }
                         if (key === 'Select') { gameManager.endGame(); return; }
                         if (key === 'Left') this.playerMove(-1);
                         else if (key === 'Right') this.playerMove(1);
@@ -424,7 +442,7 @@
                 },
                 updateScore: function() { scoreElement.textContent = `SCORE: ${this.player.score}`; },
                 update: function(time = 0) {
-                    if (!this.gameOver) {
+                    if (!this.gameOver && !this.isPaused) {
                         const deltaTime = time - this.lastTime; this.lastTime = time;
                         this.dropCounter += deltaTime;
                         if (this.dropCounter > this.dropInterval) { this.playerDrop(); }
@@ -441,7 +459,8 @@
                     context.fillRect(0, 0, canvas.width, canvas.height);
 
                     context.fillStyle = fgColor;
-                    const borderX_left = (this.xOffset - 1) * this.BLOCK_SIZE;
+                    // 修正 1：修正左邊界計算
+                    const borderX_left = this.xOffset * this.BLOCK_SIZE - 1;
                     const borderX_right = (this.xOffset + this.COLS) * this.BLOCK_SIZE;
                     context.fillRect(borderX_left, 0, 1, canvas.height);
                     context.fillRect(borderX_right, 0, 1, canvas.height);
@@ -449,11 +468,10 @@
                     context.scale(this.BLOCK_SIZE, this.BLOCK_SIZE); 
                     this.drawMatrix(this.arena, {x: 0, y: 0});
                     this.drawMatrix(this.player.matrix, this.player.pos);
-
-                    if (this.gameOver) {
-                        context.setTransform(1, 0, 0, 1, 0, 0);
-                        drawGameOverScreen(context, canvas, this.retryOption);
-                    }
+                    
+                    context.setTransform(1, 0, 0, 1, 0, 0);
+                    if (this.gameOver) { drawGameOverScreen(context, canvas, this.retryOption); }
+                    if (this.isPaused) { drawQuitMenuScreen(context, canvas, this.pauseOption); }
                 },
                 playerReset: function() {
                     const p='ILJOTSZ'; this.player.matrix = this.createPiece(p[p.length * Math.random() | 0]);
@@ -484,7 +502,7 @@
 
             const dinoGame = {
                 dino: {}, obstacles: [], score: 0, gameOver: false, spawnTimer: 0,
-                retryOption: 'YES',
+                retryOption: 'YES', isPaused: false, pauseOption: 'NO',
                 pixelScale: 2,
                 sprites: {
                     run1: [[0,0,0,0,1,1,1,1,1,1,0,0],[0,0,0,1,1,1,1,1,1,1,1,0],[0,0,0,1,1,1,1,1,0,0,0,0],[0,0,1,1,1,1,0,0,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[1,1,1,1,1,1,1,1,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[0,0,0,1,1,1,0,0,0,0,0,0],[0,0,0,1,1,0,0,0,0,0,0,0],[0,0,1,1,0,0,0,0,0,0,0,0]],
@@ -494,7 +512,8 @@
                 },
                 start: function() {
                     cancelAnimationFrame(gameManager.animationFrameId);
-                    this.gameOver = false; this.retryOption = 'YES';
+                    this.gameOver = false; this.isPaused = false;
+                    this.retryOption = 'YES'; this.pauseOption = 'NO';
                     canvas.height = canvas.clientHeight; canvas.width = canvas.clientWidth;
                     context.setTransform(1, 0, 0, 1, 0, 0); 
                     const spriteHeight = this.sprites.run1.length;
@@ -510,21 +529,28 @@
                             if (this.retryOption === 'YES') this.start();
                             else gameManager.endGame();
                         }
+                    } else if (this.isPaused) {
+                        if (key === 'Left' || key === 'Right') { this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; }
+                        else if (key === 'A') {
+                            if (this.pauseOption === 'YES') gameManager.endGame();
+                            else this.isPaused = false;
+                        } else if (key === 'Start') { this.isPaused = false; }
                     } else {
+                        if (key === 'Start') { this.isPaused = true; this.pauseOption = 'NO'; return; }
                         if (key === 'Select') { gameManager.endGame(); return; }
                         if ((key === 'A' || key === 'Up') && this.dino.onGround) { this.dino.dy = this.dino.jumpPower; this.dino.onGround = false; }
                     }
                 },
                 updateScore: function() { scoreElement.textContent = `SCORE: ${Math.floor(this.score)}`; },
                 update: function() {
-                    if (!this.gameOver) {
+                    if (!this.gameOver && !this.isPaused) {
                         this.dino.dy += this.dino.gravity; this.dino.y += this.dino.dy; this.dino.onGround = false;
                         if (this.dino.y + (this.sprites.run1.length * this.pixelScale) >= canvas.height) {
                             this.dino.y = canvas.height - (this.sprites.run1.length * this.pixelScale);
                             this.dino.dy = 0; this.dino.onGround = true;
                         }
                         this.spawnTimer--;
-                        if (this.spawnTimer <= 0) { this.obstacles.push({ x: canvas.width, width: 15, height: 20 + Math.random() * 15 }); this.spawnTimer = 120 + Math.random() * 50; }
+                        if (this.spawnTimer <= 0) { this.obstacles.push({ x: canvas.width, width: 15, height: 15 + Math.random() * 15 }); this.spawnTimer = 120 + Math.random() * 50; }
                         
                         const dinoHitbox = { x: this.dino.x, y: this.dino.y, width: this.sprites.run1[0].length * this.pixelScale, height: this.sprites.run1.length * this.pixelScale };
                         for (let i = this.obstacles.length - 1; i >= 0; i--) {
@@ -549,10 +575,10 @@
                     
                     context.fillStyle = fgColor;
                     this.obstacles.forEach(obs => { context.fillRect(obs.x, canvas.height - obs.height, obs.width, obs.height); });
-
-                    if (this.gameOver) {
-                        drawGameOverScreen(context, canvas, this.retryOption);
-                    }
+                    
+                    context.setTransform(1, 0, 0, 1, 0, 0);
+                    if (this.gameOver) { drawGameOverScreen(context, canvas, this.retryOption); }
+                    if (this.isPaused) { drawQuitMenuScreen(context, canvas, this.pauseOption); }
                 },
                 drawDinoSprite: function(ctx, color) {
                     const dinoX = this.dino.x; const dinoY = this.dino.y; const s = this.pixelScale;
@@ -577,10 +603,10 @@
             let testerInput = [];
 
             function handleButtonPress(key) {
-                audioSelect.currentTime = 0; audioSelect.play();
                 if (gameManager.isGameActive) {
                     gameManager.handleInput(key);
                 } else {
+                    audioSelect.currentTime = 0; audioSelect.play();
                     userInput.push(key);
                     userInput = userInput.slice(-konamiCode.length);
                     if (JSON.stringify(userInput) === JSON.stringify(konamiCode)) {
@@ -598,57 +624,39 @@
                 }
             }
             
-            // --- 舊的 click 監聽器 ---
-            /*
-            const allButtons = document.querySelectorAll('.gb-button');
-            allButtons.forEach(button => {
-                button.addEventListener('click', function(event) {
-                    event.preventDefault(); const key = this.dataset.key; handleButtonPress(key);
-                    this.style.backgroundColor = 'rgba(0,0,0,0.3)';
-                    setTimeout(() => { this.style.backgroundColor = ''; }, 100);
-                });
-            });
-            */
-
-            // --- 新增：長按功能監聽器 ---
             let moveInterval = null;
             const allButtons = document.querySelectorAll('.gb-button');
 
             function startAction(key) {
-                // 停止任何可能還在執行的計時器
                 clearInterval(moveInterval);
                 
-                // 執行第一次操作
+                // 只有在遊戲中才播放音效，避免在主選單重複觸發
+                if (gameManager.isGameActive) {
+                    audioSelect.currentTime = 0;
+                    audioSelect.play();
+                }
+
                 handleButtonPress(key);
 
-                // 如果是方向鍵，則啟動計時器以達成連續移動
                 if (['Left', 'Right', 'Down'].includes(key)) {
                     moveInterval = setInterval(() => {
                         handleButtonPress(key);
-                    }, 100); // 每 100 毫秒移動一次
+                    }, 100);
                 }
             }
 
             function stopAction() {
-                // 清除計時器，停止連續移動
                 clearInterval(moveInterval);
             }
 
             allButtons.forEach(button => {
                 const key = button.dataset.key;
-
-                // 按下事件 (滑鼠 & 觸控)
                 button.addEventListener('mousedown', (e) => { e.preventDefault(); startAction(key); });
                 button.addEventListener('touchstart', (e) => { e.preventDefault(); startAction(key); });
-
-                // 放開事件 (滑鼠 & 觸控)
                 button.addEventListener('mouseup', stopAction);
                 button.addEventListener('touchend', stopAction);
-                // 當滑鼠移出按鈕範圍時，也視為放開
                 button.addEventListener('mouseleave', stopAction);
             });
-
-
         });
     </script>
     
