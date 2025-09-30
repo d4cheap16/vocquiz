@@ -287,7 +287,6 @@
                 <div class="boot-screen">
                     <div class="boot-logo"><img src="Cat.jpg" alt="開機貓貓"></div>
                 </div>
-                <!-- 修正：恢復原始主選單 -->
                 <div class="main-menu">
                     <div class="screen-header">
                         <img src="CatL.png" alt="左貓" class="header-cat">
@@ -323,10 +322,9 @@
                         </ul>
                     </div>
                 </div>
-                <!-- 修正：新增遊戲選單 (Tester Menu) -->
                 <div class="tester-menu">
                     <div class="screen-header">
-                        <p>TESTER MODE</p>
+                        <p>GAME SELECT</p>
                     </div>
                     <div class="menu-wrapper">
                         <ul class="menu-list">
@@ -369,7 +367,6 @@
             const gameboyScreen = document.querySelector('.gameboy-screen');
             const bootScreen = document.querySelector('.boot-screen');
             const mainMenu = document.querySelector('.main-menu');
-            const testerMenu = document.querySelector('.tester-menu');
 
             const quotes = ["Try UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A Start", "Every expert was once a beginner.", "Don't stop until you're proud.", "The harder you work, the luckier you get.", "Success is the sum of small efforts.", "It always seems impossible until it's done.", "Mistakes are proof that you are trying.", "Turn 'I wish' into 'I will'.", "Learn something new every day.", "No one can take what you've learned away from you.", "Strive for progress, not perfection.", "Be awesome today."];
             const quoteElement = document.getElementById('quote-text');
@@ -387,24 +384,12 @@
                     if (!wasOpen) parentLi.classList.add('open');
                 });
             });
+
             const actionLinks = document.querySelectorAll('.sub-menu a, .menu-list > li:not(.menu-category) > a');
             actionLinks.forEach(item => { item.addEventListener('click', () => { audioSelect.currentTime = 0; audioSelect.play(); }); });
 
-            const testerMenuLinks = document.querySelectorAll('.tester-menu a');
-            testerMenuLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    audioSelect.currentTime = 0;
-                    audioSelect.play();
-                    const gameType = e.target.dataset.game;
-                    if (gameType === 'back') {
-                        gameManager.hideTesterMenu();
-                    } else {
-                        gameManager.startGame(gameType);
-                    }
-                });
-            });
-
+            // 精簡：移除多餘的事件監聽器，因為按鈕事件已由 gameManager 統一處理
+            
             bootScreen.addEventListener('animationend', function(e) {
                 if (e.animationName === 'fadeOutBoot') {
                     this.style.display = 'none';
@@ -476,7 +461,10 @@
                 updateMenuSelection: function() {
                     if (!this.menuItems) return;
                     this.menuItems.forEach(item => item.classList.remove('selected'));
-                    this.menuItems[this.selectedMenuIndex].classList.add('selected');
+                    const selectedItem = this.menuItems[this.selectedMenuIndex];
+                    selectedItem.classList.add('selected');
+                    // 修正：將選擇的項目捲動到可視區域
+                    selectedItem.scrollIntoView({ block: 'nearest' });
                 },
 
                 handleMenuInput: function(key) {
@@ -514,7 +502,7 @@
                 },
 
                 startGame: function(gameType) {
-                    if (this.isGameActive) return;
+                    if (this.isGameActive || !gameType) return; // 精簡：增加檢查，若無 gameType 則不執行
                     this.isGameActive = true;
                     gameboyScreen.classList.remove('tester-active');
                     gameboyScreen.classList.add('game-active');
@@ -527,9 +515,8 @@
                         this.activeGame = snakeGame;
                     } else if (gameType === 'breakout') {
                         this.activeGame = breakoutGame;
-                    } else { 
-                        this.activeGame = Math.random() < 0.25 ? tetrisGame : (Math.random() < 0.5 ? dinoGame : (Math.random() < 0.75 ? snakeGame : breakoutGame));
                     }
+                    // 精簡：移除多餘的 else，因為 gameType 必定由選單提供
                     this.activeGame.start();
                 },
 
