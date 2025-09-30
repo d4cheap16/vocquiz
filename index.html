@@ -203,7 +203,19 @@
 
         /* --- 遊戲畫布與計分板 (通用) --- */
         #game-canvas { display: none; width: 100%; height: 100%; background-color: var(--screen-bg); }
-        #game-score { display: none; position: absolute; top: 8px; right: 12px; font-size: clamp(10px, 3vw, 12px); color: var(--screen-text); z-index: 10; }
+        #game-score { 
+            display: none; 
+            position: absolute; 
+            top: 4px;
+            left: 12px;
+            right: 12px;
+            font-size: clamp(10px, 2.5vw, 11px); 
+            color: var(--screen-text); 
+            z-index: 10;
+            white-space: pre; 
+            text-align: right;
+            line-height: 1.2;
+        }
 
         .gameboy-screen.game-active .main-menu,
         .gameboy-screen.game-active .tester-menu { 
@@ -463,6 +475,7 @@
 
             const tetrisGame = {
                 arena: [], player: { pos: {x: 0, y: 0}, matrix: null, score: 0 },
+                highScore: 0,
                 COLS: 10, ROWS: 20, BLOCK_SIZE: 0, xOffset: 0,
                 dropCounter: 0, dropInterval: 1000, lastTime: 0, gameOver: false,
                 isPaused: false, pauseOption: 'NO', retryOption: 'YES',
@@ -470,6 +483,7 @@
                     cancelAnimationFrame(gameManager.animationFrameId);
                     this.gameOver = false; this.isPaused = false;
                     this.retryOption = 'YES'; this.pauseOption = 'NO';
+                    this.highScore = parseInt(localStorage.getItem('tetrisHighScore')) || 0;
                     const screenHeight = canvas.clientHeight;
                     const screenWidth = canvas.clientWidth;
                     this.ROWS = 20; this.BLOCK_SIZE = screenHeight / this.ROWS;
@@ -503,7 +517,11 @@
                         else if (key === 'B') this.playerRotate(-1);
                     }
                 },
-                updateScore: function() { scoreElement.textContent = `SCORE: ${this.player.score}`; },
+                updateScore: function() {
+                    const hi = String(this.highScore).padStart(5, '0');
+                    const current = String(this.player.score).padStart(5, '0');
+                    scoreElement.textContent = `HI ${hi}\n${current}`;
+                },
                 update: function(time = 0) {
                     if (!this.gameOver && !this.isPaused) {
                         const deltaTime = time - this.lastTime; this.lastTime = time;
@@ -538,7 +556,14 @@
                 playerReset: function() {
                     const p='ILJOTSZ'; this.player.matrix = this.createPiece(p[p.length * Math.random() | 0]);
                     this.player.pos.y=0; this.player.pos.x = (this.COLS / 2 | 0) - (this.player.matrix[0].length / 2 | 0);
-                    if (this.collide(this.arena, this.player)) { this.gameOver = true; }
+                    if (this.collide(this.arena, this.player)) {
+                        if (this.player.score > this.highScore) {
+                            this.highScore = this.player.score;
+                            localStorage.setItem('tetrisHighScore', this.highScore);
+                            this.updateScore();
+                        }
+                        this.gameOver = true;
+                    }
                 },
                 drawMatrix: function(matrix, offset) {
                     const blockColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
@@ -563,7 +588,7 @@
             };
 
             const dinoGame = {
-                dino: {}, obstacles: [], score: 0, gameOver: false, spawnTimer: 0,
+                dino: {}, obstacles: [], score: 0, highScore: 0, gameOver: false, spawnTimer: 0,
                 retryOption: 'YES', isPaused: false, pauseOption: 'NO',
                 pixelScale: 2,
                 sprites: {
@@ -576,6 +601,7 @@
                     cancelAnimationFrame(gameManager.animationFrameId);
                     this.gameOver = false; this.isPaused = false;
                     this.retryOption = 'YES'; this.pauseOption = 'NO';
+                    this.highScore = parseInt(localStorage.getItem('dinoHighScore')) || 0;
                     canvas.height = canvas.clientHeight; canvas.width = canvas.clientWidth;
                     context.setTransform(1, 0, 0, 1, 0, 0); 
                     const spriteHeight = this.sprites.run1.length;
@@ -602,7 +628,11 @@
                         if ((key === 'A' || key === 'Up') && this.dino.onGround) { this.dino.dy = this.dino.jumpPower; this.dino.onGround = false; }
                     }
                 },
-                updateScore: function() { scoreElement.textContent = `SCORE: ${Math.floor(this.score)}`; },
+                updateScore: function() {
+                    const hi = String(Math.floor(this.highScore)).padStart(5, '0');
+                    const current = String(Math.floor(this.score)).padStart(5, '0');
+                    scoreElement.textContent = `HI ${hi}\n${current}`;
+                },
                 update: function() {
                     if (!this.gameOver && !this.isPaused) {
                         this.dino.dy += this.dino.gravity; this.dino.y += this.dino.dy; this.dino.onGround = false;
@@ -619,6 +649,12 @@
                             if (obs.x + obs.width < 0) this.obstacles.splice(i, 1);
                             const obsHitbox = { x: obs.x, y: canvas.height - obs.height, width: obs.width, height: obs.height };
                             if (dinoHitbox.x < obsHitbox.x + obsHitbox.width && dinoHitbox.x + dinoHitbox.width > obsHitbox.x && dinoHitbox.y < obsHitbox.y + obsHitbox.height && dinoHitbox.y + dinoHitbox.height > obsHitbox.y) {
+                                if (!this.gameOver) {
+                                    if (this.score > this.highScore) {
+                                        this.highScore = this.score;
+                                        localStorage.setItem('dinoHighScore', Math.floor(this.highScore));
+                                    }
+                                }
                                 this.gameOver = true;
                             }
                         }
