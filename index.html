@@ -295,7 +295,7 @@
             const bootScreen = document.querySelector('.boot-screen');
             const mainMenu = document.querySelector('.main-menu');
 
-            const quotes = ["Try UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A START", "Try UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A START", "Every expert was once a beginner.", "Don't stop until you're proud.", "The harder you work, the luckier you get.", "Success is the sum of small efforts.", "It always seems impossible until it's done.", "Mistakes are proof that you are trying.", "Turn 'I wish' into 'I will'.", "Learn something new every day.", "No one can take what you've learned away from you.", "Strive for progress, not perfection.", "Be awesome today."];
+            const quotes = ["Try UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A START", "Every expert was once a beginner.", "Don't stop until you're proud.", "The harder you work, the luckier you get.", "Success is the sum of small efforts.", "It always seems impossible until it's done.", "Mistakes are proof that you are trying.", "Turn 'I wish' into 'I will'.", "Learn something new every day.", "No one can take what you've learned away from you.", "Strive for progress, not perfection.", "Be awesome today."];
             const quoteElement = document.getElementById('quote-text');
             quoteElement.textContent = quotes[Math.floor(Math.random() * quotes.length)];
 
@@ -383,7 +383,7 @@
                 dropCounter: 0, dropInterval: 1000, lastTime: 0, gameOver: false,
                 retryOption: 'YES',
                 start: function() {
-                    cancelAnimationFrame(gameManager.animationFrameId); // 修正點
+                    cancelAnimationFrame(gameManager.animationFrameId);
                     this.gameOver = false;
                     this.retryOption = 'YES';
                     const screenHeight = canvas.clientHeight; const screenWidth = canvas.clientWidth;
@@ -455,7 +455,7 @@
             const dinoGame = {
                 dino: {}, obstacles: [], score: 0, gameOver: false, spawnTimer: 0,
                 retryOption: 'YES',
-                pixelScale: 2.5,
+                pixelScale: 2,
                 sprites: {
                     run1: [[0,0,0,0,1,1,1,1,1,1,0,0],[0,0,0,1,1,1,1,1,1,1,1,0],[0,0,0,1,1,1,1,1,0,0,0,0],[0,0,1,1,1,1,0,0,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[1,1,1,1,1,1,1,1,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[0,0,0,1,1,1,0,0,0,0,0,0],[0,0,0,1,1,0,0,0,0,0,0,0],[0,0,1,1,0,0,0,0,0,0,0,0]],
                     run2: [[0,0,0,0,1,1,1,1,1,1,0,0],[0,0,0,1,1,1,1,1,1,1,1,0],[0,0,0,1,1,1,1,1,0,0,0,0],[0,0,1,1,1,1,0,0,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[1,1,1,1,1,1,1,1,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[0,0,0,1,1,1,0,0,0,0,0,0],[0,0,0,0,0,1,1,0,0,0,0,0],[0,0,0,0,0,0,1,1,0,0,0,0]],
@@ -463,7 +463,7 @@
                     dead: [[0,0,0,0,1,1,1,1,1,1,0,0],[0,0,0,1,1,0,1,0,1,1,1,0],[0,0,0,1,1,1,0,1,1,1,0,0],[0,0,1,1,1,1,1,1,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[1,1,1,1,1,1,1,1,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[0,0,0,1,1,1,0,0,0,0,0,0],[0,0,0,1,1,0,0,0,0,0,0,0],[0,0,1,1,0,0,0,0,0,0,0,0]]
                 },
                 start: function() {
-                    cancelAnimationFrame(gameManager.animationFrameId); // 修正點
+                    cancelAnimationFrame(gameManager.animationFrameId);
                     this.gameOver = false; this.retryOption = 'YES';
                     canvas.height = canvas.clientHeight; canvas.width = canvas.clientWidth;
                     context.setTransform(1, 0, 0, 1, 0, 0); 
@@ -539,21 +539,39 @@
                 }
             };
 
-            const TESTER_MODE = false;
-            let startClickCount = 0;
+            // --- 彩蛋觸發與按鈕監聽 ---
+            const TESTER_MODE = true;
             const konamiCode = ['Up', 'Up', 'Down', 'Down', 'Left', 'Right', 'Left', 'Right', 'B', 'A', 'START'];
             let userInput = [];
+
+            // 修正點：新增測試模式的變數
+            const testerCode = ['A', 'B', 'B', 'A', 'A', 'B', 'B', 'A'];
+            let testerInput = [];
 
             function handleButtonPress(key) {
                 audioSelect.currentTime = 0; audioSelect.play();
                 if (gameManager.isGameActive) {
                     gameManager.handleInput(key);
                 } else {
-                    userInput.push(key); userInput = userInput.slice(-konamiCode.length);
-                    if (JSON.stringify(userInput) === JSON.stringify(konamiCode)) { gameManager.triggerEasterEgg(); }
-                    if (TESTER_MODE && key === 'Start') {
-                        startClickCount++; if (startClickCount >= 3) { gameManager.triggerEasterEgg(); }
-                    } else if (key !== 'Start') { startClickCount = 0; }
+                    // --- 主選單中的操作 ---
+
+                    // 檢查正式彩蛋 (Konami Code)
+                    userInput.push(key);
+                    userInput = userInput.slice(-konamiCode.length);
+                    if (JSON.stringify(userInput) === JSON.stringify(konamiCode)) {
+                        gameManager.triggerEasterEgg();
+                        return; // 成功觸發後就結束，避免重複檢查
+                    }
+
+                    // 如果啟用測試模式，則檢查測試密碼
+                    if (TESTER_MODE) {
+                        testerInput.push(key);
+                        testerInput = testerInput.slice(-testerCode.length);
+                        // 修正點：比對 testerCode 而不是 konamiCode
+                        if (JSON.stringify(testerInput) === JSON.stringify(testerCode)) {
+                             gameManager.triggerEasterEgg();
+                        }
+                    }
                 }
             }
             
