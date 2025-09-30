@@ -153,7 +153,7 @@
             to { opacity: 1; }
         }
 
-        /* --- Tester Menu --- */
+        /* --- 遊戲選單 --- */
         .tester-menu {
             display: none;
             height: 100%;
@@ -199,7 +199,6 @@
         .menu-category.open .sub-menu { display: block; }
         .sub-menu a { font-size: clamp(12px, 3.5vw, 14px); }
 
-        /* --- 修改：合併選單樣式，增加 selected 狀態 --- */
         .sub-menu a::before, 
         .tester-menu .menu-list a::before { 
             content: '▶'; 
@@ -218,6 +217,20 @@
         .tester-menu .menu-list a:hover::before, 
         .tester-menu .menu-list a.selected::before { 
             opacity: 1; 
+        }
+        
+        /* --- 新增：遊戲選單底部說明 --- */
+        .menu-footer {
+            flex-shrink: 0;
+            text-align: center;
+            padding: 4% 0 2%;
+            margin-top: auto;
+            border-top: 2px solid var(--screen-text);
+            font-size: clamp(9px, 2.5vw, 11px);
+            letter-spacing: -1px;
+        }
+        .menu-footer p {
+            margin: 0;
         }
         
         /* --- 遊戲畫布與計分板 (通用) --- */
@@ -243,7 +256,6 @@
         .gameboy-screen.game-active #game-canvas { display: block; }
         .gameboy-screen.game-active #game-score { display: block; }
 
-        /* --- 新增螢幕底部格言樣式 --- */
         .screen-footer { margin: 0; padding: 0; position: absolute; bottom: 44%; left: 11%; width: 80%; text-align: left; font-size: clamp(9px, 2.2vw, 11px); color: #444; opacity: 0; animation: fadeInMenu 0.5s ease-in 1s forwards; line-height: 1.6; }
         .screen-footer p { margin: 0; padding: 0; }
         .site-footer { position: absolute; bottom: 10px; left: 0; width: 100%; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 6px; font-size: 10px; color: #555; z-index: 10; }
@@ -251,7 +263,6 @@
         @media (max-width: 380px) { .site-footer { flex-direction: column; gap: 2px; } }
         .footer-logo { height: 2em; width: auto; margin-left: 4px; vertical-align: middle; }
 
-        /* --- Gameboy 按鈕樣式 --- */
         .gb-button { 
             position: absolute; 
             transition: background-color 0.2s, transform 0.1s; 
@@ -267,7 +278,6 @@
         #btn-select, #btn-start { border-radius: 25px; }
         #btn-up, #btn-down, #btn-left, #btn-right { border-radius: 2px; }
 
-        /* --- 按鈕位置 (已完成微調) --- */
         #btn-a { top: 60%; left: 79%; width: 14%; height: 9%; }
         #btn-b { top: 64%; left: 62%; width: 14%; height: 9%; }
         #btn-select { top: 80%; left: 29%; width: 14%; height: 4%; }
@@ -335,6 +345,10 @@
                             <li><a href="#" data-game="tetris">TETRIS</a></li>
                         </ul>
                     </div>
+                    <!-- 新增：遊戲選單底部說明 -->
+                    <div class="menu-footer">
+                        <p>A: PLAY • UP/DOWN: SELECT</p>
+                    </div>
                 </div>
                 <canvas id="game-canvas"></canvas>
                 <div id="game-score"></div>
@@ -354,7 +368,7 @@
         </div>
     </div>
     
-    <audio id="audio-open" src="data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQgAADD/38Agf9/AP//fwB/AP//f/9/AP8A//9/AIAA/wB//38AgAA="></audio>
+    <audio id="audio-open" src="data:audio/wav;base64,UklGRlIAAABXQVZFZm1ートIBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQgAADD/38Agf9/AP//fwB/AP//f/9/AP8A//9/AIAA/wB//38AgAA="></audio>
     <audio id="audio-select" src="data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQgAAAAgP9/AP8AgAD/AIAA/wCAAP8AgAD/AIAA/wCAAP8AgAD/AIAA/wCAAP8A"></audio>
 
     <script>
@@ -372,6 +386,7 @@
             const quoteElement = document.getElementById('quote-text');
             quoteElement.textContent = quotes[Math.floor(Math.random() * quotes.length)];
 
+            // 主選單點擊事件
             const categories = document.querySelectorAll('.menu-category > a');
             categories.forEach(category => {
                 category.addEventListener('click', function(event) {
@@ -385,11 +400,25 @@
                 });
             });
 
-            const actionLinks = document.querySelectorAll('.sub-menu a, .menu-list > li:not(.menu-category) > a');
-            actionLinks.forEach(item => { item.addEventListener('click', () => { audioSelect.currentTime = 0; audioSelect.play(); }); });
-
-            // 精簡：移除多餘的事件監聽器，因為按鈕事件已由 gameManager 統一處理
+            const subMenuLinks = document.querySelectorAll('.sub-menu a');
+            subMenuLinks.forEach(item => { item.addEventListener('click', () => { audioSelect.currentTime = 0; audioSelect.play(); }); });
             
+            // 遊戲選單點擊事件
+            const testerMenuLinks = document.querySelectorAll('.tester-menu a');
+            testerMenuLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    audioSelect.currentTime = 0;
+                    audioSelect.play();
+                    const gameType = e.target.dataset.game;
+                    if (gameType === 'back') {
+                        gameManager.hideTesterMenu();
+                    } else {
+                        gameManager.startGame(gameType);
+                    }
+                });
+            });
+
             bootScreen.addEventListener('animationend', function(e) {
                 if (e.animationName === 'fadeOutBoot') {
                     this.style.display = 'none';
@@ -443,80 +472,58 @@
                 }
             }
 
+            function drawWinScreen(ctx, cvs, selectedOption) {
+                const textColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
+                ctx.fillStyle = 'rgba(155, 188, 15, 0.75)';
+                ctx.fillRect(0, 0, cvs.width, cvs.height);
+                ctx.fillStyle = textColor;
+                ctx.textAlign = 'center';
+                ctx.font = `clamp(18px, 6vw, 24px) 'Press Start 2P'`;
+                ctx.fillText('STAGE CLEAR!', cvs.width / 2, cvs.height / 2 - 20);
+                ctx.font = `clamp(9px, 2.5vw, 10px) 'Press Start 2P'`;
+                const textY = cvs.height / 2 + 20;
+                if (selectedOption === 'YES') {
+                    ctx.fillText(`${SELECTOR_CHAR} NEXT / QUIT`, cvs.width / 2, textY);
+                } else {
+                    ctx.fillText(`  NEXT / ${SELECTOR_CHAR} QUIT`, cvs.width / 2, textY);
+                }
+            }
+
 
             const gameManager = {
                 activeGame: null,
                 isGameActive: false,
                 animationFrameId: null,
-                selectedMenuIndex: 0, 
-                menuItems: null,
                 
                 showTesterMenu: function() {
                     gameboyScreen.classList.add('tester-active');
-                    this.menuItems = document.querySelectorAll('.tester-menu .menu-list a');
-                    this.selectedMenuIndex = 0;
-                    this.updateMenuSelection();
-                },
-                
-                updateMenuSelection: function() {
-                    if (!this.menuItems) return;
-                    this.menuItems.forEach(item => item.classList.remove('selected'));
-                    const selectedItem = this.menuItems[this.selectedMenuIndex];
-                    selectedItem.classList.add('selected');
-                    // 修正：將選擇的項目捲動到可視區域
-                    selectedItem.scrollIntoView({ block: 'nearest' });
-                },
-
-                handleMenuInput: function(key) {
-                    if (!this.menuItems) return;
-                    const lastIndex = this.menuItems.length - 1;
-
-                    if (key === 'Up') {
-                        audioOpen.currentTime = 0; audioOpen.play();
-                        this.selectedMenuIndex--;
-                        if (this.selectedMenuIndex < 0) this.selectedMenuIndex = lastIndex;
-                        this.updateMenuSelection();
-                    } else if (key === 'Down') {
-                        audioOpen.currentTime = 0; audioOpen.play();
-                        this.selectedMenuIndex++;
-                        if (this.selectedMenuIndex > lastIndex) this.selectedMenuIndex = 0;
-                        this.updateMenuSelection();
-                    } else if (key === 'A') {
-                        audioSelect.currentTime = 0; audioSelect.play();
-                        const selectedLink = this.menuItems[this.selectedMenuIndex];
-                        const gameType = selectedLink.dataset.game;
-                        if (gameType === 'back') {
-                            this.hideTesterMenu();
-                        } else {
-                            this.startGame(gameType);
-                        }
-                    }
+                    const firstItem = document.querySelector('.tester-menu .menu-list a');
+                    if (firstItem) firstItem.classList.add('selected');
                 },
                 
                 hideTesterMenu: function() {
                     gameboyScreen.classList.remove('tester-active');
-                    this.menuItems = null; 
+                    const selectedItem = document.querySelector('.tester-menu .menu-list a.selected');
+                    if (selectedItem) selectedItem.classList.remove('selected');
                     bootScreen.style.display = 'flex';
                     bootScreen.classList.add('reboot');
                     mainMenu.classList.remove('reboot');
                 },
 
                 startGame: function(gameType) {
-                    if (this.isGameActive || !gameType) return; // 精簡：增加檢查，若無 gameType 則不執行
+                    if (this.isGameActive || !gameType) return;
                     this.isGameActive = true;
                     gameboyScreen.classList.remove('tester-active');
                     gameboyScreen.classList.add('game-active');
+                    const selectedItem = document.querySelector('.tester-menu .menu-list a.selected');
+                    if (selectedItem) selectedItem.classList.remove('selected');
 
-                    if (gameType === 'tetris') {
-                        this.activeGame = tetrisGame;
-                    } else if (gameType === 'dino') {
-                        this.activeGame = dinoGame;
-                    } else if (gameType === 'snake') {
-                        this.activeGame = snakeGame;
-                    } else if (gameType === 'breakout') {
-                        this.activeGame = breakoutGame;
-                    }
-                    // 精簡：移除多餘的 else，因為 gameType 必定由選單提供
+
+                    if (gameType === 'tetris') this.activeGame = tetrisGame;
+                    else if (gameType === 'dino') this.activeGame = dinoGame;
+                    else if (gameType === 'snake') this.activeGame = snakeGame;
+                    else if (gameType === 'breakout') this.activeGame = breakoutGame;
+                    
                     this.activeGame.start();
                 },
 
@@ -532,6 +539,42 @@
                 handleInput: function(key) {
                     if (this.isGameActive && this.activeGame) {
                         this.activeGame.handleInput(key);
+                    }
+                },
+                // 新增：專門處理遊戲選單按鈕的函式
+                handleGameMenuInput: function(key) {
+                    const menuItems = document.querySelectorAll('.tester-menu .menu-list a');
+                    if (menuItems.length === 0) return;
+
+                    let currentIndex = Array.from(menuItems).findIndex(link => link.classList.contains('selected'));
+
+                    if (key === 'Up' || key === 'Down') {
+                        audioOpen.currentTime = 0; audioOpen.play();
+                        
+                        if (currentIndex !== -1) {
+                            menuItems[currentIndex].classList.remove('selected');
+                        }
+                        
+                        if (currentIndex === -1) {
+                            currentIndex = (key === 'Up') ? menuItems.length - 1 : 0;
+                        } else if (key === 'Up') {
+                            currentIndex = (currentIndex - 1 + menuItems.length) % menuItems.length;
+                        } else {
+                            currentIndex = (currentIndex + 1) % menuItems.length;
+                        }
+
+                        const newSelectedItem = menuItems[currentIndex];
+                        newSelectedItem.classList.add('selected');
+                        newSelectedItem.scrollIntoView({ block: 'nearest' });
+                    } else if (key === 'A') {
+                        const selectedItem = document.querySelector('.tester-menu a.selected');
+                        if (selectedItem) {
+                            selectedItem.click(); // 點擊事件會自己播放音效
+                        } else {
+                            audioSelect.currentTime = 0; audioSelect.play();
+                        }
+                    } else {
+                         audioSelect.currentTime = 0; audioSelect.play();
                     }
                 }
             };
@@ -786,9 +829,6 @@
                 },
             };
             
-            // =================================================================
-            // --- 新增：貪食蛇遊戲 ---
-            // =================================================================
             const snakeGame = {
                 snake: [], food: {}, score: 0, highScore: 0, gameOver: false,
                 isPaused: false, retryOption: 'YES', pauseOption: 'NO',
@@ -918,15 +958,14 @@
                 }
             };
 
-            // =================================================================
-            // --- 新增：打磚塊遊戲 ---
-            // =================================================================
             const breakoutGame = {
                 ball: {}, paddle: {}, bricks: [], score: 0, highScore: 0, lives: 3, gameOver: false,
                 isPaused: false, retryOption: 'YES', pauseOption: 'NO',
+                levelComplete: false, winOption: 'YES', level: 1,
                 start: function() {
                     cancelAnimationFrame(gameManager.animationFrameId);
                     this.gameOver = false; this.isPaused = false; this.retryOption = 'YES'; this.pauseOption = 'NO';
+                    this.levelComplete = false; this.winOption = 'YES'; this.level = 1;
                     this.highScore = parseInt(localStorage.getItem('breakoutHighScore')) || 0;
                     canvas.height = canvas.clientHeight; canvas.width = canvas.clientWidth;
                     this.lives = 3; this.score = 0;
@@ -937,27 +976,50 @@
                     this.update();
                 },
                 end: function() { cancelAnimationFrame(gameManager.animationFrameId); },
+                nextLevel: function() {
+                    this.level++;
+                    this.levelComplete = false;
+                    this.paddle = {x: canvas.width / 2 - 25, y: canvas.height - 10, width: 50, height: 5};
+                    const speedMultiplier = 1 + (this.level - 1) * 0.15;
+                    this.ball = {
+                        x: canvas.width / 2, 
+                        y: canvas.height - 20, 
+                        radius: 4, 
+                        dx: (Math.random() < 0.5 ? 2 : -2) * speedMultiplier, 
+                        dy: -2 * speedMultiplier
+                    };
+                    this.createBricks();
+                    this.updateScore();
+                },
                 handleInput: function(key) {
                      if (this.gameOver) {
                         if (key === 'Left' || key === 'Right') { 
                             this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES'; 
-                            this.draw();
                         } 
                         else if (key === 'A') {
                             if (this.retryOption === 'YES') this.start();
                             else gameManager.endGame();
                         }
+                    } else if (this.levelComplete) {
+                        if (key === 'Left' || key === 'Right') {
+                            this.winOption = this.winOption === 'YES' ? 'NO' : 'YES';
+                        } else if (key === 'A') {
+                            if (this.winOption === 'YES') {
+                                this.nextLevel();
+                            } else {
+                                gameManager.endGame();
+                            }
+                        }
                     } else if (this.isPaused) {
                         if (key === 'Left' || key === 'Right') { 
                             this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; 
-                            this.draw();
                         }
                         else if (key === 'A') {
                             if (this.pauseOption === 'YES') gameManager.endGame();
-                            else { this.isPaused = false; this.update(); }
-                        } else if (key === 'Start') { this.isPaused = false; this.update(); }
+                            else { this.isPaused = false; }
+                        } else if (key === 'Start') { this.isPaused = false; }
                     } else {
-                        if (key === 'Start') { this.isPaused = true; this.pauseOption = 'NO'; this.draw(); return; }
+                        if (key === 'Start') { this.isPaused = true; this.pauseOption = 'NO'; return; }
                         if (key === 'Left') { this.paddle.x -= 15; if (this.paddle.x < 0) this.paddle.x = 0; }
                         else if (key === 'Right') { this.paddle.x += 15; if (this.paddle.x + this.paddle.width > canvas.width) this.paddle.x = canvas.width - this.paddle.width; }
                     }
@@ -965,42 +1027,42 @@
                 updateScore: function() {
                     const hi = String(this.highScore).padStart(5, '0');
                     const current = String(this.score).padStart(5, '0');
-                    scoreElement.textContent = `HI ${hi}\n${current}\nLIVES ${this.lives}`;
+                    scoreElement.textContent = `HI ${hi}\n${current}\nLIVES ${this.lives} LV ${this.level}`;
                 },
                 update: function() {
-                    if (this.gameOver || this.isPaused) return;
-                    
-                    this.ball.x += this.ball.dx; this.ball.y += this.ball.dy;
+                    if (!this.gameOver && !this.isPaused && !this.levelComplete) {
+                        this.ball.x += this.ball.dx; this.ball.y += this.ball.dy;
 
-                    if (this.ball.x + this.ball.radius > canvas.width || this.ball.x - this.ball.radius < 0) this.ball.dx *= -1;
-                    if (this.ball.y - this.ball.radius < 0) this.ball.dy *= -1;
-                    if (this.ball.y + this.ball.radius > canvas.height) {
-                        this.lives--;
-                        this.updateScore();
-                        if (this.lives <= 0) {
-                            this.setGameOver();
-                        } else {
-                            this.ball = {x: canvas.width / 2, y: canvas.height - 20, radius: 4, dx: 2, dy: -2};
-                            this.paddle = {x: canvas.width / 2 - 25, y: canvas.height - 10, width: 50, height: 5};
-                        }
-                    }
-                    if (this.ball.y + this.ball.radius > this.paddle.y && this.ball.x > this.paddle.x && this.ball.x < this.paddle.x + this.paddle.width) {
-                        this.ball.dy *= -1;
-                    }
+                        if (this.ball.x + this.ball.radius > canvas.width || this.ball.x - this.ball.radius < 0) this.ball.dx *= -1;
+                        if (this.ball.y - this.ball.radius < 0) this.ball.dy *= -1;
 
-                    this.bricks.forEach(brick => {
-                        if (brick.visible && this.ball.x > brick.x && this.ball.x < brick.x + brick.width && this.ball.y > brick.y && this.ball.y < brick.y + brick.height) {
-                            this.ball.dy *= -1;
-                            brick.visible = false;
-                            this.score += 10;
+                        if (this.ball.y + this.ball.radius > canvas.height) {
+                            this.lives--;
                             this.updateScore();
+                            if (this.lives <= 0) {
+                                this.setGameOver();
+                            } else {
+                                this.ball = {x: canvas.width / 2, y: canvas.height - 20, radius: 4, dx: 2, dy: -2};
+                                this.paddle = {x: canvas.width / 2 - 25, y: canvas.height - 10, width: 50, height: 5};
+                            }
                         }
-                    });
+                        if (this.ball.y + this.ball.radius > this.paddle.y && this.ball.x > this.paddle.x && this.ball.x < this.paddle.x + this.paddle.width) {
+                            this.ball.dy *= -1;
+                        }
 
-                    if (this.bricks.every(b => !b.visible)) {
-                        this.setGameOver();
+                        this.bricks.forEach(brick => {
+                            if (brick.visible && this.ball.x > brick.x && this.ball.x < brick.x + brick.width && this.ball.y > brick.y && this.ball.y < brick.y + brick.height) {
+                                this.ball.dy *= -1;
+                                brick.visible = false;
+                                this.score += 10;
+                                this.updateScore();
+                            }
+                        });
+
+                        if (this.bricks.every(b => !b.visible)) {
+                            this.levelComplete = true;
+                        }
                     }
-
                     this.draw();
                     gameManager.animationFrameId = requestAnimationFrame(this.update.bind(this));
                 },
@@ -1017,6 +1079,7 @@
                     
                     if (this.gameOver) { drawGameOverScreen(context, canvas, this.retryOption); }
                     if (this.isPaused) { drawQuitMenuScreen(context, canvas, this.pauseOption); }
+                    if (this.levelComplete) { drawWinScreen(context, canvas, this.winOption); }
                 },
                 createBricks: function() {
                     this.bricks = [];
@@ -1043,8 +1106,7 @@
                 }
             };
 
-
-            // --- 彩蛋觸發與按鈕監聽 ---
+            // --- 簡化後的按鈕監聽邏輯 ---
             const TESTER_MODE = true;
             const konamiCode = ['Up', 'Up', 'Down', 'Down', 'Left', 'Right', 'Left', 'Right', 'B', 'A', 'Start'];
             let userInput = [];
@@ -1052,28 +1114,37 @@
             let testerInput = [];
 
             function handleButtonPress(key) {
+                // 狀態 1: 遊戲中
                 if (gameManager.isGameActive) {
                     gameManager.handleInput(key);
-                } else if (gameboyScreen.classList.contains('tester-active')) {
-                    gameManager.handleMenuInput(key);
-                } else {
-                    audioSelect.currentTime = 0; audioSelect.play();
-                    
-                    userInput.push(key);
-                    userInput = userInput.slice(-konamiCode.length);
-                    if (JSON.stringify(userInput) === JSON.stringify(konamiCode)) {
-                        gameManager.showTesterMenu();
-                        userInput = [];
-                        return;
-                    }
+                    return;
+                }
 
-                    if (TESTER_MODE) {
-                        testerInput.push(key);
-                        testerInput = testerInput.slice(-testerCode.length);
-                        if (JSON.stringify(testerInput) === JSON.stringify(testerCode)) {
-                             gameManager.showTesterMenu();
-                             testerInput = [];
-                        }
+                // 狀態 2: 遊戲選單中
+                if (gameboyScreen.classList.contains('tester-active')) {
+                    gameManager.handleGameMenuInput(key);
+                    return;
+                }
+
+                // 狀態 3: 主選單中 (只處理密碼)
+                audioSelect.currentTime = 0; audioSelect.play();
+                
+                userInput.push(key);
+                userInput = userInput.slice(-konamiCode.length);
+                if (JSON.stringify(userInput) === JSON.stringify(konamiCode)) {
+                    gameManager.showTesterMenu();
+                    userInput = [];
+                    testerInput = [];
+                    return;
+                }
+
+                if (TESTER_MODE) {
+                    testerInput.push(key);
+                    testerInput = testerInput.slice(-testerCode.length);
+                    if (JSON.stringify(testerInput) === JSON.stringify(testerCode)) {
+                         gameManager.showTesterMenu();
+                         userInput = [];
+                         testerInput = [];
                     }
                 }
             }
