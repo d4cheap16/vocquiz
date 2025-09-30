@@ -74,7 +74,7 @@
             position: absolute;
             top: 9%; 
             left: 9%;
-            width: 79%;
+            width: 78%;
             height: 37%;
             background-color: var(--screen-bg);
             color: var(--screen-text);
@@ -768,13 +768,19 @@
                 end: function() { clearTimeout(gameManager.animationFrameId); },
                 handleInput: function(key) {
                     if (this.gameOver) {
-                        if (key === 'Left' || key === 'Right') { this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES'; } 
+                        if (key === 'Left' || key === 'Right') { 
+                            this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES'; 
+                            this.draw();
+                        } 
                         else if (key === 'A') {
                             if (this.retryOption === 'YES') this.start();
                             else gameManager.endGame();
                         }
                     } else if (this.isPaused) {
-                        if (key === 'Left' || key === 'Right') { this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; }
+                        if (key === 'Left' || key === 'Right') { 
+                            this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; 
+                            this.draw();
+                        }
                         else if (key === 'A') {
                             if (this.pauseOption === 'YES') gameManager.endGame();
                             else { this.isPaused = false; this.update(); }
@@ -888,13 +894,19 @@
                 end: function() { cancelAnimationFrame(gameManager.animationFrameId); },
                 handleInput: function(key) {
                      if (this.gameOver) {
-                        if (key === 'Left' || key === 'Right') { this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES'; } 
+                        if (key === 'Left' || key === 'Right') { 
+                            this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES'; 
+                            this.draw();
+                        } 
                         else if (key === 'A') {
                             if (this.retryOption === 'YES') this.start();
                             else gameManager.endGame();
                         }
                     } else if (this.isPaused) {
-                        if (key === 'Left' || key === 'Right') { this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; }
+                        if (key === 'Left' || key === 'Right') { 
+                            this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; 
+                            this.draw();
+                        }
                         else if (key === 'A') {
                             if (this.pauseOption === 'YES') gameManager.endGame();
                             else { this.isPaused = false; this.update(); }
@@ -1064,5 +1076,4 @@
 
 </body>
 </html>
-
 
