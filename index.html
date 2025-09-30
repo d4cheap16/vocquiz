@@ -434,21 +434,36 @@
                     this.draw();
                     gameManager.animationFrameId = requestAnimationFrame(this.update.bind(this));
                 },
+
+
                 draw: function() {
                     const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-bg');
+                    const fgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
+
+                    context.setTransform(1, 0, 0, 1, 0, 0); // 確保每次繪圖前都重設座標
                     context.fillStyle = bgColor;
-                    context.setTransform(1, 0, 0, 1, 0, 0); 
                     context.fillRect(0, 0, canvas.width, canvas.height);
 
-                    context.scale(this.BLOCK_SIZE, this.BLOCK_SIZE); 
-                    this.drawMatrix(this.arena, {x: 0, y: 0});
-                    this.drawMatrix(this.player.matrix, this.player.pos);
-                    
-                    if (this.gameOver) {
-                        context.setTransform(1, 0, 0, 1, 0, 0);
-                        drawGameOverScreen(context, canvas, this.retryOption);
+                // --- 修正點：在放大(scale)之前繪製邊界 ---
+                context.fillStyle = fgColor;
+                // 計算邊界的像素位置
+                const borderX_left = (this.xOffset - 1) * this.BLOCK_SIZE;
+                const borderX_right = (this.xOffset + this.COLS) * this.BLOCK_SIZE;
+
+                context.fillRect(borderX_left, 0, 1, canvas.height); // 左邊界，寬度為 1px
+                context.fillRect(borderX_right, 0, 1, canvas.height); // 右邊界，寬度為 1px
+                // --- 邊界繪製結束 ---
+
+                context.scale(this.BLOCK_SIZE, this.BLOCK_SIZE); 
+                this.drawMatrix(this.arena, {x: 0, y: 0});
+                this.drawMatrix(this.player.matrix, this.player.pos);
+
+                if (this.gameOver) {
+                context.setTransform(1, 0, 0, 1, 0, 0);
+                drawGameOverScreen(context, canvas, this.retryOption);
                     }
                 },
+
                 playerReset: function() {
                     const p='ILJOTSZ'; this.player.matrix = this.createPiece(p[p.length * Math.random() | 0]);
                     this.player.pos.y=0; this.player.pos.x = (this.COLS / 2 | 0) - (this.player.matrix[0].length / 2 | 0);
