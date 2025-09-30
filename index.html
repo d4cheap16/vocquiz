@@ -57,11 +57,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-
-            /* 解決方案 2：禁用長按選單和選取 */
-            -webkit-touch-callout: none; /* iOS Safari */
-            -webkit-user-select: none;   /* Safari */
-            user-select: none;           /* Standard syntax */
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         .gameboy-image {
@@ -434,36 +432,29 @@
                     this.draw();
                     gameManager.animationFrameId = requestAnimationFrame(this.update.bind(this));
                 },
-
-
                 draw: function() {
                     const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-bg');
                     const fgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
 
-                    context.setTransform(1, 0, 0, 1, 0, 0); // 確保每次繪圖前都重設座標
+                    context.setTransform(1, 0, 0, 1, 0, 0); 
                     context.fillStyle = bgColor;
                     context.fillRect(0, 0, canvas.width, canvas.height);
 
-                // --- 修正點：在放大(scale)之前繪製邊界 ---
-                context.fillStyle = fgColor;
-                // 計算邊界的像素位置
-                const borderX_left = (this.xOffset - 1) * this.BLOCK_SIZE;
-                const borderX_right = (this.xOffset + this.COLS) * this.BLOCK_SIZE;
+                    context.fillStyle = fgColor;
+                    const borderX_left = (this.xOffset - 1) * this.BLOCK_SIZE;
+                    const borderX_right = (this.xOffset + this.COLS) * this.BLOCK_SIZE;
+                    context.fillRect(borderX_left, 0, 1, canvas.height);
+                    context.fillRect(borderX_right, 0, 1, canvas.height);
 
-                context.fillRect(borderX_left, 0, 1, canvas.height); // 左邊界，寬度為 1px
-                context.fillRect(borderX_right, 0, 1, canvas.height); // 右邊界，寬度為 1px
-                // --- 邊界繪製結束 ---
+                    context.scale(this.BLOCK_SIZE, this.BLOCK_SIZE); 
+                    this.drawMatrix(this.arena, {x: 0, y: 0});
+                    this.drawMatrix(this.player.matrix, this.player.pos);
 
-                context.scale(this.BLOCK_SIZE, this.BLOCK_SIZE); 
-                this.drawMatrix(this.arena, {x: 0, y: 0});
-                this.drawMatrix(this.player.matrix, this.player.pos);
-
-                if (this.gameOver) {
-                context.setTransform(1, 0, 0, 1, 0, 0);
-                drawGameOverScreen(context, canvas, this.retryOption);
+                    if (this.gameOver) {
+                        context.setTransform(1, 0, 0, 1, 0, 0);
+                        drawGameOverScreen(context, canvas, this.retryOption);
                     }
                 },
-
                 playerReset: function() {
                     const p='ILJOTSZ'; this.player.matrix = this.createPiece(p[p.length * Math.random() | 0]);
                     this.player.pos.y=0; this.player.pos.x = (this.COLS / 2 | 0) - (this.player.matrix[0].length / 2 | 0);
@@ -607,6 +598,8 @@
                 }
             }
             
+            // --- 舊的 click 監聽器 ---
+            /*
             const allButtons = document.querySelectorAll('.gb-button');
             allButtons.forEach(button => {
                 button.addEventListener('click', function(event) {
@@ -615,6 +608,47 @@
                     setTimeout(() => { this.style.backgroundColor = ''; }, 100);
                 });
             });
+            */
+
+            // --- 新增：長按功能監聽器 ---
+            let moveInterval = null;
+            const allButtons = document.querySelectorAll('.gb-button');
+
+            function startAction(key) {
+                // 停止任何可能還在執行的計時器
+                clearInterval(moveInterval);
+                
+                // 執行第一次操作
+                handleButtonPress(key);
+
+                // 如果是方向鍵，則啟動計時器以達成連續移動
+                if (['Left', 'Right', 'Down'].includes(key)) {
+                    moveInterval = setInterval(() => {
+                        handleButtonPress(key);
+                    }, 100); // 每 100 毫秒移動一次
+                }
+            }
+
+            function stopAction() {
+                // 清除計時器，停止連續移動
+                clearInterval(moveInterval);
+            }
+
+            allButtons.forEach(button => {
+                const key = button.dataset.key;
+
+                // 按下事件 (滑鼠 & 觸控)
+                button.addEventListener('mousedown', (e) => { e.preventDefault(); startAction(key); });
+                button.addEventListener('touchstart', (e) => { e.preventDefault(); startAction(key); });
+
+                // 放開事件 (滑鼠 & 觸控)
+                button.addEventListener('mouseup', stopAction);
+                button.addEventListener('touchend', stopAction);
+                // 當滑鼠移出按鈕範圍時，也視為放開
+                button.addEventListener('mouseleave', stopAction);
+            });
+
+
         });
     </script>
     
