@@ -628,7 +628,7 @@
                     context.setTransform(1, 0, 0, 1, 0, 0); 
                     
                     const s = this.pixelScale;
-                    const dinoHeight = s * 6; // Based on blocky dino's height
+                    const dinoHeight = s * 6; // Based on blocky dino's total height
                     this.dino = { x: 50, y: canvas.height - dinoHeight, dy: 0, gravity: 0.6, jumpPower: -13, onGround: true };
                     
                     this.obstacles = []; this.score = 0; this.spawnTimer = 0;
@@ -679,8 +679,7 @@
                             this.spawnTimer = 80 + Math.random() * 50; 
                         }
                         
-                        // New hitbox calculation
-                        const dinoHitbox = { x: this.dino.x - s * 3, y: this.dino.y, width: s * 11, height: dinoHeight };
+                        const dinoHitbox = { x: this.dino.x - s * 3, y: this.dino.y, width: s * 13, height: s * 6 };
 
                         for (let i = this.obstacles.length - 1; i >= 0; i--) {
                             let obs = this.obstacles[i]; obs.x -= 2.2 + (this.score / 200);
@@ -735,15 +734,17 @@
                 drawBlockyDino: function(ctx, color) {
                     const dinoX = this.dino.x;
                     const dinoY = this.dino.y;
-                    const s = this.pixelScale; // 使用 pixelScale 來讓調整更方便
+                    const s = this.pixelScale;
                     ctx.fillStyle = color;
 
                     // 身體
-                    ctx.fillRect(dinoX, dinoY + s * 1, s * 6, s * 4);
+                    ctx.fillRect(dinoX, dinoY + s * 1, s * 5, s * 4);
+                    
                     // 頭部
-                    ctx.fillRect(dinoX + s * 5, dinoY, s * 3, s * 3);
+                    ctx.fillRect(dinoX + s * 5, dinoY, s * 5, s * 5);
+                    
                     // 尾巴
-                    ctx.fillRect(dinoX - s * 3, dinoY + s * 3, s * 4, s * 2);
+                    ctx.fillRect(dinoX - s * 3, dinoY + s * 2, s * 4, s * 2);
 
                     // 根據跑步狀態，切換腳的位置來製造動畫感
                     const isRunningFrame1 = Math.floor(this.score / 6) % 2 === 0;
