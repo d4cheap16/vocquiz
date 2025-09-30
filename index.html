@@ -152,6 +152,21 @@
             to { opacity: 1; }
         }
 
+        /* --- Tester Menu --- */
+        .tester-menu {
+            display: none;
+            height: 100%;
+            flex-direction: column;
+            padding: 3%;
+            box-sizing: border-box;
+        }
+        .gameboy-screen.tester-active .main-menu {
+            display: none;
+        }
+        .gameboy-screen.tester-active .tester-menu {
+            display: flex;
+        }
+
         .screen-header {
             display: flex;
             justify-content: center;
@@ -190,7 +205,10 @@
         #game-canvas { display: none; width: 100%; height: 100%; background-color: var(--screen-bg); }
         #game-score { display: none; position: absolute; top: 8px; right: 12px; font-size: clamp(10px, 3vw, 12px); color: var(--screen-text); z-index: 10; }
 
-        .gameboy-screen.game-active .main-menu { display: none; }
+        .gameboy-screen.game-active .main-menu,
+        .gameboy-screen.game-active .tester-menu { 
+            display: none; 
+        }
         .gameboy-screen.game-active #game-canvas { display: block; }
         .gameboy-screen.game-active #game-score { display: block; }
 
@@ -264,6 +282,18 @@
                         </ul>
                     </div>
                 </div>
+                <div class="tester-menu">
+                    <div class="screen-header">
+                        <p>TESTER MODE</p>
+                    </div>
+                    <div class="menu-wrapper">
+                        <ul class="menu-list">
+                            <li><a href="#" data-game="tetris">Tetris</a></li>
+                            <li><a href="#" data-game="dino">Dino</a></li>
+                            <li><a href="#" data-game="back">Main Menu</a></li>
+                        </ul>
+                    </div>
+                </div>
                 <canvas id="game-canvas"></canvas>
                 <div id="game-score"></div>
             </div>
@@ -293,6 +323,7 @@
             const gameboyScreen = document.querySelector('.gameboy-screen');
             const bootScreen = document.querySelector('.boot-screen');
             const mainMenu = document.querySelector('.main-menu');
+            const testerMenu = document.querySelector('.tester-menu');
 
             const quotes = ["Try UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A Start", "Every expert was once a beginner.", "Don't stop until you're proud.", "The harder you work, the luckier you get.", "Success is the sum of small efforts.", "It always seems impossible until it's done.", "Mistakes are proof that you are trying.", "Turn 'I wish' into 'I will'.", "Learn something new every day.", "No one can take what you've learned away from you.", "Strive for progress, not perfection.", "Be awesome today."];
             const quoteElement = document.getElementById('quote-text');
@@ -312,6 +343,21 @@
             });
             const actionLinks = document.querySelectorAll('.sub-menu a, .menu-list > li:not(.menu-category) > a');
             actionLinks.forEach(item => { item.addEventListener('click', () => { audioSelect.currentTime = 0; audioSelect.play(); }); });
+
+            const testerMenuLinks = document.querySelectorAll('.tester-menu a');
+            testerMenuLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    audioSelect.currentTime = 0;
+                    audioSelect.play();
+                    const gameType = e.target.dataset.game;
+                    if (gameType === 'back') {
+                        gameManager.hideTesterMenu();
+                    } else {
+                        gameManager.startGame(gameType);
+                    }
+                });
+            });
 
             bootScreen.addEventListener('animationend', function(e) {
                 if (e.animationName === 'fadeOutBoot') {
@@ -371,14 +417,34 @@
                 activeGame: null,
                 isGameActive: false,
                 animationFrameId: null,
-                triggerEasterEgg: function() {
-                    if (this.isGameActive) return; 
+                
+                showTesterMenu: function() {
+                    gameboyScreen.classList.add('tester-active');
+                },
+                
+                hideTesterMenu: function() {
+                    gameboyScreen.classList.remove('tester-active');
+                    bootScreen.style.display = 'flex';
+                    bootScreen.classList.add('reboot');
+                    mainMenu.classList.remove('reboot');
+                },
+
+                startGame: function(gameType) {
+                    if (this.isGameActive) return;
                     this.isGameActive = true;
+                    gameboyScreen.classList.remove('tester-active');
                     gameboyScreen.classList.add('game-active');
-                    if (Math.random() < 0.5) { this.activeGame = tetrisGame; } 
-                    else { this.activeGame = dinoGame; }
+
+                    if (gameType === 'tetris') {
+                        this.activeGame = tetrisGame;
+                    } else if (gameType === 'dino') {
+                        this.activeGame = dinoGame;
+                    } else { // Default/random for Konami
+                        this.activeGame = Math.random() < 0.5 ? tetrisGame : dinoGame;
+                    }
                     this.activeGame.start();
                 },
+
                 endGame: function() {
                     if (!this.isGameActive) return;
                     this.isGameActive = false;
@@ -499,7 +565,7 @@
             const dinoGame = {
                 dino: {}, obstacles: [], score: 0, gameOver: false, spawnTimer: 0,
                 retryOption: 'YES', isPaused: false, pauseOption: 'NO',
-                pixelScale: 2.5,
+                pixelScale: 2,
                 sprites: {
                     run1: [[0,0,0,0,1,1,1,1,1,1,0,0],[0,0,0,1,1,1,1,1,1,1,1,0],[0,0,0,1,1,1,1,1,0,0,0,0],[0,0,1,1,1,1,0,0,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[1,1,1,1,1,1,1,1,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[0,0,0,1,1,1,0,0,0,0,0,0],[0,0,0,1,1,0,0,0,0,0,0,0],[0,0,1,1,0,0,0,0,0,0,0,0]],
                     run2: [[0,0,0,0,1,1,1,1,1,1,0,0],[0,0,0,1,1,1,1,1,1,1,1,0],[0,0,0,1,1,1,1,1,0,0,0,0],[0,0,1,1,1,1,0,0,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[1,1,1,1,1,1,1,1,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[0,0,0,1,1,1,0,0,0,0,0,0],[0,0,0,0,0,1,1,0,0,0,0,0],[0,0,0,0,0,0,1,1,0,0,0,0]],
@@ -602,10 +668,12 @@
                     gameManager.handleInput(key);
                 } else {
                     audioSelect.currentTime = 0; audioSelect.play();
+                    
                     userInput.push(key);
                     userInput = userInput.slice(-konamiCode.length);
                     if (JSON.stringify(userInput) === JSON.stringify(konamiCode)) {
-                        gameManager.triggerEasterEgg();
+                        gameManager.startGame();
+                        userInput = [];
                         return;
                     }
 
@@ -613,7 +681,8 @@
                         testerInput.push(key);
                         testerInput = testerInput.slice(-testerCode.length);
                         if (JSON.stringify(testerInput) === JSON.stringify(testerCode)) {
-                             gameManager.triggerEasterEgg();
+                             gameManager.showTesterMenu();
+                             testerInput = [];
                         }
                     }
                 }
