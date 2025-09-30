@@ -198,10 +198,28 @@
         .sub-menu { list-style: none; padding-left: 10px; margin: 5px 0; display: none; }
         .menu-category.open .sub-menu { display: block; }
         .sub-menu a { font-size: clamp(12px, 3.5vw, 14px); }
-        .sub-menu a::before { content: '▶'; margin-right: 8%; opacity: 0; transition: opacity 0.2s; }
-        .menu-list a:hover, .menu-list a:focus { background-color: var(--screen-text); color: var(--screen-bg); }
-        .sub-menu a:hover::before, .sub-menu a:focus::before { opacity: 1; }
 
+        /* --- 修改：合併選單樣式，增加 selected 狀態 --- */
+        .sub-menu a::before, 
+        .tester-menu .menu-list a::before { 
+            content: '▶'; 
+            margin-right: 8%; 
+            opacity: 0; 
+            transition: opacity 0.2s; 
+        }
+        .menu-list a:hover, 
+        .menu-list a:focus, 
+        .menu-list a.selected { 
+            background-color: var(--screen-text); 
+            color: var(--screen-bg); 
+        }
+        .sub-menu a:hover::before, 
+        .sub-menu a:focus::before, 
+        .tester-menu .menu-list a:hover::before, 
+        .tester-menu .menu-list a.selected::before { 
+            opacity: 1; 
+        }
+        
         /* --- 遊戲畫布與計分板 (通用) --- */
         #game-canvas { display: none; width: 100%; height: 100%; background-color: var(--screen-bg); }
         #game-score { 
@@ -269,6 +287,7 @@
                 <div class="boot-screen">
                     <div class="boot-logo"><img src="Cat.jpg" alt="開機貓貓"></div>
                 </div>
+                <!-- 修正：恢復原始主選單 -->
                 <div class="main-menu">
                     <div class="screen-header">
                         <img src="CatL.png" alt="左貓" class="header-cat">
@@ -304,17 +323,18 @@
                         </ul>
                     </div>
                 </div>
+                <!-- 修正：新增遊戲選單 (Tester Menu) -->
                 <div class="tester-menu">
                     <div class="screen-header">
                         <p>TESTER MODE</p>
                     </div>
                     <div class="menu-wrapper">
                         <ul class="menu-list">
-                            <li><a href="#" data-game="tetris">TETRIS</a></li>
+                            <li><a href="#" data-game="back">HOME</a></li>
+                            <li><a href="#" data-game="breakout">BREAKOUT</a></li>
                             <li><a href="#" data-game="dino">DINO RUN!</a></li>
                             <li><a href="#" data-game="snake">SNAKE</a></li>
-                            <li><a href="#" data-game="breakout">BREAKOUT</a></li>
-                            <li><a href="#" data-game="back">HOME</a></li>
+                            <li><a href="#" data-game="tetris">TETRIS</a></li>
                         </ul>
                     </div>
                 </div>
@@ -443,13 +463,51 @@
                 activeGame: null,
                 isGameActive: false,
                 animationFrameId: null,
+                selectedMenuIndex: 0, 
+                menuItems: null,
                 
                 showTesterMenu: function() {
                     gameboyScreen.classList.add('tester-active');
+                    this.menuItems = document.querySelectorAll('.tester-menu .menu-list a');
+                    this.selectedMenuIndex = 0;
+                    this.updateMenuSelection();
+                },
+                
+                updateMenuSelection: function() {
+                    if (!this.menuItems) return;
+                    this.menuItems.forEach(item => item.classList.remove('selected'));
+                    this.menuItems[this.selectedMenuIndex].classList.add('selected');
+                },
+
+                handleMenuInput: function(key) {
+                    if (!this.menuItems) return;
+                    const lastIndex = this.menuItems.length - 1;
+
+                    if (key === 'Up') {
+                        audioOpen.currentTime = 0; audioOpen.play();
+                        this.selectedMenuIndex--;
+                        if (this.selectedMenuIndex < 0) this.selectedMenuIndex = lastIndex;
+                        this.updateMenuSelection();
+                    } else if (key === 'Down') {
+                        audioOpen.currentTime = 0; audioOpen.play();
+                        this.selectedMenuIndex++;
+                        if (this.selectedMenuIndex > lastIndex) this.selectedMenuIndex = 0;
+                        this.updateMenuSelection();
+                    } else if (key === 'A') {
+                        audioSelect.currentTime = 0; audioSelect.play();
+                        const selectedLink = this.menuItems[this.selectedMenuIndex];
+                        const gameType = selectedLink.dataset.game;
+                        if (gameType === 'back') {
+                            this.hideTesterMenu();
+                        } else {
+                            this.startGame(gameType);
+                        }
+                    }
                 },
                 
                 hideTesterMenu: function() {
                     gameboyScreen.classList.remove('tester-active');
+                    this.menuItems = null; 
                     bootScreen.style.display = 'flex';
                     bootScreen.classList.add('reboot');
                     mainMenu.classList.remove('reboot');
@@ -469,8 +527,8 @@
                         this.activeGame = snakeGame;
                     } else if (gameType === 'breakout') {
                         this.activeGame = breakoutGame;
-                    } else { // Default/random for Konami
-                        this.activeGame = Math.random() < 0.5 ? tetrisGame : dinoGame;
+                    } else { 
+                        this.activeGame = Math.random() < 0.25 ? tetrisGame : (Math.random() < 0.5 ? dinoGame : (Math.random() < 0.75 ? snakeGame : breakoutGame));
                     }
                     this.activeGame.start();
                 },
@@ -1009,13 +1067,15 @@
             function handleButtonPress(key) {
                 if (gameManager.isGameActive) {
                     gameManager.handleInput(key);
+                } else if (gameboyScreen.classList.contains('tester-active')) {
+                    gameManager.handleMenuInput(key);
                 } else {
                     audioSelect.currentTime = 0; audioSelect.play();
                     
                     userInput.push(key);
                     userInput = userInput.slice(-konamiCode.length);
                     if (JSON.stringify(userInput) === JSON.stringify(konamiCode)) {
-                        gameManager.startGame();
+                        gameManager.showTesterMenu();
                         userInput = [];
                         return;
                     }
@@ -1076,9 +1136,4 @@
 
 </body>
 </html>
-
-
-
-
-
 
