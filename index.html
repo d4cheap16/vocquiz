@@ -219,7 +219,7 @@
             opacity: 1; 
         }
         
-        /* --- 新增：遊戲選單底部說明 --- */
+        /* --- 遊戲選單底部說明 --- */
         .menu-footer {
             flex-shrink: 0;
             text-align: center;
@@ -255,6 +255,22 @@
         }
         .gameboy-screen.game-active #game-canvas { display: block; }
         .gameboy-screen.game-active #game-score { display: block; }
+
+        /* --- 新增：遊戲畫面復古濾鏡 --- */
+        .gameboy-screen.game-active::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(15, 56, 15, 0.07) 1px, rgba(15, 56, 15, 0.07) 2px),
+                repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(15, 56, 15, 0.07) 1px, rgba(15, 56, 15, 0.07) 2px);
+            background-size: 2px 2px;
+            pointer-events: none;
+            z-index: 5;
+        }
 
         .screen-footer { margin: 0; padding: 0; position: absolute; bottom: 44%; left: 11%; width: 80%; text-align: left; font-size: clamp(9px, 2.2vw, 11px); color: #444; opacity: 0; animation: fadeInMenu 0.5s ease-in 1s forwards; line-height: 1.6; }
         .screen-footer p { margin: 0; padding: 0; }
