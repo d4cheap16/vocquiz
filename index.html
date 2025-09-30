@@ -69,11 +69,10 @@
             height: 33%;
             background-color: var(--screen-bg);
             color: var(--screen-text);
-            padding: 3%;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* 隱藏滾動條直到需要時 */
+            overflow: hidden;
             border-radius: 9px;
         }
         
@@ -84,25 +83,35 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #000; /* 初始為黑色 */
+            background-color: #000;
             z-index: 100;
             display: flex;
             justify-content: center;
             align-items: center;
+            /* 預設的動畫 */
             animation: fadeOutBoot 1s ease-in 1.5s forwards;
         }
 
         .boot-logo {
             opacity: 0;
+            /* 預設的動畫 */
             animation: dropInLogo 1.5s ease-out 0.5s forwards, blinkLogo 0.8s step-end 2.5s;
         }
+
+        /* 新增：用於重新觸發動畫的 class */
+        .boot-screen.reboot {
+            display: flex !important;
+            opacity: 1;
+            animation: fadeOutBoot 1s ease-in 1.5s forwards;
+        }
+        .boot-screen.reboot .boot-logo {
+            opacity: 0;
+            animation: dropInLogo 1.5s ease-out 0.5s forwards, blinkLogo 0.8s step-end 2.5s;
+        }
+
         .boot-logo img {
-            width: 100%; /* 讓貓貓的寬度佔螢幕的一半，看起來很巨大 */
+            width: 100%; 
             height: auto;
-            display: flex;
-            justify-content: center;
-	    	align-items: center;
-			width: 100%;
         }  
 
         @keyframes dropInLogo {
@@ -118,13 +127,21 @@
             to { opacity: 0; visibility: hidden; }
         }
         
-        /* --- 主選單 (初始隱藏) --- */
+        /* --- 主選單 --- */
         .main-menu {
             opacity: 0;
             animation: fadeInMenu 0.5s ease-in 2.5s forwards;
             height: 100%;
             display: flex;
             flex-direction: column;
+            padding: 3%;
+            box-sizing: border-box;
+        }
+        
+        /* 新增：用於重新觸發動畫的 class */
+        .main-menu.reboot {
+            opacity: 0;
+            animation: fadeInMenu 0.5s ease-in 2.5s forwards;
         }
 
         @keyframes fadeInMenu {
@@ -135,7 +152,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-         gap: 8px; /* 貓貓和標題的間距 */
+            gap: 8px;
             padding-bottom: 2%;
             border-bottom: 2px solid var(--screen-text);
             margin-bottom: 3%;
@@ -144,218 +161,60 @@
             flex-shrink: 0;
         }
         .header-cat {
-           height: 2em; /* 讓貓貓的高度跟文字差不多 */
+           height: 2em;
             width: auto;
-}        
+        }        
         .menu-wrapper {
             overflow-y: auto;
             flex-grow: 1;
         }
 
-        .menu-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+        .menu-list { list-style: none; padding: 0; margin: 0; }
+        .menu-list li { margin-bottom: 2%; }
+        .menu-list a { color: var(--screen-text); text-decoration: none; display: flex; align-items: center; padding: 2.5%; font-size: clamp(14px, 3.8vw, 16px); transition: all 0.2s; white-space: nowrap; }
+        .menu-category > a { font-weight: bold; justify-content: space-between; }
+        .menu-category > a::after { content: '▼'; font-size: 80%; transition: transform 0.2s; }
+        .menu-category.open > a::after { transform: rotate(180deg); }
+        .sub-menu { list-style: none; padding-left: 10px; margin: 5px 0; display: none; }
+        .menu-category.open .sub-menu { display: block; }
+        .sub-menu a { font-size: clamp(12px, 3.5vw, 14px); }
+        .sub-menu a::before { content: '▶'; margin-right: 8%; opacity: 0; transition: opacity 0.2s; }
+        .menu-list a:hover, .menu-list a:focus { background-color: var(--screen-text); color: var(--screen-bg); }
+        .sub-menu a:hover::before, .sub-menu a:focus::before { opacity: 1; }
 
-        .menu-list li {
-            margin-bottom: 2%;
-        }
-        
-        .menu-list a {
-            color: var(--screen-text);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            padding: 2.5%;
-            font-size: clamp(14px, 3.8vw, 16px);
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
+        /* --- 遊戲畫布與計分板 (通用) --- */
+        #game-canvas { display: none; width: 100%; height: 100%; background-color: var(--screen-bg); }
+        #game-score { display: none; position: absolute; top: 8px; right: 12px; font-size: clamp(10px, 3vw, 12px); color: var(--screen-text); z-index: 10; }
 
-        .menu-category > a {
-            font-weight: bold;
-            justify-content: space-between;
-        }
-        
-        .menu-category > a::after {
-            content: '▼';
-            font-size: 80%;
-            transition: transform 0.2s;
-        }
-
-        .menu-category.open > a::after {
-            transform: rotate(180deg);
-        }
-        
-        .sub-menu {
-            list-style: none;
-            padding-left: 10px;
-            margin: 5px 0;
-            display: none;
-        }
-
-        .menu-category.open .sub-menu {
-            display: block;
-        }
-
-        .sub-menu a {
-            font-size: clamp(12px, 3.5vw, 14px);
-        }
-        
-        .sub-menu a::before {
-            content: '▶';
-            margin-right: 8%;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .menu-list a:hover,
-        .menu-list a:focus {
-            background-color: var(--screen-text);
-            color: var(--screen-bg);
-        }
-
-        .sub-menu a:hover::before,
-        .sub-menu a:focus::before {
-            opacity: 1;
-        }
+        /* 當遊戲進行中時，隱藏主選單，顯示遊戲與分數 */
+        .gameboy-screen.game-active .main-menu { display: none; }
+        .gameboy-screen.game-active #game-canvas { display: block; }
+        .gameboy-screen.game-active #game-score { display: block; }
 
         /* --- 新增螢幕底部格言樣式 --- */
-        .screen-footer {
-            margin: 0; 
-            padding: 0;
-            position: absolute;
-            bottom: 45%; /* 定位到螢幕下方外殼 */
-            left: 11%;
-            width: 80%;
-            text-align: left;
-            font-size: clamp(9px, 2.2vw, 11px);
-            color: #444; /* 深灰色文字 */
-            opacity: 0; /* 動畫結束後顯示 */
-            animation: fadeInMenu 0.5s ease-in 1s forwards;
-            line-height: 1.6; 
-        }
-
-        .screen-footer p {
-            margin: 0; 
-            padding: 0;
-        }
-
-        .site-footer {
-            position: absolute;
-            bottom: 10px;
-            left: 0;
-            width: 100%;
-            display: flex; /* 使用 Flexbox 來排版 */
-            flex-direction: row; /* 預設為同一行 */
-            justify-content: center; /* 水平置中 */
-            align-items: center; /* 垂直置中 */
-            gap: 6px; /* 項目之間的間距 */
-            font-size: 10px;
-            color: #555;
-            z-index: 10;
-        }
-
-        .site-footer span {
-            display: inline-flex;
-            align-items: center;
-        }
-
-        /* 當螢幕寬度小於 380px 時 (大部分手機) */
-        @media (max-width: 380px) {
-            .site-footer {
-                flex-direction: column; /* 改為垂直排列 (換行) */
-                gap: 2px; /* 縮小行距 */
-            }
-        }
-
-        .footer-logo {
-            height: 2em;
-            width: auto;
-            margin-left: 4px;
-            vertical-align: middle;
-        }
+        .screen-footer { margin: 0; padding: 0; position: absolute; bottom: 45%; left: 11%; width: 80%; text-align: left; font-size: clamp(9px, 2.2vw, 11px); color: #444; opacity: 0; animation: fadeInMenu 0.5s ease-in 1s forwards; line-height: 1.6; }
+        .screen-footer p { margin: 0; padding: 0; }
+        .site-footer { position: absolute; bottom: 10px; left: 0; width: 100%; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 6px; font-size: 10px; color: #555; z-index: 10; }
+        .site-footer span { display: inline-flex; align-items: center; }
+        @media (max-width: 380px) { .site-footer { flex-direction: column; gap: 2px; } }
+        .footer-logo { height: 2em; width: auto; margin-left: 4px; vertical-align: middle; }
 
         /* --- Gameboy 按鈕樣式 --- */
-        .gb-button {
-            position: absolute;
-            transition: background-color 0.2s;
-        }
+        .gb-button { position: absolute; transition: background-color 0.2s; }
+        .gb-button:hover { background-color: rgba(0, 0, 0, 0.2); cursor: pointer; }
+        #btn-a, #btn-b { border-radius: 50%; }
+        #btn-select, #btn-start { border-radius: 25px; }
+        #btn-up, #btn-down, #btn-left, #btn-right { border-radius: 2px; }
 
-        .gb-button:hover {
-            background-color: rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-        }
-
-        #btn-a, #btn-b {
-            border-radius: 50%; /* 圓形按鈕 A & B */
-        }
-
-        #btn-select, #btn-start {
-            border-radius: 25px; /* 橢圓形按鈕 Select & Start */
-        }
-
-        #btn-up, #btn-down, #btn-left, #btn-right {
-             border-radius: 2px;
-        }
-
-        /* --- 按鈕位置 --- */
-        #btn-a {
-            top: 60%;
-            left: 79%;
-            width: 14%;
-            height: 9%;
-        }
-
-        #btn-b {
-	top: 64%;
-	left: 62%;
-	width: 14%;
-	height: 9%;
-        }
-
-        #btn-select {
-            top: 80%;
-            left: 29%;
-            width: 14%;
-            height: 4%;
-        }
-
-        #btn-start {
-            top: 80%;
-            left: 46%;
-            width: 14%;
-            height: 4%;
-        }
-
-        #btn-up {
-            top: 60%;
-            left: 16%;
-            width: 9%;
-            height: 6%;
-        }
-
-        #btn-down {
-            top: 70%;
-            left: 16%;
-            width: 9%;
-            height: 6%;
-        }
-
-        #btn-left {
-            top: 65%;
-            left: 8%;
-            width: 9%;
-            height: 6%;
-        }
-
-        #btn-right {
-            top: 65%;
-            left: 25%;
-            width: 6%;
-            height: 6%;
-        }
+        /* --- 按鈕位置 (已完成微調) --- */
+        #btn-a { top: 60%; left: 79%; width: 14%; height: 9%; }
+        #btn-b { top: 64%; left: 62%; width: 14%; height: 9%; }
+        #btn-select { top: 80%; left: 29%; width: 14%; height: 4%; }
+        #btn-start { top: 80%; left: 46%; width: 14%; height: 4%; }
+        #btn-up { top: 60%; left: 16%; width: 9%; height: 6%; }
+        #btn-down { top: 70%; left: 16%; width: 9%; height: 6%; }
+        #btn-left { top: 65%; left: 8%; width: 9%; height: 6%; }
+        #btn-right { top: 65%; left: 25%; width: 9%; height: 6%; }
     </style>
 </head>
 <body>
@@ -364,17 +223,14 @@
         <div class="gameboy-wrapper">
             <img src="GB01.png" alt="Game Boy background" class="gameboy-image">
             <div class="gameboy-screen">
-                <!-- 開機動畫畫面 -->
                 <div class="boot-screen">
                     <div class="boot-logo"><img src="Cat.jpg" alt="開機貓貓"></div>
                 </div>
-
-                <!-- 主選單畫面 (初始隱藏) -->
                 <div class="main-menu">
                     <div class="screen-header">
-                    <img src="CatL.png" alt="左貓" class="header-cat">
-                    <p>VoCat</p>
-                <img src="CatR.png" alt="右貓" class="header-cat">
+                        <img src="CatL.png" alt="左貓" class="header-cat">
+                        <p>VoCat</p>
+                        <img src="CatR.png" alt="右貓" class="header-cat">
                     </div>
                     <div class="menu-wrapper">
                         <ul class="menu-list">
@@ -405,134 +261,304 @@
                         </ul>
                     </div>
                 </div>
-
+                <canvas id="game-canvas"></canvas>
+                <div id="game-score"></div>
             </div>
-             <!-- 將格言區塊移到螢幕外 -->
             <div class="screen-footer">
                 <p id="quote-text">Loading quote...</p>
             </div>
-
             <!-- Gameboy 按鈕 -->
-            <a href="#" id="btn-a" class="gb-button"></a>
-            <a href="#" id="btn-b" class="gb-button"></a>
-            <a href="#" id="btn-select" class="gb-button"></a>
-            <a href="#" id="btn-start" class="gb-button"></a>
-            <a href="#" id="btn-up" class="gb-button"></a>
-            <a href="#" id="btn-down" class="gb-button"></a>
-            <a href="#" id="btn-left" class="gb-button"></a>
-            <a href="#" id="btn-right" class="gb-button"></a>
-
+            <a href="#" id="btn-a" class="gb-button" data-key="A"></a>
+            <a href="#" id="btn-b" class="gb-button" data-key="B"></a>
+            <a href="#" id="btn-select" class="gb-button" data-key="Select"></a>
+            <a href="#" id="btn-start" class="gb-button" data-key="Start"></a>
+            <a href="#" id="btn-up" class="gb-button" data-key="Up"></a>
+            <a href="#" id="btn-down" class="gb-button" data-key="Down"></a>
+            <a href="#" id="btn-left" class="gb-button" data-key="Left"></a>
+            <a href="#" id="btn-right" class="gb-button" data-key="Right"></a>
         </div>
     </div>
     
-    <!-- 音效檔案 -->
     <audio id="audio-open" src="data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQgAADD/38Agf9/AP//fwB/AP//f/9/AP8A//9/AIAA/wB//38AgAA="></audio>
     <audio id="audio-select" src="data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQgAAAAgP9/AP8AgAD/AIAA/wCAAP8AgAD/AIAA/wCAAP8AgAD/AIAA/wCAAP8A"></audio>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- 更新後的格言列表 ---
-            const quotes = [
-                "Every expert was once a beginner.",
-                "Don't stop until you're proud.",
-                "The harder you work, the luckier you get.",
-                "Success is the sum of small efforts.",
-                "It always seems impossible until it's done.",
-                "Mistakes are proof that you are trying.",
-                "Turn 'I wish' into 'I will'.",
-                "Learn something new every day.",
-                "No one can take what you've learned away from you.",
-                "Strive for progress, not perfection.",
-                "Be awesome today."
-            ];
-
-            // --- 隨機顯示格言 ---
-            const quoteElement = document.getElementById('quote-text');
-            const randomIndex = Math.floor(Math.random() * quotes.length);
-            quoteElement.textContent = quotes[randomIndex];
-
-
-            // --- 選單互動與音效 ---
-            const categories = document.querySelectorAll('.menu-category > a');
-            const actionLinks = document.querySelectorAll('.sub-menu a, .menu-list > li:not(.menu-category) > a');
+            
             const audioOpen = document.getElementById('audio-open');
             const audioSelect = document.getElementById('audio-select');
+            const gameboyScreen = document.querySelector('.gameboy-screen');
+            const bootScreen = document.querySelector('.boot-screen');
+            const mainMenu = document.querySelector('.main-menu');
 
+            const quotes = ["Every expert was once a beginner.", "Don't stop until you're proud.", "The harder you work, the luckier you get.", "Success is the sum of small efforts.", "It always seems impossible until it's done.", "Mistakes are proof that you are trying.", "Turn 'I wish' into 'I will'.", "Learn something new every day.", "No one can take what you've learned away from you.", "Strive for progress, not perfection.", "Be awesome today."];
+            const quoteElement = document.getElementById('quote-text');
+            quoteElement.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+
+            const categories = document.querySelectorAll('.menu-category > a');
             categories.forEach(category => {
                 category.addEventListener('click', function(event) {
                     event.preventDefault();
-                    
                     audioOpen.currentTime = 0;
                     audioOpen.play();
-
                     const parentLi = this.parentElement;
                     const wasOpen = parentLi.classList.contains('open');
-                    
-                    document.querySelectorAll('.menu-category.open').forEach(c => {
-                        c.classList.remove('open');
-                    });
-
-                    if (!wasOpen) {
-                        parentLi.classList.add('open');
-                    }
+                    document.querySelectorAll('.menu-category.open').forEach(c => c.classList.remove('open'));
+                    if (!wasOpen) parentLi.classList.add('open');
                 });
             });
+            const actionLinks = document.querySelectorAll('.sub-menu a, .menu-list > li:not(.menu-category) > a');
+            actionLinks.forEach(item => { item.addEventListener('click', () => { audioSelect.currentTime = 0; audioSelect.play(); }); });
 
-            actionLinks.forEach(item => {
-                item.addEventListener('click', function() {
-                    audioSelect.currentTime = 0;
-                    audioSelect.play();
-                });
-            });
-
-            // --- 開機動畫 ---
-            const bootScreen = document.querySelector('.boot-screen');
-            bootScreen.addEventListener('animationend', function() {
-                bootScreen.style.display = 'none';
-                document.querySelector('.gameboy-screen').style.overflowY = 'auto';
-            });
-
-            // --- Gameboy 按鈕互動 ---
-            const buttonA = document.getElementById('btn-a');
-            buttonA.addEventListener('click', function(event) {
-                event.preventDefault(); // 防止點擊 '#' 時頁面跳轉
-                
-                audioSelect.currentTime = 0;
-                audioSelect.play();
-
-                // 您可以在這裡加入想要的彩蛋功能！
-                // 例如：跳出一個隱藏的訊息、更換主題顏色等等。
-                console.log("A 按鈕被點擊了！未來可以在此處觸發彩蛋。"); 
-            });
-
-            // --- 為其他按鈕加上監聽器 ---
-            const buttonB = document.getElementById('btn-b');
-            const buttonSelect = document.getElementById('btn-select');
-            const buttonStart = document.getElementById('btn-start');
-            const buttonUp = document.getElementById('btn-up');
-            const buttonDown = document.getElementById('btn-down');
-            const buttonLeft = document.getElementById('btn-left');
-            const buttonRight = document.getElementById('btn-right');
-
-            const allButtons = [
-                { el: buttonB, name: 'B' },
-                { el: buttonSelect, name: 'Select' },
-                { el: buttonStart, name: 'Start' },
-                { el: buttonUp, name: 'Up' },
-                { el: buttonDown, name: 'Down' },
-                { el: buttonLeft, name: 'Left' },
-                { el: buttonRight, name: 'Right' }
-            ];
-
-            allButtons.forEach(btn => {
-                if (btn.el) {
-                    btn.el.addEventListener('click', function(event) {
-                        event.preventDefault();
-                        audioSelect.currentTime = 0;
-                        audioSelect.play();
-                        console.log(`${btn.name} 按鈕被點擊了！`);
-                    });
+            bootScreen.addEventListener('animationend', function(e) {
+                if (e.animationName === 'fadeOutBoot') {
+                    this.style.display = 'none';
+                    this.classList.remove('reboot'); 
+                    mainMenu.classList.add('reboot');
                 }
+            });
+
+            // =================================================================
+            // --- 彩蛋遊戲管理區塊 ---
+            // =================================================================
+            const canvas = document.getElementById('game-canvas');
+            const context = canvas.getContext('2d');
+            const scoreElement = document.getElementById('game-score');
+
+            function drawGameOverScreen(ctx, cvs, selectedOption) {
+                const textColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
+                ctx.fillStyle = 'rgba(155, 188, 15, 0.75)';
+                ctx.fillRect(0, 0, cvs.width, cvs.height);
+                ctx.fillStyle = textColor;
+                ctx.textAlign = 'center';
+                ctx.font = `clamp(18px, 6vw, 24px) 'Press Start 2P'`;
+                ctx.fillText('GAME OVER', cvs.width / 2, cvs.height / 2 - 20);
+                ctx.font = `clamp(9px, 2.5vw, 10px) 'Press Start 2P'`;
+                const retryText = "RETRY";
+                const yesText = "YES";
+                const noText = "NO";
+                const textY = cvs.height / 2 + 20;
+                if (selectedOption === 'YES') {
+                    ctx.fillText(`${retryText}   ▶ ${yesText} / ${noText}`, cvs.width / 2, textY);
+                } else {
+                    ctx.fillText(`${retryText}     ${yesText} / ▶ ${noText}`, cvs.width / 2, textY);
+                }
+            }
+
+            const gameManager = {
+                activeGame: null,
+                isGameActive: false,
+                animationFrameId: null,
+                triggerEasterEgg: function() {
+                    if (this.isGameActive) return; 
+                    this.isGameActive = true;
+                    gameboyScreen.classList.add('game-active');
+                    if (Math.random() < 0.5) { this.activeGame = tetrisGame; } 
+                    else { this.activeGame = dinoGame; }
+                    this.activeGame.start();
+                },
+                endGame: function() {
+                    if (!this.isGameActive) return;
+                    this.isGameActive = false;
+                    if (this.activeGame) { this.activeGame.end(); }
+                    this.activeGame = null;
+                    gameboyScreen.classList.remove('game-active');
+                    bootScreen.classList.add('reboot');
+                    mainMenu.classList.remove('reboot');
+                },
+                handleInput: function(key) {
+                    if (this.isGameActive && this.activeGame) {
+                        this.activeGame.handleInput(key);
+                    }
+                }
+            };
+
+            const tetrisGame = {
+                arena: [], player: { pos: {x: 0, y: 0}, matrix: null, score: 0 },
+                COLS: 10, ROWS: 20, BLOCK_SIZE: 0,
+                dropCounter: 0, dropInterval: 1000, lastTime: 0, gameOver: false,
+                retryOption: 'YES',
+                start: function() {
+                    this.gameOver = false;
+                    this.retryOption = 'YES';
+                    const screenHeight = canvas.clientHeight; const screenWidth = canvas.clientWidth;
+                    this.ROWS = 20; this.BLOCK_SIZE = screenHeight / this.ROWS;
+                    this.COLS = Math.floor(screenWidth / this.BLOCK_SIZE);
+                    canvas.height = screenHeight; canvas.width = screenWidth;
+                    context.scale(this.BLOCK_SIZE, this.BLOCK_SIZE);
+                    this.arena = this.createMatrix(this.COLS, this.ROWS);
+                    this.player.score = 0; this.updateScore(); this.playerReset();
+                    this.update();
+                },
+                end: function() { cancelAnimationFrame(gameManager.animationFrameId); },
+                handleInput: function(key) {
+                    if (this.gameOver) {
+                        if (key === 'Left' || key === 'Right') {
+                            this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES';
+                        } else if (key === 'A') {
+                            if (this.retryOption === 'YES') this.start();
+                            else gameManager.endGame();
+                        }
+                    } else {
+                        if (key === 'Select') { gameManager.endGame(); return; }
+                        if (key === 'Left') this.playerMove(-1);
+                        else if (key === 'Right') this.playerMove(1);
+                        else if (key === 'Down') this.playerDrop();
+                        else if (key === 'A' || key === 'Up') this.playerRotate(1);
+                        else if (key === 'B') this.playerRotate(-1);
+                    }
+                },
+                updateScore: function() { scoreElement.textContent = `SCORE: ${this.player.score}`; },
+                update: function(time = 0) {
+                    if (!this.gameOver) {
+                        const deltaTime = time - this.lastTime; this.lastTime = time;
+                        this.dropCounter += deltaTime;
+                        if (this.dropCounter > this.dropInterval) { this.playerDrop(); }
+                    }
+                    this.draw();
+                    gameManager.animationFrameId = requestAnimationFrame(this.update.bind(this));
+                },
+                draw: function() {
+                    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-bg');
+                    context.fillStyle = bgColor;
+                    context.setTransform(this.BLOCK_SIZE, 0, 0, this.BLOCK_SIZE, 0, 0); 
+                    context.fillRect(0, 0, this.COLS, this.ROWS);
+                    this.drawMatrix(this.arena, {x: 0, y: 0});
+                    this.drawMatrix(this.player.matrix, this.player.pos);
+                    if (this.gameOver) {
+                        context.setTransform(1, 0, 0, 1, 0, 0);
+                        drawGameOverScreen(context, canvas, this.retryOption);
+                    }
+                },
+                playerReset: function() {
+                    const p='ILJOTSZ'; this.player.matrix = this.createPiece(p[p.length * Math.random() | 0]);
+                    this.player.pos.y=0; this.player.pos.x = (this.arena[0].length/2|0) - (this.player.matrix[0].length/2|0);
+                    if (this.collide(this.arena, this.player)) { this.gameOver = true; }
+                },
+                drawMatrix: function(m, o) { const c=getComputedStyle(document.documentElement).getPropertyValue('--screen-text'); context.fillStyle = c; m.forEach((r, y) => { r.forEach((v, x) => { if (v !== 0) { context.fillRect(x + o.x, y + o.y, 1, 1); } }); }); },
+                createMatrix: function(w, h) { const m = []; while(h--){ m.push(new Array(w).fill(0)); } return m; },
+                createPiece: function(t) { if (t === 'T') return [[0,0,0],[1,1,1],[0,1,0]]; else if (t === 'O') return [[1,1],[1,1]]; else if (t === 'L') return [[0,1,0],[0,1,0],[0,1,1]]; else if (t === 'J') return [[0,1,0],[0,1,0],[1,1,0]]; else if (t === 'I') return [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]]; else if (t === 'S') return [[0,1,1],[1,1,0],[0,0,0]]; else if (t === 'Z') return [[1,1,0],[0,1,1],[0,0,0]]; },
+                collide: function(a, p) { const [m, o] = [p.matrix, p.pos]; for (let y=0; y<m.length; ++y) { for (let x=0; x<m[y].length; ++x) { if (m[y][x] !== 0 && (a[y+o.y] && a[y+o.y][x+o.x]) !== 0) return true; } } return false; },
+                merge: function(a, p) { p.matrix.forEach((r, y) => { r.forEach((v, x) => { if (v !== 0) a[y+p.pos.y][x+p.pos.x] = v; }); }); },
+                playerDrop: function() { this.player.pos.y++; if (this.collide(this.arena, this.player)) { this.player.pos.y--; this.merge(this.arena, this.player); this.playerReset(); this.arenaSweep(); } this.dropCounter = 0; },
+                playerMove: function(dir) { this.player.pos.x += dir; if (this.collide(this.arena, this.player)) this.player.pos.x -= dir; },
+                playerRotate: function(dir) { const pos = this.player.pos.x; let offset=1; this.rotate(this.player.matrix, dir); while (this.collide(this.arena, this.player)) { this.player.pos.x += offset; offset = -(offset + (offset > 0 ? 1 : -1)); if (offset > this.player.matrix[0].length) { this.rotate(this.player.matrix, -dir); this.player.pos.x = pos; return; } } },
+                rotate: function(m, d) { for (let y=0; y<m.length; ++y) { for (let x=0; x<y; ++x) { [m[x][y], m[y][x]] = [m[y][x], m[x][y]]; } } if (d > 0) m.forEach(r => r.reverse()); else m.reverse(); },
+                arenaSweep: function() { outer: for (let y = this.arena.length-1; y>0; --y) { for (let x=0; x<this.arena[y].length; ++x) { if(this.arena[y][x] === 0) continue outer; } const r = this.arena.splice(y, 1)[0].fill(0); this.arena.unshift(r); ++y; this.player.score += 10; this.updateScore(); } },
+            };
+
+            const dinoGame = {
+                dino: {}, obstacles: [], score: 0, gameOver: false, spawnTimer: 0,
+                retryOption: 'YES',
+                pixelScale: 2.5,
+                // 精緻版小恐龍的像素矩陣
+                sprites: {
+                    run1: [[0,0,0,0,1,1,1,1,1,1,0,0],[0,0,0,1,1,1,1,1,1,1,1,0],[0,0,0,1,1,1,1,1,0,0,0,0],[0,0,1,1,1,1,0,0,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[1,1,1,1,1,1,1,1,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[0,0,0,1,1,1,0,0,0,0,0,0],[0,0,0,1,1,0,0,0,0,0,0,0],[0,0,1,1,0,0,0,0,0,0,0,0]],
+                    run2: [[0,0,0,0,1,1,1,1,1,1,0,0],[0,0,0,1,1,1,1,1,1,1,1,0],[0,0,0,1,1,1,1,1,0,0,0,0],[0,0,1,1,1,1,0,0,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[1,1,1,1,1,1,1,1,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[0,0,0,1,1,1,0,0,0,0,0,0],[0,0,0,0,0,1,1,0,0,0,0,0],[0,0,0,0,0,0,1,1,0,0,0,0]],
+                    jump: [[0,0,0,0,1,1,1,1,1,1,0,0],[0,0,0,1,1,1,1,1,1,1,1,0],[0,0,0,1,1,1,1,1,0,0,0,0],[0,0,1,1,1,1,0,0,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[1,1,1,1,1,1,1,1,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[0,0,0,1,1,1,0,0,0,0,0,0],[0,0,0,1,1,0,1,1,0,0,0,0],[0,0,1,1,0,0,1,1,0,0,0,0]],
+                    dead: [[0,0,0,0,1,1,1,1,1,1,0,0],[0,0,0,1,1,0,1,0,1,1,1,0],[0,0,0,1,1,1,0,1,1,1,0,0],[0,0,1,1,1,1,1,1,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[1,1,1,1,1,1,1,1,0,0,0,0],[0,1,1,1,1,1,1,0,0,0,0,0],[0,0,0,1,1,1,0,0,0,0,0,0],[0,0,0,1,1,0,0,0,0,0,0,0],[0,0,1,1,0,0,0,0,0,0,0,0]]
+                },
+                start: function() {
+                    this.gameOver = false; this.retryOption = 'YES';
+                    canvas.height = canvas.clientHeight; canvas.width = canvas.clientWidth;
+                    context.setTransform(1, 0, 0, 1, 0, 0); 
+                    const spriteHeight = this.sprites.run1.length;
+                    this.dino = { x: 50, y: canvas.height - (spriteHeight * this.pixelScale), dy: 0, gravity: 0.6, jumpPower: -10, onGround: true };
+                    this.obstacles = []; this.score = 0; this.spawnTimer = 0;
+                    this.updateScore(); this.update();
+                },
+                end: function() { cancelAnimationFrame(gameManager.animationFrameId); },
+                handleInput: function(key) {
+                    if (this.gameOver) {
+                        if (key === 'Left' || key === 'Right') { this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES'; } 
+                        else if (key === 'A') {
+                            if (this.retryOption === 'YES') this.start();
+                            else gameManager.endGame();
+                        }
+                    } else {
+                        if (key === 'Select') { gameManager.endGame(); return; }
+                        if ((key === 'A' || key === 'Up') && this.dino.onGround) { this.dino.dy = this.dino.jumpPower; this.dino.onGround = false; }
+                    }
+                },
+                updateScore: function() { scoreElement.textContent = `SCORE: ${Math.floor(this.score)}`; },
+                update: function() {
+                    if (!this.gameOver) {
+                        this.dino.dy += this.dino.gravity; this.dino.y += this.dino.dy; this.dino.onGround = false;
+                        if (this.dino.y + (this.sprites.run1.length * this.pixelScale) >= canvas.height) {
+                            this.dino.y = canvas.height - (this.sprites.run1.length * this.pixelScale);
+                            this.dino.dy = 0; this.dino.onGround = true;
+                        }
+                        this.spawnTimer--;
+                        if (this.spawnTimer <= 0) { this.obstacles.push({ x: canvas.width, width: 20, height: 20 + Math.random() * 30 }); this.spawnTimer = 90 + Math.random() * 50; }
+                        
+                        const dinoHitbox = { x: this.dino.x, y: this.dino.y, width: this.sprites.run1[0].length * this.pixelScale, height: this.sprites.run1.length * this.pixelScale };
+                        for (let i = this.obstacles.length - 1; i >= 0; i--) {
+                            let obs = this.obstacles[i]; obs.x -= 3 + (this.score / 100);
+                            if (obs.x + obs.width < 0) this.obstacles.splice(i, 1);
+                            const obsHitbox = { x: obs.x, y: canvas.height - obs.height, width: obs.width, height: obs.height };
+                            if (dinoHitbox.x < obsHitbox.x + obsHitbox.width && dinoHitbox.x + dinoHitbox.width > obsHitbox.x && dinoHitbox.y < obsHitbox.y + obsHitbox.height && dinoHitbox.y + dinoHitbox.height > obsHitbox.y) {
+                                this.gameOver = true;
+                            }
+                        }
+                        this.score += 0.2; this.updateScore();
+                    }
+                    this.draw();
+                    gameManager.animationFrameId = requestAnimationFrame(this.update.bind(this));
+                },
+                draw: function() {
+                    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-bg');
+                    const fgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
+                    context.fillStyle = bgColor; context.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    this.drawDinoSprite(context, fgColor); // 繪製小恐龍
+                    
+                    context.fillStyle = fgColor;
+                    this.obstacles.forEach(obs => { context.fillRect(obs.x, canvas.height - obs.height, obs.width, obs.height); });
+
+                    if (this.gameOver) {
+                        drawGameOverScreen(context, canvas, this.retryOption);
+                    }
+                },
+                drawDinoSprite: function(ctx, color) {
+                    const dinoX = this.dino.x; const dinoY = this.dino.y; const s = this.pixelScale;
+                    ctx.fillStyle = color;
+                    let sprite;
+                    if (this.gameOver) { sprite = this.sprites.dead; }
+                    else if (!this.dino.onGround) { sprite = this.sprites.jump; }
+                    else { sprite = (Math.floor(this.score / 6) % 2 === 0) ? this.sprites.run1 : this.sprites.run2; }
+                    for (let r = 0; r < sprite.length; r++) {
+                        for (let c = 0; c < sprite[r].length; c++) {
+                            if (sprite[r][c] === 1) { ctx.fillRect(dinoX + c * s, dinoY + r * s, s, s); }
+                        }
+                    }
+                }
+            };
+
+            const TESTER_MODE = true;
+            let startClickCount = 0;
+            const konamiCode = ['Up', 'Up', 'Down', 'Down', 'Left', 'Right', 'Left', 'Right', 'B', 'A'];
+            let userInput = [];
+
+            function handleButtonPress(key) {
+                audioSelect.currentTime = 0; audioSelect.play();
+                if (gameManager.isGameActive) {
+                    gameManager.handleInput(key);
+                } else {
+                    userInput.push(key); userInput = userInput.slice(-konamiCode.length);
+                    if (JSON.stringify(userInput) === JSON.stringify(konamiCode)) { gameManager.triggerEasterEgg(); }
+                    if (TESTER_MODE && key === 'Start') {
+                        startClickCount++; if (startClickCount >= 3) { gameManager.triggerEasterEgg(); }
+                    } else if (key !== 'Start') { startClickCount = 0; }
+                }
+            }
+            
+            const allButtons = document.querySelectorAll('.gb-button');
+            allButtons.forEach(button => {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault(); const key = this.dataset.key; handleButtonPress(key);
+                    this.style.backgroundColor = 'rgba(0,0,0,0.3)';
+                    setTimeout(() => { this.style.backgroundColor = ''; }, 100);
+                });
             });
         });
     </script>
