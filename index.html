@@ -738,13 +738,13 @@
                     ctx.fillStyle = color;
 
                     // 身體
-                    ctx.fillRect(dinoX, dinoY + s * 1, s * 5, s * 4);
+                    ctx.fillRect(dinoX, dinoY + s * 2, s * 7, s * 3);
                     
                     // 頭部
-                    ctx.fillRect(dinoX + s * 5, dinoY, s * 5, s * 5);
+                    ctx.fillRect(dinoX + s * 6, dinoY, s * 5, s * 5);
                     
                     // 尾巴
-                    ctx.fillRect(dinoX - s * 3, dinoY + s * 2, s * 4, s * 2);
+                    ctx.fillRect(dinoX - s * 3, dinoY + s * 3, s * 3, s * 4);
 
                     // 根據跑步狀態，切換腳的位置來製造動畫感
                     const isRunningFrame1 = Math.floor(this.score / 6) % 2 === 0;
@@ -838,4 +838,5 @@
 
 </body>
 </html>
+
 
