@@ -338,6 +338,15 @@
     <audio id="audio-select" src="data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQgAAAAgP9/AP8AgAD/AIAA/wCAAP8AgAD/AIAA/wCAAP8AgAD/AIAA/wCAAP8A"></audio>
 
     <script>
+        // =================================================================
+        // --- 新增的程式碼：防止手機長按跳出選單 ---
+        // =================================================================
+        // 這會監聽整個頁面的 'contextmenu' 事件 (通常由長按或滑鼠右鍵觸發)
+        // 然後呼叫 e.preventDefault() 來阻止瀏覽器執行預設的行為 (也就是跳出選單)
+        window.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
         document.addEventListener('DOMContentLoaded', function() {
             
             const audioOpen = document.getElementById('audio-open');
@@ -347,7 +356,7 @@
             const mainMenu = document.querySelector('.main-menu');
             const testerMenu = document.querySelector('.tester-menu');
 
-            const quotes = ["Try: UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A START", "Every expert was once a beginner.", "Don't stop until you're proud.", "The harder you work, the luckier you get.", "Success is the sum of small efforts.", "It always seems impossible until it's done.", "Mistakes are proof that you are trying.", "Turn 'I wish' into 'I will'.", "Learn something new every day.", "No one can take what you've learned away from you.", "Strive for progress, not perfection.", "Be awesome today."];
+            const quotes = ["Try UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A Start", "Every expert was once a beginner.", "Don't stop until you're proud.", "The harder you work, the luckier you get.", "Success is the sum of small efforts.", "It always seems impossible until it's done.", "Mistakes are proof that you are trying.", "Turn 'I wish' into 'I will'.", "Learn something new every day.", "No one can take what you've learned away from you.", "Strive for progress, not perfection.", "Be awesome today."];
             const quoteElement = document.getElementById('quote-text');
             quoteElement.textContent = quotes[Math.floor(Math.random() * quotes.length)];
 
@@ -839,7 +848,3 @@
 
 </body>
 </html>
-
-
-
-
