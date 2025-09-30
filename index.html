@@ -494,7 +494,7 @@
                             this.dino.dy = 0; this.dino.onGround = true;
                         }
                         this.spawnTimer--;
-                        if (this.spawnTimer <= 0) { this.obstacles.push({ x: canvas.width, width: 20, height: 20 + Math.random() * 30 }); this.spawnTimer = 90 + Math.random() * 50; }
+                        if (this.spawnTimer <= 0) { this.obstacles.push({ x: canvas.width, width: 15, height: 15 + Math.random() * 30 }); this.spawnTimer = 100 + Math.random() * 50; }
                         
                         const dinoHitbox = { x: this.dino.x, y: this.dino.y, width: this.sprites.run1[0].length * this.pixelScale, height: this.sprites.run1.length * this.pixelScale };
                         for (let i = this.obstacles.length - 1; i >= 0; i--) {
@@ -596,4 +596,5 @@
 
 </body>
 </html>
+
 
