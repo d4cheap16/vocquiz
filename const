@@ -295,7 +295,7 @@
             const bootScreen = document.querySelector('.boot-screen');
             const mainMenu = document.querySelector('.main-menu');
 
-            const quotes = ["Try UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A", "Try UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A", "Every expert was once a beginner.", "Don't stop until you're proud.", "The harder you work, the luckier you get.", "Success is the sum of small efforts.", "It always seems impossible until it's done.", "Mistakes are proof that you are trying.", "Turn 'I wish' into 'I will'.", "Learn something new every day.", "No one can take what you've learned away from you.", "Strive for progress, not perfection.", "Be awesome today."];
+            const quotes = ["Try: UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A", "Try: UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A", "Try: UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A", "Every expert was once a beginner.", "Don't stop until you're proud.", "The harder you work, the luckier you get.", "Success is the sum of small efforts.", "It always seems impossible until it's done.", "Mistakes are proof that you are trying.", "Turn 'I wish' into 'I will'.", "Learn something new every day.", "No one can take what you've learned away from you.", "Strive for progress, not perfection.", "Be awesome today."];
             const quoteElement = document.getElementById('quote-text');
             quoteElement.textContent = quotes[Math.floor(Math.random() * quotes.length)];
 
@@ -497,7 +497,7 @@
                         
                         const dinoHitbox = { x: this.dino.x, y: this.dino.y, width: this.sprites.run1[0].length * this.pixelScale, height: this.sprites.run1.length * this.pixelScale };
                         for (let i = this.obstacles.length - 1; i >= 0; i--) {
-                            let obs = this.obstacles[i]; obs.x -= 3 + (this.score / 100);
+                            let obs = this.obstacles[i]; obs.x -= 1.5 + (this.score / 150);
                             if (obs.x + obs.width < 0) this.obstacles.splice(i, 1);
                             const obsHitbox = { x: obs.x, y: canvas.height - obs.height, width: obs.width, height: obs.height };
                             if (dinoHitbox.x < obsHitbox.x + obsHitbox.width && dinoHitbox.x + dinoHitbox.width > obsHitbox.x && dinoHitbox.y < obsHitbox.y + obsHitbox.height && dinoHitbox.y + dinoHitbox.height > obsHitbox.y) {
@@ -577,6 +577,7 @@
 
 </body>
 </html>
+
 
 
 
