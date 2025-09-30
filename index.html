@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>VoCat</title>
     <link rel="preload" as="image" href="GB01.png">
-    <link rel="preload" as="image" href="Cat.jpg">
     
     <!-- 社群媒體預覽卡片 (Open Graph Meta Tags) -->
     <meta name="description" content="Learn high school vocabulary in a fun way!">
@@ -234,8 +233,17 @@
         .footer-logo { height: 2em; width: auto; margin-left: 4px; vertical-align: middle; }
 
         /* --- Gameboy 按鈕樣式 --- */
-        .gb-button { position: absolute; transition: background-color 0.2s; }
-        .gb-button:hover { background-color: rgba(0, 0, 0, 0.2); cursor: pointer; }
+        .gb-button { 
+            position: absolute; 
+            transition: background-color 0.2s, transform 0.1s; 
+        }
+        .gb-button:hover { 
+            background-color: rgba(0, 0, 0, 0.2); 
+            cursor: pointer; 
+        }
+        .gb-button:active {
+            transform: scale(0.95);
+        }
         #btn-a, #btn-b { border-radius: 50%; }
         #btn-select, #btn-start { border-radius: 25px; }
         #btn-up, #btn-down, #btn-left, #btn-right { border-radius: 2px; }
@@ -484,6 +492,7 @@
                     cancelAnimationFrame(gameManager.animationFrameId);
                     this.gameOver = false; this.isPaused = false;
                     this.retryOption = 'YES'; this.pauseOption = 'NO';
+                    this.dropInterval = 1000; // 重設速度
                     this.highScore = parseInt(localStorage.getItem('tetrisHighScore')) || 0;
                     const screenHeight = canvas.clientHeight;
                     const screenWidth = canvas.clientWidth;
@@ -585,7 +594,24 @@
                 playerMove: function(dir) { this.player.pos.x += dir; if (this.collide(this.arena, this.player)) this.player.pos.x -= dir; },
                 playerRotate: function(dir) { const pos = this.player.pos.x; let offset=1; this.rotate(this.player.matrix, dir); while (this.collide(this.arena, this.player)) { this.player.pos.x += offset; offset = -(offset + (offset > 0 ? 1 : -1)); if (offset > this.player.matrix[0].length) { this.rotate(this.player.matrix, -dir); this.player.pos.x = pos; return; } } },
                 rotate: function(m, d) { for (let y=0; y<m.length; ++y) { for (let x=0; x<y; ++x) { [m[x][y], m[y][x]] = [m[y][x], m[x][y]]; } } if (d > 0) m.forEach(r => r.reverse()); else m.reverse(); },
-                arenaSweep: function() { outer: for (let y = this.arena.length-1; y>0; --y) { for (let x=0; x<this.arena[y].length; ++x) { if(this.arena[y][x] === 0) continue outer; } const r = this.arena.splice(y, 1)[0].fill(0); this.arena.unshift(r); ++y; this.player.score += 10; this.updateScore(); } },
+                arenaSweep: function() { 
+                    let rowCount = 0;
+                    outer: for (let y = this.arena.length-1; y>0; --y) { 
+                        for (let x=0; x<this.arena[y].length; ++x) { if(this.arena[y][x] === 0) continue outer; } 
+                        const r = this.arena.splice(y, 1)[0].fill(0); 
+                        this.arena.unshift(r); 
+                        ++y; 
+                        rowCount++;
+                    } 
+                    if (rowCount > 0) {
+                        this.player.score += rowCount * 10;
+                         // 每50分增加一次難度
+                        if (Math.floor(this.player.score / 50) > Math.floor((this.player.score - rowCount * 10) / 50)) {
+                           this.dropInterval = Math.max(150, this.dropInterval - 50);
+                        }
+                        this.updateScore();
+                    }
+                },
             };
 
             const dinoGame = {
@@ -642,11 +668,17 @@
                             this.dino.dy = 0; this.dino.onGround = true;
                         }
                         this.spawnTimer--;
-                        if (this.spawnTimer <= 0) { this.obstacles.push({ x: canvas.width, width: 15, height: 15 + Math.random() * 15 }); this.spawnTimer = 120 + Math.random() * 50; }
+                        if (this.spawnTimer <= 0) { 
+                            const type = Math.random() > 0.4 ? 1 : 2; // 1 for small, 2 for large
+                            const height = type === 1 ? 20 : 30;
+                            const width = type === 1 ? 10 : 15;
+                            this.obstacles.push({ x: canvas.width, width: width, height: height, type: type }); 
+                            this.spawnTimer = 90 + Math.random() * 50; 
+                        }
                         
                         const dinoHitbox = { x: this.dino.x, y: this.dino.y, width: this.sprites.run1[0].length * this.pixelScale, height: this.sprites.run1.length * this.pixelScale };
                         for (let i = this.obstacles.length - 1; i >= 0; i--) {
-                            let obs = this.obstacles[i]; obs.x -= 1.8 + (this.score / 200);
+                            let obs = this.obstacles[i]; obs.x -= 2.2 + (this.score / 200);
                             if (obs.x + obs.width < 0) this.obstacles.splice(i, 1);
                             const obsHitbox = { x: obs.x, y: canvas.height - obs.height, width: obs.width, height: obs.height };
                             if (dinoHitbox.x < obsHitbox.x + obsHitbox.width && dinoHitbox.x + dinoHitbox.width > obsHitbox.x && dinoHitbox.y < obsHitbox.y + obsHitbox.height && dinoHitbox.y + dinoHitbox.height > obsHitbox.y) {
@@ -672,11 +704,28 @@
                     this.drawDinoSprite(context, fgColor);
                     
                     context.fillStyle = fgColor;
-                    this.obstacles.forEach(obs => { context.fillRect(obs.x, canvas.height - obs.height, obs.width, obs.height); });
+                    this.obstacles.forEach(obs => { this.drawCactus(context, obs); });
                     
                     context.setTransform(1, 0, 0, 1, 0, 0);
                     if (this.gameOver) { drawGameOverScreen(context, canvas, this.retryOption); }
                     if (this.isPaused) { drawQuitMenuScreen(context, canvas, this.pauseOption); }
+                },
+                drawCactus: function(ctx, obs) {
+                    const groundY = canvas.height;
+                    const stemWidth = obs.width * 0.6;
+                    const stemX = obs.x + (obs.width - stemWidth) / 2;
+                    // Main stem
+                    ctx.fillRect(stemX, groundY - obs.height, stemWidth, obs.height);
+                    
+                    // Arms
+                    const armWidth = obs.width * 0.8;
+                    const armHeight = 5;
+                    if (obs.type === 1) { // Small cactus
+                         ctx.fillRect(obs.x, groundY - obs.height * 0.7, armWidth, armHeight);
+                    } else { // Large cactus
+                         ctx.fillRect(obs.x, groundY - obs.height * 0.8, armWidth, armHeight);
+                         ctx.fillRect(stemX, groundY - obs.height * 0.5, armWidth, armHeight);
+                    }
                 },
                 drawDinoSprite: function(ctx, color) {
                     const dinoX = this.dino.x; const dinoY = this.dino.y; const s = this.pixelScale;
@@ -770,5 +819,4 @@
 
 </body>
 </html>
-
 
