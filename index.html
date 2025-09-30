@@ -318,7 +318,10 @@
                 if (e.animationName === 'fadeOutBoot') {
                     this.style.display = 'none';
                     this.classList.remove('reboot'); 
-                    mainMenu.classList.add('reboot');
+                    mainMenu.classList.add('reboot');                   
+                    // 在此處重置彩蛋輸入紀錄
+                    userInput = [];
+                    testerInput = [];
                 }
             });
 
@@ -596,6 +599,7 @@
 
 </body>
 </html>
+
 
 
 
