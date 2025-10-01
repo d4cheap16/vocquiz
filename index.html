@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>VoCat</title>
-    <link rel="preload" as="image" href="GB01.png">
-    <link rel="preload" as="image" href="Cat.jpg">
+    <link rel="preload" as="image" href="https://d4cheap16.github.io/vp/GB01.png">
+    <link rel="preload" as="image" href="https://d4cheap16.github.io/vp/Cat.jpg">
     
     <!-- 社群媒體預覽卡片 (Open Graph Meta Tags) -->
     <meta name="description" content="Learn high school vocabulary in a fun way!">
@@ -189,6 +189,19 @@
             flex-grow: 1;
         }
 
+        /* --- 美化卷軸樣式 --- */
+        .menu-wrapper::-webkit-scrollbar {
+            width: 10px;
+        }
+        .menu-wrapper::-webkit-scrollbar-track {
+            background: var(--screen-bg);
+            border-left: 2px solid var(--screen-text);
+        }
+        .menu-wrapper::-webkit-scrollbar-thumb {
+            background: var(--screen-text);
+            border-radius: 0; /* 移除圓角，更像素化 */
+        }
+
         .menu-list { list-style: none; padding: 0; margin: 0; }
         .menu-list li { margin-bottom: 2%; }
         .menu-list a { color: var(--screen-text); text-decoration: none; display: flex; align-items: center; padding: 2.5%; font-size: clamp(14px, 3.8vw, 16px); transition: all 0.2s; white-space: nowrap; }
@@ -272,7 +285,8 @@
             z-index: 5;
         }
 
-        .screen-footer { margin: 0; padding: 0; position: absolute; bottom: 44%; left: 11%; width: 80%; text-align: left; font-size: clamp(9px, 2.2vw, 11px); color: #444; opacity: 0; animation: fadeInMenu 0.5s ease-in 1s forwards; line-height: 1.6; }
+        .screen-footer { margin: 0; padding: 0; position: absolute; bottom: 44%; left: 11%; width: 80%; text-align: left; font-size: clamp(9px, 2.2vw, 11px); color: #444; opacity: 0; line-height: 1.6; }
+        .screen-footer.animate { animation: fadeInMenu 0.5s ease-in 0s forwards; }
         .screen-footer p { margin: 0; padding: 0; }
         .site-footer { position: absolute; bottom: 10px; left: 0; width: 100%; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 6px; font-size: 10px; color: #555; z-index: 10; }
         .site-footer span { display: inline-flex; align-items: center; }
@@ -302,22 +316,97 @@
         #btn-down { top: 70%; left: 16%; width: 9%; height: 6%; }
         #btn-left { top: 65%; left: 8%; width: 9%; height: 6%; }
         #btn-right { top: 65%; left: 25%; width: 9%; height: 6%; }
+
+        /* --- 說明視窗樣式 --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none; /* 預設隱藏 */
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .modal-overlay.show {
+            display: flex; /* 當有 .show class 時顯示 */
+        }
+
+        .modal-content {
+            background-color: var(--screen-bg);
+            color: var(--screen-text);
+            border: 3px solid var(--screen-text);
+            padding: 15px;
+            max-width: 95%;
+            width: 500px;
+            border-radius: 8px;
+            font-family: 'Noto Sans TC', sans-serif; /* 內文使用較易閱讀的字體 */
+            line-height: 1.7;
+            font-size: clamp(14px, 3.5vw, 16px);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--screen-text);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            font-family: 'Press Start 2P', cursive;
+        }
+        
+        .modal-header p {
+            margin: 0;
+            font-size: clamp(15px, 4vw, 18px);
+        }
+        
+        .modal-close-btn {
+            background-color: var(--screen-text);
+            color: var(--screen-bg);
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-family: sans-serif;
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.1s;
+        }
+        .modal-close-btn:active {
+            transform: scale(0.9);
+        }
+
+        .modal-body p {
+            margin: 0 0 1em 0;
+        }
+        .modal-body p:last-child {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="gameboy-wrapper">
-            <img src="GB01.png" alt="Game Boy background" class="gameboy-image">
+            <img src="https://d4cheap16.github.io/vp/GB01.png" alt="Game Boy background" class="gameboy-image">
             <div class="gameboy-screen">
                 <div class="boot-screen">
-                    <div class="boot-logo"><img src="Cat.jpg" alt="開機貓貓"></div>
+                    <div class="boot-logo"><img src="https://d4cheap16.github.io/vp/Cat.jpg" alt="開機貓貓"></div>
                 </div>
                 <div class="main-menu">
                     <div class="screen-header">
-                        <img src="CatL.png" alt="左貓" class="header-cat">
+                        <img src="https://d4cheap16.github.io/vp/CatL.png" alt="左貓" class="header-cat">
                         <p>VoCat</p>
-                        <img src="CatR.png" alt="右貓" class="header-cat">
+                        <img src="https://d4cheap16.github.io/vp/CatR.png" alt="右貓" class="header-cat">
                     </div>
                     <div class="menu-wrapper">
                         <ul class="menu-list">
@@ -345,6 +434,13 @@
                                     <li><a href="https://forms.gle/zxU34XhghWkukZrz8" target="_blank">高二上一段</a></li>
                                 </ul>
                             </li>
+                            <li class="menu-category">
+                                <a href="#">ABOUT ME</a>
+                                <ul class="sub-menu">
+                                    <li><a href="#" id="design-concept-link">DESIGN CONCEPT</a></li>
+                                </ul>
+                            </li>
+
                         </ul>
                     </div>
                 </div>
@@ -387,6 +483,19 @@
     <audio id="audio-open" src="data:audio/wav;base64,UklGRlIAAABXQVZFZm1ートIBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQgAADD/38Agf9/AP//fwB/AP//f/9/AP8A//9/AIAA/wB//38AgAA="></audio>
     <audio id="audio-select" src="data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQgAAAAgP9/AP8AgAD/AIAA/wCAAP8AgAD/AIAA/wCAAP8AgAD/AIAA/wCAAP8A"></audio>
 
+    <!-- 設計理念說明視窗 -->
+    <div id="about-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p>DESIGN CONCEPT</p>
+                <button id="close-modal-btn" class="modal-close-btn">X</button>
+            </div>
+            <div class="modal-body">
+                <!-- 內容將由 JS 填入 -->
+            </div>
+        </div>
+    </div>
+
     <script>
         window.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
@@ -397,10 +506,45 @@
             const gameboyScreen = document.querySelector('.gameboy-screen');
             const bootScreen = document.querySelector('.boot-screen');
             const mainMenu = document.querySelector('.main-menu');
+            const screenFooter = document.querySelector('.screen-footer');
+            const designConceptLink = document.getElementById('design-concept-link');
+            const aboutModal = document.getElementById('about-modal');
+            const closeModalBtn = document.getElementById('close-modal-btn');
 
             const quotes = ["Try: UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A START", "Every expert was once a beginner.", "Try: UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A START", "Don't stop until you're proud.", "The harder you work, the luckier you get.", "Success is the sum of small efforts.", "It always seems impossible until it's done.", "Mistakes are proof that you are trying.", "Turn 'I wish' into 'I will'.", "Learn something new every day.", "No one can take what you've learned away from you.", "Strive for progress, not perfection.", "Be awesome today."];
             const quoteElement = document.getElementById('quote-text');
             quoteElement.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+            screenFooter.classList.add('animate');
+
+            // --- 說明視窗內容 ---
+            const modalBody = aboutModal.querySelector('.modal-body');
+            modalBody.innerHTML = `
+                <p>Welcome to VoCat！</p>
+                <p>希望能透過 Game Boy 的懷舊風格，將學習變成一場有趣的冒險。</p>
+                <p>網站還原了我的童年，也藏了小彩蛋，希望大家一起找到樂趣！</p>
+            `;
+
+            // --- 說明視窗事件監聽 ---
+            designConceptLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                audioOpen.currentTime = 0;
+                audioOpen.play();
+                aboutModal.classList.add('show');
+            });
+
+            function closeModal() {
+                audioSelect.currentTime = 0;
+                audioSelect.play();
+                aboutModal.classList.remove('show');
+            }
+
+            closeModalBtn.addEventListener('click', closeModal);
+            aboutModal.addEventListener('click', (e) => {
+                if (e.target === aboutModal) {
+                    closeModal();
+                }
+            });
+
 
             // 主選單點擊事件
             const categories = document.querySelectorAll('.menu-category > a');
@@ -440,6 +584,12 @@
                     this.style.display = 'none';
                     this.classList.remove('reboot'); 
                     mainMenu.classList.add('reboot');
+                    
+                    // 重設引言和頁腳動畫
+                    quoteElement.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+                    screenFooter.classList.remove('animate');
+                    setTimeout(() => { screenFooter.classList.add('animate'); }, 10);
+
                     userInput = [];
                     testerInput = [];
                 }
@@ -928,7 +1078,7 @@
                     }
                     
                     this.draw();
-                    gameManager.animationFrameId = setTimeout(this.update.bind(this), Math.max(80, 250 - (this.score * 2)));
+                    gameManager.animationFrameId = setTimeout(this.update.bind(this), Math.max(90, 300 - (this.score * 2)));
                 },
                 draw: function() {
                     const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-bg');
@@ -1204,12 +1354,10 @@
         <span>Designed by CHENWEI with</span>
         <span>
             Gemini
-            <img src="Gemini.png" alt="Google Gemini Logo" class="footer-logo">
+            <img src="https://d4cheap16.github.io/vp/Gemini.png" alt="Google Gemini Logo" class="footer-logo">
         </span>
     </footer>
 
 </body>
 </html>
-
-
 
