@@ -585,11 +585,6 @@
                     this.classList.remove('reboot'); 
                     mainMenu.classList.add('reboot');
                     
-                    // 重設引言和頁腳動畫
-                    quoteElement.textContent = quotes[Math.floor(Math.random() * quotes.length)];
-                    screenFooter.classList.remove('animate');
-                    setTimeout(() => { screenFooter.classList.add('animate'); }, 10);
-
                     userInput = [];
                     testerInput = [];
                 }
@@ -1360,5 +1355,6 @@
 
 </body>
 </html>
+
 
 
