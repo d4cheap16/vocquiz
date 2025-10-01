@@ -285,7 +285,7 @@
             z-index: 5;
         }
 
-        .screen-footer { margin: 0; padding: 0; position: absolute; bottom: 44%; left: 11%; width: 80%; text-align: left; font-size: clamp(9px, 2.2vw, 11px); color: #444; opacity: 0; line-height: 1.6; }
+        .screen-footer { margin: 0; padding: 0; position: absolute; bottom: 46%; left: 11%; width: 80%; text-align: left; font-size: clamp(9px, 2.2vw, 11px); color: #444; opacity: 0; line-height: 1.6; }
         .screen-footer.animate { animation: fadeInMenu 0.5s ease-in 0s forwards; }
         .screen-footer p { margin: 0; padding: 0; }
         .site-footer { position: absolute; bottom: 10px; left: 0; width: 100%; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 6px; font-size: 10px; color: #555; z-index: 10; }
@@ -545,6 +545,15 @@
                 }
             });
 
+            // --- 點擊引言更換句子 ---
+            screenFooter.addEventListener('click', function() {
+            // 播放一個選擇音效，增加回饋感
+                audioSelect.currentTime = 0;
+                audioSelect.play();
+            // 從 quotes 陣列中隨機挑選一句新的引言
+                quoteElement.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+            });
+            
 
             // 主選單點擊事件
             const categories = document.querySelectorAll('.menu-category > a');
@@ -1355,6 +1364,7 @@
 
 </body>
 </html>
+
 
 
 
