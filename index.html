@@ -904,7 +904,7 @@
             let moveInterval = null; const allButtons = document.querySelectorAll('.gb-button');
             function startAction(key) {
                 clearInterval(moveInterval); if (gameManager.isGameActive) { audioSelect.currentTime = 0; audioSelect.play(); }
-                handleButtonPress(key); if (gameManager.isGameActive && ['Left', 'Right', 'Down'].includes(key)) moveInterval = setInterval(() => { handleButtonPress(key); }, 100);
+                handleButtonPress(key); if (gameManager.isGameActive && ['Left', 'Right', 'Down', 'A'].includes(key)) moveInterval = setInterval(() => { handleButtonPress(key); }, 100);
             }
             function stopAction() { clearInterval(moveInterval); }
             allButtons.forEach(button => {
@@ -928,6 +928,7 @@
 
 </body>
 </html>
+
 
 
 
