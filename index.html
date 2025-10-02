@@ -626,7 +626,7 @@
                     this.gameState = { score: 0, highScore: parseInt(localStorage.getItem('ghostbusterHighScore')) || 0, level: 1, status: 'playing', retryOption: 'YES' };
                     this.player = { x: canvas.clientWidth / 2 - 12, y: canvas.clientHeight - 25, width: 24, height: 12, speed: 4, alive: true };
                     this.playerBullets = []; this.enemyBullets = [];
-                    this.enemyConfig = { rows: 2, cols: 7, width: 20, height: 10, padding: 8, offsetTop: 20, offsetLeft: 25, speedX: 0.5, direction: 1, moveInterval: 40, moveTimer: 40, shootInterval: 70, shootTimer: 60 };
+                    this.enemyConfig = { rows: 2, cols: 7, width: 20, height: 10, padding: 8, offsetTop: 20, offsetLeft: 25, speedX: 0.5, direction: 1, moveInterval: 40, moveTimer: 40, shootInterval: 90, shootTimer: 60 };
                     this.updateDifficulty(); this.createEnemies(); this.updateScore();
                     this.update();
                 },
@@ -928,5 +928,6 @@
 
 </body>
 </html>
+
 
 
