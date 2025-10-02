@@ -626,7 +626,7 @@
                     this.gameState = { score: 0, highScore: parseInt(localStorage.getItem('ghostbusterHighScore')) || 0, level: 1, status: 'playing', retryOption: 'YES' };
                     this.player = { x: canvas.clientWidth / 2 - 12, y: canvas.clientHeight - 25, width: 24, height: 12, speed: 4, alive: true };
                     this.playerBullets = []; this.enemyBullets = [];
-                    this.enemyConfig = { rows: 2, cols: 7, width: 20, height: 10, padding: 8, offsetTop: 20, offsetLeft: 25, speedX: 0.5, direction: 1, moveInterval: 40, moveTimer: 40, shootInterval: 90, shootTimer: 60 };
+                    this.enemyConfig = { rows: 2, cols: 7, width: 20, height: 10, padding: 8, offsetTop: 20, offsetLeft: 25, speedX: 0.5, direction: 1, moveInterval: 40, moveTimer: 40, shootInterval: 70, shootTimer: 60 };
                     this.updateDifficulty(); this.createEnemies(); this.updateScore();
                     this.update();
                 },
@@ -663,36 +663,46 @@
                     scoreElement.textContent = `HI ${hi}\n${current}\nLV ${this.gameState.level}`;
                 },
                 update: function() {
-                    if (this.gameState.status !== 'playing' || this.isPaused) { this.draw(); requestAnimationFrame(this.update.bind(this)); return; }
-                    // 更新玩家
-                    if (this.player.x < 5) this.player.x = 5; if (this.player.x + this.player.width > canvas.clientWidth - 5) this.player.x = canvas.clientWidth - this.player.width - 5;
+                // 只有在遊戲進行中且未暫停時，才更新遊戲狀態
+                    if (this.gameState.status === 'playing' && !this.isPaused) {
+                // 更新玩家
+                    if (this.player.x < 5) this.player.x = 5;
+                    if (this.player.x + this.player.width > canvas.clientWidth - 5) this.player.x = canvas.clientWidth - this.player.width - 5;
                     if (this.playerShootCooldown > 0) this.playerShootCooldown--;
-                    // 更新子彈
+
+                // 更新子彈
                     for (let i = this.playerBullets.length - 1; i >= 0; i--) { this.playerBullets[i].y -= this.playerBullets[i].speed; if (this.playerBullets[i].y < 0) this.playerBullets.splice(i, 1); }
                     for (let i = this.enemyBullets.length - 1; i >= 0; i--) { this.enemyBullets[i].y += this.enemyBullets[i].speed; if (this.enemyBullets[i].y > canvas.clientHeight) this.enemyBullets.splice(i, 1); }
-                    // 更新敵人
+
+                // 更新敵人
                     this.enemyConfig.moveTimer--;
                     if (this.enemyConfig.moveTimer <= 0) {
-                        this.enemyConfig.moveTimer = this.enemyConfig.moveInterval;
-                        let wallHit = false;
-                        for (const e of this.enemies) if (e.alive && ((e.x + e.width >= canvas.clientWidth - 10 && this.enemyConfig.direction > 0) || (e.x <= 10 && this.enemyConfig.direction < 0))) { wallHit = true; break; }
-                        if (wallHit) { this.enemyConfig.direction *= -1; for (const e of this.enemies) e.y += e.height / 2; }
-                        for (const e of this.enemies) { e.x += this.enemyConfig.speedX * this.enemyConfig.direction; if(e.alive && e.y + e.height >= this.player.y) { this.setGameOver(); break; } }
-                    }
+                    this.enemyConfig.moveTimer = this.enemyConfig.moveInterval;
+                    let wallHit = false;
+                    for (const e of this.enemies) if (e.alive && ((e.x + e.width >= canvas.clientWidth - 10 && this.enemyConfig.direction > 0) || (e.x <= 10 && this.enemyConfig.direction < 0))) { wallHit = true; break; }
+                    if (wallHit) { this.enemyConfig.direction *= -1; for (const e of this.enemies) e.y += e.height / 2; }
+                    for (const e of this.enemies) { e.x += this.enemyConfig.speedX * this.enemyConfig.direction; if(e.alive && e.y + e.height >= this.player.y) { this.setGameOver(); break; } }
+                        }
                     this.enemyConfig.shootTimer--;
                     if (this.enemyConfig.shootTimer <= 0) {
-                        this.enemyConfig.shootTimer = this.enemyConfig.shootInterval;
-                        const alive = this.enemies.filter(e => e.alive); if (alive.length > 0) { const shooter = alive[Math.floor(Math.random() * alive.length)]; this.enemyBullets.push({ x: shooter.x + shooter.width / 2 - 2, y: shooter.y + shooter.height, width: 4, height: 8, speed: 3 }); }
-                    }
+                    this.enemyConfig.shootTimer = this.enemyConfig.shootInterval;
+                    const alive = this.enemies.filter(e => e.alive); if (alive.length > 0) { const shooter = alive[Math.floor(Math.random() * alive.length)]; this.enemyBullets.push({ x: shooter.x + shooter.width / 2 - 2, y: shooter.y + shooter.height, width: 4, height: 8, speed: 3 }); }
+                        }
+
                     // 碰撞偵測
                     for (let i = this.playerBullets.length - 1; i >= 0; i--) { const b = this.playerBullets[i]; for (const e of this.enemies) if (e.alive && b.x < e.x + e.width && b.x + b.width > e.x && b.y < e.y + e.height && b.y + b.height > e.y) { e.alive = false; this.playerBullets.splice(i, 1); this.gameState.score += 10; this.updateScore(); break; } }
                     for (let i = this.enemyBullets.length - 1; i >= 0; i--) { const b = this.enemyBullets[i]; if (this.player.alive && b.x < this.player.x + this.player.width && b.x + b.width > this.player.x && b.y < this.player.y + this.player.height && b.y + b.height > this.player.y) { this.setGameOver(); break; } }
                     for (const e of this.enemies) { if (e.alive && this.player.alive && e.x < this.player.x + this.player.width && e.x + e.width > this.player.x && e.y < this.player.y + this.player.height && e.y + e.height > this.player.y) { this.setGameOver(); break; } }
                     if (this.enemies.every(e => !e.alive)) this.gameState.status = 'levelComplete';
-                    
+                        }
+
+                // 無論遊戲狀態如何，每一幀都重新繪製畫面
                     this.draw();
-                    gameManager.animationFrameId = requestAnimationFrame(this.update.bind(this));
+
+                // 永遠只在函式結尾呼叫下一個迴圈，並永遠記錄其 ID
+                gameManager.animationFrameId = requestAnimationFrame(this.update.bind(this));
                 },
+                
                 draw: function() {
                     const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-bg');
                     const fgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
@@ -928,8 +938,4 @@
 
 </body>
 </html>
-
-
-
-
 
