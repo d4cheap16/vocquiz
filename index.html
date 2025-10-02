@@ -194,12 +194,12 @@
             width: 10px;
         }
         .menu-wrapper::-webkit-scrollbar-track {
-            background: var(--screen-bg);
-            border-left: 2px transparent;
+            background: transparent;
+            border-left: 2px solid transparent;
         }
         .menu-wrapper::-webkit-scrollbar-thumb {
             background: transparent;
-            border-radius: 0; /* 移除圓角，更像素化 */
+            border-radius: 0;
         }
 
         .menu-list { list-style: none; padding: 0; margin: 0; }
@@ -260,6 +260,7 @@
             white-space: pre; 
             text-align: right;
             line-height: 1.2;
+            font-family: 'Press Start 2P', cursive;
         }
 
         .gameboy-screen.game-active .main-menu,
@@ -285,7 +286,20 @@
             z-index: 5;
         }
 
-        .screen-footer { margin: 0; padding: 0; position: absolute; bottom: 46%; left: 11%; width: 80%; text-align: left; font-size: clamp(9px, 2.2vw, 11px); color: #444; opacity: 0; line-height: 1.6; }
+        .screen-footer { 
+            margin: 0; 
+            padding: 0; 
+            position: absolute; 
+            bottom: 46%; 
+            left: 11%; 
+            width: 80%; 
+            text-align: left; 
+            font-size: clamp(9px, 2.2vw, 11px); 
+            color: #444; 
+            opacity: 0; 
+            line-height: 1.6; 
+            cursor: pointer; 
+        }
         .screen-footer.animate { animation: fadeInMenu 0.5s ease-in 0s forwards; }
         .screen-footer p { margin: 0; padding: 0; }
         .site-footer { position: absolute; bottom: 10px; left: 0; width: 100%; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 6px; font-size: 10px; color: #555; z-index: 10; }
@@ -325,7 +339,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
-            display: none; /* 預設隱藏 */
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 200;
@@ -334,7 +348,7 @@
         }
 
         .modal-overlay.show {
-            display: flex; /* 當有 .show class 時顯示 */
+            display: flex;
         }
 
         .modal-content {
@@ -345,7 +359,7 @@
             max-width: 95%;
             width: 500px;
             border-radius: 8px;
-            font-family: 'Noto Sans TC', sans-serif; /* 內文使用較易閱讀的字體 */
+            font-family: 'Noto Sans TC', sans-serif;
             line-height: 1.7;
             font-size: clamp(14px, 3.5vw, 16px);
         }
@@ -360,10 +374,7 @@
             font-family: 'Press Start 2P', cursive;
         }
         
-        .modal-header p {
-            margin: 0;
-            font-size: clamp(15px, 4vw, 18px);
-        }
+        .modal-header p { margin: 0; font-size: clamp(15px, 4vw, 18px); }
         
         .modal-close-btn {
             background-color: var(--screen-text);
@@ -381,16 +392,9 @@
             align-items: center;
             transition: transform 0.1s;
         }
-        .modal-close-btn:active {
-            transform: scale(0.9);
-        }
-
-        .modal-body p {
-            margin: 0 0 1em 0;
-        }
-        .modal-body p:last-child {
-            margin-bottom: 0;
-        }
+        .modal-close-btn:active { transform: scale(0.9); }
+        .modal-body p { margin: 0 0 1em 0; }
+        .modal-body p:last-child { margin-bottom: 0; }
     </style>
 </head>
 <body>
@@ -410,8 +414,7 @@
                     </div>
                     <div class="menu-wrapper">
                         <ul class="menu-list">
-                            <li class="menu-category">
-                                <a href="#">課文單字</a>
+                            <li class="menu-category"><a href="#">課文單字</a>
                                 <ul class="sub-menu">
                                     <li><a href="book1.html" target="_self">Book 1</a></li>
                                     <li><a href="book2.html" target="_self">Book 2</a></li>
@@ -420,47 +423,40 @@
                                     <li><a href="book5.html" target="_self">Book 5</a></li>
                                 </ul>
                             </li>
-                            <li class="menu-category">
-                                <a href="#">高頻單字</a>
+                            <li class="menu-category"><a href="#">高頻單字</a>
                                 <ul class="sub-menu">
                                     <li><a href="high_freq.html" target="_self">Expert Mode</a></li>
                                     <li><a href="https://forms.gle/oDeaR87M4xSkaixE6" target="_blank">高一上一段</a></li>
                                 </ul>
                             </li>
-                            <li class="menu-category">
-                                <a href="#">文法練習</a>
+                            <li class="menu-category"><a href="#">文法練習</a>
                                 <ul class="sub-menu">
                                     <li><a href="https://forms.gle/mVhyunhWvFi1TgNt5" target="_blank">高一上一段</a></li>
                                     <li><a href="https://forms.gle/zxU34XhghWkukZrz8" target="_blank">高二上一段</a></li>
                                 </ul>
                             </li>
-                            <li class="menu-category">
-                                <a href="#">ABOUT ME</a>
+                            <li class="menu-category"><a href="#">ABOUT ME</a>
                                 <ul class="sub-menu">
                                     <li><a href="#" id="design-concept-link">DESIGN CONCEPT</a></li>
                                 </ul>
                             </li>
-
                         </ul>
                     </div>
                 </div>
                 <div class="tester-menu">
-                    <div class="screen-header">
-                        <p>GAME SELECT</p>
-                    </div>
+                    <div class="screen-header"><p>GAME SELECT</p></div>
                     <div class="menu-wrapper">
                         <ul class="menu-list">
                             <li><a href="#" data-game="back">MAIN MENU</a></li>
                             <li><a href="#" data-game="breakout">BREAKOUT</a></li>
                             <li><a href="#" data-game="dino">DINO RUN</a></li>
+                            <li><a href="#" data-game="ghostbuster">GHOSTBUSTER</a></li>
                             <li><a href="#" data-game="snake">SNAKE</a></li>
                             <li><a href="#" data-game="tetris">TETRIS</a></li>
+
                         </ul>
                     </div>
-                    <!-- 新增：遊戲選單底部說明 -->
-                    <div class="menu-footer">
-                        <p>A: PLAY • UP/DOWN: SELECT</p>
-                    </div>
+                    <div class="menu-footer"><p>A: PLAY • UP/DOWN: SELECT</p></div>
                 </div>
                 <canvas id="game-canvas"></canvas>
                 <div id="game-score"></div>
@@ -483,16 +479,13 @@
     <audio id="audio-open" src="data:audio/wav;base64,UklGRlIAAABXQVZFZm1ートIBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQgAADD/38Agf9/AP//fwB/AP//f/9/AP8A//9/AIAA/wB//38AgAA="></audio>
     <audio id="audio-select" src="data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQgAAAAgP9/AP8AgAD/AIAA/wCAAP8AgAD/AIAA/wCAAP8AgAD/AIAA/wCAAP8A"></audio>
 
-    <!-- 設計理念說明視窗 -->
     <div id="about-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <p>DESIGN CONCEPT</p>
                 <button id="close-modal-btn" class="modal-close-btn">X</button>
             </div>
-            <div class="modal-body">
-                <!-- 內容將由 JS 填入 -->
-            </div>
+            <div class="modal-body"><!-- 內容將由 JS 填入 --></div>
         </div>
     </div>
 
@@ -511,91 +504,45 @@
             const aboutModal = document.getElementById('about-modal');
             const closeModalBtn = document.getElementById('close-modal-btn');
 
-            const quotes = ["Try: UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A START", "Every expert was once a beginner.", "Try: UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A START", "Don't stop until you're proud.", "The harder you work, the luckier you get.", "Success is the sum of small efforts.", "It always seems impossible until it's done.", "Mistakes are proof that you are trying.", "Turn 'I wish' into 'I will'.", "Learn something new every day.", "No one can take what you've learned away from you.", "Strive for progress, not perfection.", "Be awesome today."];
+            const quotes = ["Try: UP UP DOWN DOWN LEFT RIGHT LEFT RIGHT B A START", "Every expert was once a beginner.", "Don't stop until you're proud.", "The harder you work, the luckier you get.", "Success is the sum of small efforts.", "It always seems impossible until it's done.", "Mistakes are proof that you are trying.", "Turn 'I wish' into 'I will'.", "Learn something new every day.", "No one can take what you've learned away from you.", "Strive for progress, not perfection.", "Be awesome today."];
             const quoteElement = document.getElementById('quote-text');
             quoteElement.textContent = quotes[Math.floor(Math.random() * quotes.length)];
             screenFooter.classList.add('animate');
 
-            // --- 說明視窗內容 ---
             const modalBody = aboutModal.querySelector('.modal-body');
-            modalBody.innerHTML = `
-                <p>Welcome to VoCat！</p>
-                <p>希望能透過 Game Boy 的懷舊風格，將學習變成一場有趣的冒險。</p>
-                <p>網站還原了我的童年，也藏了小彩蛋，希望大家一起找到樂趣！</p>
-            `;
+            modalBody.innerHTML = `<p>Welcome to VoCat！</p><p>希望能透過 Game Boy 的懷舊風格，將學習變成一場有趣的冒險。</p><p>網站還原了我的童年，也藏了小彩蛋，希望大家一起找到樂趣！</p>`;
 
-            // --- 說明視窗事件監聽 ---
-            designConceptLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                audioOpen.currentTime = 0;
-                audioOpen.play();
-                aboutModal.classList.add('show');
-            });
-
-            function closeModal() {
-                audioSelect.currentTime = 0;
-                audioSelect.play();
-                aboutModal.classList.remove('show');
-            }
-
+            designConceptLink.addEventListener('click', (e) => { e.preventDefault(); audioOpen.currentTime = 0; audioOpen.play(); aboutModal.classList.add('show'); });
+            function closeModal() { audioSelect.currentTime = 0; audioSelect.play(); aboutModal.classList.remove('show'); }
             closeModalBtn.addEventListener('click', closeModal);
-            aboutModal.addEventListener('click', (e) => {
-                if (e.target === aboutModal) {
-                    closeModal();
-                }
-            });
+            aboutModal.addEventListener('click', (e) => { if (e.target === aboutModal) closeModal(); });
+            screenFooter.addEventListener('click', function() { audioSelect.currentTime = 0; audioSelect.play(); quoteElement.textContent = quotes[Math.floor(Math.random() * quotes.length)]; }); 
 
-            // --- 點擊引言更換句子 ---
-            screenFooter.addEventListener('click', function() {
-            // 播放一個選擇音效，增加回饋感
-                audioSelect.currentTime = 0;
-                audioSelect.play();
-            // 從 quotes 陣列中隨機挑選一句新的引言
-                quoteElement.textContent = quotes[Math.floor(Math.random() * quotes.length)];
-            });
-            
-
-            // 主選單點擊事件
             const categories = document.querySelectorAll('.menu-category > a');
             categories.forEach(category => {
                 category.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    audioOpen.currentTime = 0;
-                    audioOpen.play();
-                    const parentLi = this.parentElement;
-                    const wasOpen = parentLi.classList.contains('open');
+                    event.preventDefault(); audioOpen.currentTime = 0; audioOpen.play();
+                    const parentLi = this.parentElement; const wasOpen = parentLi.classList.contains('open');
                     document.querySelectorAll('.menu-category.open').forEach(c => c.classList.remove('open'));
                     if (!wasOpen) parentLi.classList.add('open');
                 });
             });
-
             const subMenuLinks = document.querySelectorAll('.sub-menu a');
             subMenuLinks.forEach(item => { item.addEventListener('click', () => { audioSelect.currentTime = 0; audioSelect.play(); }); });
             
-            // 遊戲選單點擊事件
             const testerMenuLinks = document.querySelectorAll('.tester-menu a');
             testerMenuLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    audioSelect.currentTime = 0;
-                    audioSelect.play();
+                    e.preventDefault(); audioSelect.currentTime = 0; audioSelect.play();
                     const gameType = e.target.dataset.game;
-                    if (gameType === 'back') {
-                        gameManager.hideTesterMenu();
-                    } else {
-                        gameManager.startGame(gameType);
-                    }
+                    if (gameType === 'back') gameManager.hideTesterMenu(); else gameManager.startGame(gameType);
                 });
             });
 
             bootScreen.addEventListener('animationend', function(e) {
                 if (e.animationName === 'fadeOutBoot') {
-                    this.style.display = 'none';
-                    this.classList.remove('reboot'); 
-                    mainMenu.classList.add('reboot');
-                    
-                    userInput = [];
-                    testerInput = [];
+                    this.style.display = 'none'; this.classList.remove('reboot'); 
+                    mainMenu.classList.add('reboot'); userInput = []; testerInput = [];
                 }
             });
 
@@ -605,744 +552,361 @@
             const canvas = document.getElementById('game-canvas');
             const context = canvas.getContext('2d');
             const scoreElement = document.getElementById('game-score');
-
             const SELECTOR_CHAR = '•';
 
             function drawGameOverScreen(ctx, cvs, selectedOption) {
                 const textColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
-                ctx.fillStyle = 'rgba(155, 188, 15, 0.75)';
-                ctx.fillRect(0, 0, cvs.width, cvs.height);
-                ctx.fillStyle = textColor;
-                ctx.textAlign = 'center';
-                ctx.font = `clamp(18px, 6vw, 24px) 'Press Start 2P'`;
-                ctx.fillText('GAME OVER', cvs.width / 2, cvs.height / 2 - 20);
-                ctx.font = `clamp(9px, 2.5vw, 10px) 'Press Start 2P'`;
-                const textY = cvs.height / 2 + 20;
-                if (selectedOption === 'YES') {
-                    ctx.fillText(`RETRY   ${SELECTOR_CHAR} YES / NO`, cvs.width / 2, textY);
-                } else {
-                    ctx.fillText(`RETRY     YES / ${SELECTOR_CHAR} NO`, cvs.width / 2, textY);
-                }
+                ctx.fillStyle = 'rgba(155, 188, 15, 0.75)'; ctx.fillRect(0, 0, cvs.width, cvs.height);
+                ctx.fillStyle = textColor; ctx.textAlign = 'center';
+                ctx.font = `clamp(18px, 6vw, 24px) 'Press Start 2P'`; ctx.fillText('GAME OVER', cvs.width / 2, cvs.height / 2 - 20);
+                ctx.font = `clamp(9px, 2.5vw, 10px) 'Press Start 2P'`; const textY = cvs.height / 2 + 20;
+                if (selectedOption === 'YES') ctx.fillText(`RETRY   ${SELECTOR_CHAR} YES / NO`, cvs.width / 2, textY); else ctx.fillText(`RETRY     YES / ${SELECTOR_CHAR} NO`, cvs.width / 2, textY);
             }
             
             function drawQuitMenuScreen(ctx, cvs, selectedOption) {
                 const textColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
-                ctx.fillStyle = 'rgba(155, 188, 15, 0.75)';
-                ctx.fillRect(0, 0, cvs.width, cvs.height);
-                ctx.fillStyle = textColor;
-                ctx.textAlign = 'center';
-                ctx.font = `clamp(14px, 5vw, 18px) 'Press Start 2P'`;
-                ctx.fillText('QUIT?', cvs.width / 2, cvs.height / 2 - 20);
-                ctx.font = `clamp(9px, 2.5vw, 10px) 'Press Start 2P'`;
-                const textY = cvs.height / 2 + 20;
-                 if (selectedOption === 'YES') {
-                    ctx.fillText(`${SELECTOR_CHAR} YES / NO`, cvs.width / 2, textY);
-                } else {
-                    ctx.fillText(`  YES / ${SELECTOR_CHAR} NO`, cvs.width / 2, textY);
-                }
+                ctx.fillStyle = 'rgba(155, 188, 15, 0.75)'; ctx.fillRect(0, 0, cvs.width, cvs.height);
+                ctx.fillStyle = textColor; ctx.textAlign = 'center';
+                ctx.font = `clamp(14px, 5vw, 18px) 'Press Start 2P'`; ctx.fillText('QUIT?', cvs.width / 2, cvs.height / 2 - 20);
+                ctx.font = `clamp(9px, 2.5vw, 10px) 'Press Start 2P'`; const textY = cvs.height / 2 + 20;
+                if (selectedOption === 'YES') ctx.fillText(`${SELECTOR_CHAR} YES / NO`, cvs.width / 2, textY); else ctx.fillText(`  YES / ${SELECTOR_CHAR} NO`, cvs.width / 2, textY);
             }
 
             function drawWinScreen(ctx, cvs, selectedOption) {
                 const textColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
-                ctx.fillStyle = 'rgba(155, 188, 15, 0.75)';
-                ctx.fillRect(0, 0, cvs.width, cvs.height);
-                ctx.fillStyle = textColor;
-                ctx.textAlign = 'center';
-                ctx.font = `clamp(18px, 6vw, 24px) 'Press Start 2P'`;
-                ctx.fillText('STAGE CLEAR!', cvs.width / 2, cvs.height / 2 - 20);
-                ctx.font = `clamp(9px, 2.5vw, 10px) 'Press Start 2P'`;
-                const textY = cvs.height / 2 + 20;
-                if (selectedOption === 'YES') {
-                    ctx.fillText(`${SELECTOR_CHAR} NEXT / QUIT`, cvs.width / 2, textY);
-                } else {
-                    ctx.fillText(`  NEXT / ${SELECTOR_CHAR} QUIT`, cvs.width / 2, textY);
-                }
+                ctx.fillStyle = 'rgba(155, 188, 15, 0.75)'; ctx.fillRect(0, 0, cvs.width, cvs.height);
+                ctx.fillStyle = textColor; ctx.textAlign = 'center';
+                ctx.font = `clamp(18px, 6vw, 24px) 'Press Start 2P'`; ctx.fillText('STAGE CLEAR!', cvs.width / 2, cvs.height / 2 - 20);
+                ctx.font = `clamp(9px, 2.5vw, 10px) 'Press Start 2P'`; const textY = cvs.height / 2 + 20;
+                if (selectedOption === 'YES') ctx.fillText(`${SELECTOR_CHAR} NEXT / QUIT`, cvs.width / 2, textY); else ctx.fillText(`  NEXT / ${SELECTOR_CHAR} QUIT`, cvs.width / 2, textY);
             }
 
-
             const gameManager = {
-                activeGame: null,
-                isGameActive: false,
-                animationFrameId: null,
-                
-                showTesterMenu: function() {
-                    gameboyScreen.classList.add('tester-active');
-                    const firstItem = document.querySelector('.tester-menu .menu-list a');
-                    if (firstItem) firstItem.classList.add('selected');
-                },
-                
-                hideTesterMenu: function() {
-                    gameboyScreen.classList.remove('tester-active');
-                    const selectedItem = document.querySelector('.tester-menu .menu-list a.selected');
-                    if (selectedItem) selectedItem.classList.remove('selected');
-                    bootScreen.style.display = 'flex';
-                    bootScreen.classList.add('reboot');
-                    mainMenu.classList.remove('reboot');
-                },
-
+                activeGame: null, isGameActive: false, animationFrameId: null,
+                showTesterMenu: function() { gameboyScreen.classList.add('tester-active'); const firstItem = document.querySelector('.tester-menu .menu-list a'); if (firstItem) firstItem.classList.add('selected'); },
+                hideTesterMenu: function() { gameboyScreen.classList.remove('tester-active'); const selectedItem = document.querySelector('.tester-menu .menu-list a.selected'); if (selectedItem) selectedItem.classList.remove('selected'); bootScreen.style.display = 'flex'; bootScreen.classList.add('reboot'); mainMenu.classList.remove('reboot'); },
                 startGame: function(gameType) {
-                    if (this.isGameActive || !gameType) return;
-                    this.isGameActive = true;
-                    gameboyScreen.classList.remove('tester-active');
-                    gameboyScreen.classList.add('game-active');
-                    const selectedItem = document.querySelector('.tester-menu .menu-list a.selected');
-                    if (selectedItem) selectedItem.classList.remove('selected');
-
-
+                    if (this.isGameActive || !gameType) return; this.isGameActive = true;
+                    gameboyScreen.classList.remove('tester-active'); gameboyScreen.classList.add('game-active');
+                    const selectedItem = document.querySelector('.tester-menu .menu-list a.selected'); if (selectedItem) selectedItem.classList.remove('selected');
                     if (gameType === 'tetris') this.activeGame = tetrisGame;
                     else if (gameType === 'dino') this.activeGame = dinoGame;
                     else if (gameType === 'snake') this.activeGame = snakeGame;
                     else if (gameType === 'breakout') this.activeGame = breakoutGame;
-                    
+                    else if (gameType === 'ghostbuster') this.activeGame = ghostbusterGame;
                     this.activeGame.start();
                 },
-
                 endGame: function() {
-                    if (!this.isGameActive) return;
-                    this.isGameActive = false;
-                    if (this.activeGame) { this.activeGame.end(); }
-                    this.activeGame = null;
-                    gameboyScreen.classList.remove('game-active');
-                    bootScreen.classList.add('reboot');
-                    mainMenu.classList.remove('reboot');
+                    if (!this.isGameActive) return; this.isGameActive = false;
+                    if (this.activeGame) { this.activeGame.end(); } this.activeGame = null;
+                    gameboyScreen.classList.remove('game-active'); bootScreen.classList.add('reboot'); mainMenu.classList.remove('reboot');
+                },
+                handleInput: function(key) { if (this.isGameActive && this.activeGame) this.activeGame.handleInput(key); },
+                handleGameMenuInput: function(key) {
+                    const menuItems = document.querySelectorAll('.tester-menu .menu-list a'); if (menuItems.length === 0) return;
+                    let currentIndex = Array.from(menuItems).findIndex(link => link.classList.contains('selected'));
+                    if (key === 'Up' || key === 'Down') {
+                        audioOpen.currentTime = 0; audioOpen.play(); if (currentIndex !== -1) menuItems[currentIndex].classList.remove('selected');
+                        if (currentIndex === -1) currentIndex = (key === 'Up') ? menuItems.length - 1 : 0; else if (key === 'Up') currentIndex = (currentIndex - 1 + menuItems.length) % menuItems.length; else currentIndex = (currentIndex + 1) % menuItems.length;
+                        const newSelectedItem = menuItems[currentIndex]; newSelectedItem.classList.add('selected'); newSelectedItem.scrollIntoView({ block: 'nearest' });
+                    } else if (key === 'A') {
+                        const selectedItem = document.querySelector('.tester-menu a.selected'); if (selectedItem) selectedItem.click(); else { audioSelect.currentTime = 0; audioSelect.play(); }
+                    } else { audioSelect.currentTime = 0; audioSelect.play(); }
+                }
+            };
+            
+            // --- GHOSTBUSTER 遊戲 ---
+            const ghostbusterGame = {
+                gameState: {}, player: {}, playerBullets: [], enemyBullets: [], playerShootCooldown: 0, enemies: [], enemyConfig: {}, isPaused: false, pauseOption: 'NO',
+                start: function() {
+                    cancelAnimationFrame(gameManager.animationFrameId);
+                    canvas.height = canvas.clientHeight;
+                    canvas.width = canvas.clientWidth;
+                    this.isPaused = false; this.pauseOption = 'NO';
+                    this.gameState = { score: 0, highScore: parseInt(localStorage.getItem('ghostbusterHighScore')) || 0, level: 1, status: 'playing', retryOption: 'YES' };
+                    this.player = { x: canvas.clientWidth / 2 - 12, y: canvas.clientHeight - 25, width: 24, height: 12, speed: 4, alive: true };
+                    this.playerBullets = []; this.enemyBullets = [];
+                    this.enemyConfig = { rows: 2, cols: 7, width: 20, height: 10, padding: 8, offsetTop: 20, offsetLeft: 25, speedX: 0.5, direction: 1, moveInterval: 40, moveTimer: 40, shootInterval: 70, shootTimer: 60 };
+                    this.updateDifficulty(); this.createEnemies(); this.updateScore();
+                    this.update();
+                },
+                end: function() { cancelAnimationFrame(gameManager.animationFrameId); },
+                updateDifficulty: function() {
+                    this.enemyConfig.moveInterval = Math.max(10, 40 - this.gameState.level * 2);
+                    this.enemyConfig.shootInterval = Math.max(20, 70 - this.gameState.level * 3);
+                },
+                nextLevel: function() {
+                    this.gameState.level++; this.playerBullets = []; this.enemyBullets = [];
+                    this.updateDifficulty(); this.createEnemies(); this.gameState.status = 'playing';
                 },
                 handleInput: function(key) {
-                    if (this.isGameActive && this.activeGame) {
-                        this.activeGame.handleInput(key);
+                    if (this.gameState.status === 'gameOver' || this.gameState.status === 'levelComplete') {
+                        if (key === 'Left' || key === 'Right') { this.gameState.retryOption = this.gameState.retryOption === 'YES' ? 'NO' : 'YES'; }
+                        else if (key === 'A') { if (this.gameState.retryOption === 'YES') { if (this.gameState.status === 'gameOver') this.start(); else this.nextLevel(); } else { gameManager.endGame(); } }
+                    } else if (this.isPaused) {
+                        if (key === 'Left' || key === 'Right') { this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; }
+                        else if (key === 'A') { if (this.pauseOption === 'YES') gameManager.endGame(); else this.isPaused = false; } 
+                        else if (key === 'Start') { this.isPaused = false; }
+                    } else if (this.gameState.status === 'playing') {
+                        if (key === 'Start') { this.isPaused = true; this.pauseOption = 'NO'; return; }
+                        if (key === 'Left') this.player.x -= this.player.speed;
+                        else if (key === 'Right') this.player.x += this.player.speed;
+                        else if (key === 'A' && this.playerShootCooldown === 0) {
+                            this.playerBullets.push({ x: this.player.x + this.player.width / 2 - 2, y: this.player.y, width: 4, height: 8, speed: 5 });
+                            this.playerShootCooldown = 25;
+                        }
                     }
                 },
-                // 新增：專門處理遊戲選單按鈕的函式
-                handleGameMenuInput: function(key) {
-                    const menuItems = document.querySelectorAll('.tester-menu .menu-list a');
-                    if (menuItems.length === 0) return;
-
-                    let currentIndex = Array.from(menuItems).findIndex(link => link.classList.contains('selected'));
-
-                    if (key === 'Up' || key === 'Down') {
-                        audioOpen.currentTime = 0; audioOpen.play();
-                        
-                        if (currentIndex !== -1) {
-                            menuItems[currentIndex].classList.remove('selected');
+                updateScore: function() {
+                    const hi = String(this.gameState.highScore).padStart(5, '0');
+                    const current = String(this.gameState.score).padStart(5, '0');
+                    scoreElement.textContent = `HI ${hi}\n${current}\nLV ${this.gameState.level}`;
+                },
+                update: function() {
+                    if (this.gameState.status !== 'playing' || this.isPaused) { this.draw(); requestAnimationFrame(this.update.bind(this)); return; }
+                    // 更新玩家
+                    if (this.player.x < 5) this.player.x = 5; if (this.player.x + this.player.width > canvas.clientWidth - 5) this.player.x = canvas.clientWidth - this.player.width - 5;
+                    if (this.playerShootCooldown > 0) this.playerShootCooldown--;
+                    // 更新子彈
+                    for (let i = this.playerBullets.length - 1; i >= 0; i--) { this.playerBullets[i].y -= this.playerBullets[i].speed; if (this.playerBullets[i].y < 0) this.playerBullets.splice(i, 1); }
+                    for (let i = this.enemyBullets.length - 1; i >= 0; i--) { this.enemyBullets[i].y += this.enemyBullets[i].speed; if (this.enemyBullets[i].y > canvas.clientHeight) this.enemyBullets.splice(i, 1); }
+                    // 更新敵人
+                    this.enemyConfig.moveTimer--;
+                    if (this.enemyConfig.moveTimer <= 0) {
+                        this.enemyConfig.moveTimer = this.enemyConfig.moveInterval;
+                        let wallHit = false;
+                        for (const e of this.enemies) if (e.alive && ((e.x + e.width >= canvas.clientWidth - 10 && this.enemyConfig.direction > 0) || (e.x <= 10 && this.enemyConfig.direction < 0))) { wallHit = true; break; }
+                        if (wallHit) { this.enemyConfig.direction *= -1; for (const e of this.enemies) e.y += e.height / 2; }
+                        for (const e of this.enemies) { e.x += this.enemyConfig.speedX * this.enemyConfig.direction; if(e.alive && e.y + e.height >= this.player.y) { this.setGameOver(); break; } }
+                    }
+                    this.enemyConfig.shootTimer--;
+                    if (this.enemyConfig.shootTimer <= 0) {
+                        this.enemyConfig.shootTimer = this.enemyConfig.shootInterval;
+                        const alive = this.enemies.filter(e => e.alive); if (alive.length > 0) { const shooter = alive[Math.floor(Math.random() * alive.length)]; this.enemyBullets.push({ x: shooter.x + shooter.width / 2 - 2, y: shooter.y + shooter.height, width: 4, height: 8, speed: 3 }); }
+                    }
+                    // 碰撞偵測
+                    for (let i = this.playerBullets.length - 1; i >= 0; i--) { const b = this.playerBullets[i]; for (const e of this.enemies) if (e.alive && b.x < e.x + e.width && b.x + b.width > e.x && b.y < e.y + e.height && b.y + b.height > e.y) { e.alive = false; this.playerBullets.splice(i, 1); this.gameState.score += 10; this.updateScore(); break; } }
+                    for (let i = this.enemyBullets.length - 1; i >= 0; i--) { const b = this.enemyBullets[i]; if (this.player.alive && b.x < this.player.x + this.player.width && b.x + b.width > this.player.x && b.y < this.player.y + this.player.height && b.y + b.height > this.player.y) { this.setGameOver(); break; } }
+                    for (const e of this.enemies) { if (e.alive && this.player.alive && e.x < this.player.x + this.player.width && e.x + e.width > this.player.x && e.y < this.player.y + this.player.height && e.y + e.height > this.player.y) { this.setGameOver(); break; } }
+                    if (this.enemies.every(e => !e.alive)) this.gameState.status = 'levelComplete';
+                    
+                    this.draw();
+                    gameManager.animationFrameId = requestAnimationFrame(this.update.bind(this));
+                },
+                draw: function() {
+                    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-bg');
+                    const fgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
+                    context.fillStyle = bgColor; context.fillRect(0, 0, canvas.width, canvas.height);
+                    this.drawPlayer(fgColor);
+                    this.drawBullets(fgColor);
+                    this.drawEnemies(fgColor);
+                    if (this.gameState.status === 'gameOver') drawGameOverScreen(context, canvas, this.gameState.retryOption);
+                    if (this.gameState.status === 'levelComplete') drawWinScreen(context, canvas, this.gameState.retryOption);
+                    if (this.isPaused) drawQuitMenuScreen(context, canvas, this.pauseOption);
+                },
+                setGameOver: function() {
+                    this.player.alive = false; this.gameState.status = 'gameOver';
+                    if (this.gameState.score > this.gameState.highScore) {
+                        this.gameState.highScore = this.gameState.score; localStorage.setItem('ghostbusterHighScore', this.gameState.highScore);
+                    }
+                    this.updateScore();
+                },
+                createEnemies: function() {
+                    this.enemies = []; this.enemyConfig.direction = 1;
+                    for (let c = 0; c < this.enemyConfig.cols; c++) {
+                        for (let r = 0; r < this.enemyConfig.rows; r++) {
+                            const enemyX = c * (this.enemyConfig.width + this.enemyConfig.padding) + this.enemyConfig.offsetLeft;
+                            const enemyY = r * (this.enemyConfig.height + this.enemyConfig.padding) + this.enemyConfig.offsetTop;
+                            this.enemies.push({ x: enemyX, y: enemyY, width: this.enemyConfig.width, height: this.enemyConfig.height, alive: true });
                         }
-                        
-                        if (currentIndex === -1) {
-                            currentIndex = (key === 'Up') ? menuItems.length - 1 : 0;
-                        } else if (key === 'Up') {
-                            currentIndex = (currentIndex - 1 + menuItems.length) % menuItems.length;
-                        } else {
-                            currentIndex = (currentIndex + 1) % menuItems.length;
+                    }
+                },
+                drawPlayer: function(color) {
+                    if (!this.player.alive) return;
+                    context.fillStyle = color;
+                    const p = this.player;
+                    context.fillRect(p.x, p.y + 4, p.width, p.height - 4); 
+                    context.fillRect(p.x + (p.width / 2) - 3, p.y, 6, 6); 
+                },
+                drawBullets: function(color) {
+                    context.fillStyle = color; for (const b of this.playerBullets) context.fillRect(b.x, b.y, b.width, b.height);
+                    context.fillStyle = color; for (const b of this.enemyBullets) context.fillRect(b.x, b.y, b.width, b.height);
+                },
+                drawEnemies: function(color) {
+                    for (const e of this.enemies) {
+                        if (e.alive) {
+                            context.fillStyle = color;
+                            context.fillRect(e.x, e.y, e.width, e.height);
                         }
-
-                        const newSelectedItem = menuItems[currentIndex];
-                        newSelectedItem.classList.add('selected');
-                        newSelectedItem.scrollIntoView({ block: 'nearest' });
-                    } else if (key === 'A') {
-                        const selectedItem = document.querySelector('.tester-menu a.selected');
-                        if (selectedItem) {
-                            selectedItem.click(); // 點擊事件會自己播放音效
-                        } else {
-                            audioSelect.currentTime = 0; audioSelect.play();
-                        }
-                    } else {
-                         audioSelect.currentTime = 0; audioSelect.play();
                     }
                 }
             };
 
             const tetrisGame = {
-                arena: [], player: { pos: {x: 0, y: 0}, matrix: null, score: 0 },
-                highScore: 0,
-                COLS: 10, ROWS: 20, BLOCK_SIZE: 0, xOffset: 0,
-                dropCounter: 0, dropInterval: 1000, lastTime: 0, gameOver: false,
-                isPaused: false, pauseOption: 'NO', retryOption: 'YES',
+                arena: [], player: { pos: {x: 0, y: 0}, matrix: null, score: 0 }, highScore: 0, COLS: 10, ROWS: 20, BLOCK_SIZE: 0, xOffset: 0, dropCounter: 0, dropInterval: 1000, lastTime: 0, gameOver: false, isPaused: false, pauseOption: 'NO', retryOption: 'YES',
                 start: function() {
-                    cancelAnimationFrame(gameManager.animationFrameId);
-                    this.gameOver = false; this.isPaused = false;
-                    this.retryOption = 'YES'; this.pauseOption = 'NO';
-                    this.dropInterval = 1000;
-                    this.highScore = parseInt(localStorage.getItem('tetrisHighScore')) || 0;
-                    const screenHeight = canvas.clientHeight;
-                    const screenWidth = canvas.clientWidth;
-                    this.ROWS = 20; this.BLOCK_SIZE = screenHeight / this.ROWS;
-                    this.COLS = 10;
-                    this.xOffset = (screenWidth / this.BLOCK_SIZE - this.COLS) / 2;
-                    canvas.height = screenHeight; canvas.width = screenWidth;
-                    this.arena = this.createMatrix(this.COLS, this.ROWS);
-                    this.player.score = 0; this.updateScore(); this.playerReset();
-                    this.update();
+                    cancelAnimationFrame(gameManager.animationFrameId); this.gameOver = false; this.isPaused = false; this.retryOption = 'YES'; this.pauseOption = 'NO'; this.dropInterval = 1000; this.highScore = parseInt(localStorage.getItem('tetrisHighScore')) || 0;
+                    const screenHeight = canvas.clientHeight; const screenWidth = canvas.clientWidth; this.ROWS = 20; this.BLOCK_SIZE = screenHeight / this.ROWS; this.COLS = 10; this.xOffset = (screenWidth / this.BLOCK_SIZE - this.COLS) / 2;
+                    canvas.height = screenHeight; canvas.width = screenWidth; this.arena = this.createMatrix(this.COLS, this.ROWS); this.player.score = 0; this.updateScore(); this.playerReset(); this.update();
                 },
                 end: function() { clearTimeout(gameManager.animationFrameId); },
                 handleInput: function(key) {
-                    if (this.gameOver) {
-                        if (key === 'Left' || key === 'Right') { this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES'; } 
-                        else if (key === 'A') {
-                            if (this.retryOption === 'YES') this.start();
-                            else gameManager.endGame();
-                        }
-                    } else if (this.isPaused) {
-                        if (key === 'Left' || key === 'Right') { this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; }
-                        else if (key === 'A') {
-                            if (this.pauseOption === 'YES') gameManager.endGame();
-                            else this.isPaused = false;
-                        } else if (key === 'Start') { this.isPaused = false; }
-                    } else {
-                        if (key === 'Start') { this.isPaused = true; this.pauseOption = 'NO'; return; }
-                        if (key === 'Left') this.playerMove(-1);
-                        else if (key === 'Right') this.playerMove(1);
-                        else if (key === 'Down') this.playerDrop();
-                        else if (key === 'A' || key === 'Up') this.playerRotate(1);
-                        else if (key === 'B') this.playerRotate(-1);
-                    }
+                    if (this.gameOver) { if (key === 'Left' || key === 'Right') this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES'; else if (key === 'A') { if (this.retryOption === 'YES') this.start(); else gameManager.endGame(); } } 
+                    else if (this.isPaused) { if (key === 'Left' || key === 'Right') this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; else if (key === 'A') { if (this.pauseOption === 'YES') gameManager.endGame(); else this.isPaused = false; } else if (key === 'Start') this.isPaused = false; } 
+                    else { if (key === 'Start') { this.isPaused = true; this.pauseOption = 'NO'; return; } if (key === 'Left') this.playerMove(-1); else if (key === 'Right') this.playerMove(1); else if (key === 'Down') this.playerDrop(); else if (key === 'A' || key === 'Up') this.playerRotate(1); else if (key === 'B') this.playerRotate(-1); }
                 },
-                updateScore: function() {
-                    const hi = String(this.highScore).padStart(5, '0');
-                    const current = String(this.player.score).padStart(5, '0');
-                    scoreElement.textContent = `HI ${hi}\n${current}`;
-                },
+                updateScore: function() { const hi = String(this.highScore).padStart(5, '0'); const current = String(this.player.score).padStart(5, '0'); scoreElement.textContent = `HI ${hi}\n${current}`; },
                 update: function(time = 0) {
-                    if (!this.gameOver && !this.isPaused) {
-                        const deltaTime = time - this.lastTime; this.lastTime = time;
-                        this.dropCounter += deltaTime;
-                        if (this.dropCounter > this.dropInterval) { this.playerDrop(); }
-                    }
-                    this.draw();
-                    gameManager.animationFrameId = requestAnimationFrame(this.update.bind(this));
+                    if (!this.gameOver && !this.isPaused) { const deltaTime = time - this.lastTime; this.lastTime = time; this.dropCounter += deltaTime; if (this.dropCounter > this.dropInterval) this.playerDrop(); }
+                    this.draw(); gameManager.animationFrameId = requestAnimationFrame(this.update.bind(this));
                 },
                 draw: function() {
-                    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-bg');
-                    const fgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
-                    context.setTransform(1, 0, 0, 1, 0, 0); 
-                    context.fillStyle = bgColor;
-                    context.fillRect(0, 0, canvas.width, canvas.height);
-                    context.fillStyle = fgColor;
-                    const borderX_left = this.xOffset * this.BLOCK_SIZE - 1;
-                    const borderX_right = (this.xOffset + this.COLS) * this.BLOCK_SIZE;
-                    context.fillRect(borderX_left, 0, 1, canvas.height);
-                    context.fillRect(borderX_right, 0, 1, canvas.height);
-                    context.scale(this.BLOCK_SIZE, this.BLOCK_SIZE); 
-                    this.drawMatrix(this.arena, {x: 0, y: 0});
-                    this.drawMatrix(this.player.matrix, this.player.pos);
-                    context.setTransform(1, 0, 0, 1, 0, 0);
-                    if (this.gameOver) { drawGameOverScreen(context, canvas, this.retryOption); }
-                    if (this.isPaused) { drawQuitMenuScreen(context, canvas, this.pauseOption); }
+                    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-bg'); const fgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
+                    context.setTransform(1, 0, 0, 1, 0, 0); context.fillStyle = bgColor; context.fillRect(0, 0, canvas.width, canvas.height); context.fillStyle = fgColor;
+                    const borderX_left = this.xOffset * this.BLOCK_SIZE - 1; const borderX_right = (this.xOffset + this.COLS) * this.BLOCK_SIZE; context.fillRect(borderX_left, 0, 1, canvas.height); context.fillRect(borderX_right, 0, 1, canvas.height);
+                    context.scale(this.BLOCK_SIZE, this.BLOCK_SIZE); this.drawMatrix(this.arena, {x: 0, y: 0}); this.drawMatrix(this.player.matrix, this.player.pos);
+                    context.setTransform(1, 0, 0, 1, 0, 0); if (this.gameOver) drawGameOverScreen(context, canvas, this.retryOption); if (this.isPaused) drawQuitMenuScreen(context, canvas, this.pauseOption);
                 },
                 playerReset: function() {
-                    const p='ILJOTSZ'; this.player.matrix = this.createPiece(p[p.length * Math.random() | 0]);
-                    this.player.pos.y=0; this.player.pos.x = (this.COLS / 2 | 0) - (this.player.matrix[0].length / 2 | 0);
-                    if (this.collide(this.arena, this.player)) {
-                        if (this.player.score > this.highScore) {
-                            this.highScore = this.player.score;
-                            localStorage.setItem('tetrisHighScore', this.highScore);
-                            this.updateScore();
-                        }
-                        this.gameOver = true;
-                    }
+                    const p='ILJOTSZ'; this.player.matrix = this.createPiece(p[p.length * Math.random() | 0]); this.player.pos.y=0; this.player.pos.x = (this.COLS / 2 | 0) - (this.player.matrix[0].length / 2 | 0);
+                    if (this.collide(this.arena, this.player)) { if (this.player.score > this.highScore) { this.highScore = this.player.score; localStorage.setItem('tetrisHighScore', this.highScore); this.updateScore(); } this.gameOver = true; }
                 },
-                drawMatrix: function(matrix, offset) {
-                    const blockColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
-                    context.fillStyle = blockColor;
-                    matrix.forEach((row, y) => {
-                        row.forEach((value, x) => {
-                            if (value !== 0) {
-                                context.fillRect(this.xOffset + x + offset.x, y + offset.y, 1, 1);
-                            }
-                        });
-                    });
-                },
+                drawMatrix: function(matrix, offset) { const blockColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text'); context.fillStyle = blockColor; matrix.forEach((row, y) => { row.forEach((value, x) => { if (value !== 0) context.fillRect(this.xOffset + x + offset.x, y + offset.y, 1, 1); }); }); },
                 createMatrix: function(w, h) { const m = []; while(h--){ m.push(new Array(w).fill(0)); } return m; },
                 createPiece: function(t) { if (t === 'T') return [[0,0,0],[1,1,1],[0,1,0]]; else if (t === 'O') return [[1,1],[1,1]]; else if (t === 'L') return [[0,1,0],[0,1,0],[0,1,1]]; else if (t === 'J') return [[0,1,0],[0,1,0],[1,1,0]]; else if (t === 'I') return [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]]; else if (t === 'S') return [[0,1,1],[1,1,0],[0,0,0]]; else if (t === 'Z') return [[1,1,0],[0,1,1],[0,0,0]]; },
-                collide: function(a, p) { const [m, o] = [p.matrix, p.pos]; for (let y=0; y<m.length; ++y) { for (let x=0; x<m[y].length; ++x) { if (m[y][x] !== 0 && (a[y+o.y] && a[y+o.y][x+o.x]) !== 0) return true; } } return false; },
+                collide: function(a, p) { const [m, o] = [p.matrix, p.pos]; for (let y=0; y<m.length; ++y) for (let x=0; x<m[y].length; ++x) if (m[y][x] !== 0 && (a[y+o.y] && a[y+o.y][x+o.x]) !== 0) return true; return false; },
                 merge: function(a, p) { p.matrix.forEach((r, y) => { r.forEach((v, x) => { if (v !== 0) a[y+p.pos.y][x+p.pos.x] = v; }); }); },
                 playerDrop: function() { this.player.pos.y++; if (this.collide(this.arena, this.player)) { this.player.pos.y--; this.merge(this.arena, this.player); this.playerReset(); this.arenaSweep(); } this.dropCounter = 0; },
                 playerMove: function(dir) { this.player.pos.x += dir; if (this.collide(this.arena, this.player)) this.player.pos.x -= dir; },
                 playerRotate: function(dir) { const pos = this.player.pos.x; let offset=1; this.rotate(this.player.matrix, dir); while (this.collide(this.arena, this.player)) { this.player.pos.x += offset; offset = -(offset + (offset > 0 ? 1 : -1)); if (offset > this.player.matrix[0].length) { this.rotate(this.player.matrix, -dir); this.player.pos.x = pos; return; } } },
-                rotate: function(m, d) { for (let y=0; y<m.length; ++y) { for (let x=0; x<y; ++x) { [m[x][y], m[y][x]] = [m[y][x], m[x][y]]; } } if (d > 0) m.forEach(r => r.reverse()); else m.reverse(); },
-                arenaSweep: function() { 
-                    let rowCount = 0;
-                    outer: for (let y = this.arena.length-1; y>0; --y) { 
-                        for (let x=0; x<this.arena[y].length; ++x) { if(this.arena[y][x] === 0) continue outer; } 
-                        const r = this.arena.splice(y, 1)[0].fill(0); 
-                        this.arena.unshift(r); 
-                        ++y; 
-                        rowCount++;
-                    } 
-                    if (rowCount > 0) {
-                        this.player.score += rowCount * 10;
-                        if (Math.floor(this.player.score / 60) > Math.floor((this.player.score - rowCount * 10) / 60)) {
-                           this.dropInterval = Math.max(150, this.dropInterval - 50);
-                        }
-                        this.updateScore();
-                    }
-                },
+                rotate: function(m, d) { for (let y=0; y<m.length; ++y) for (let x=0; x<y; ++x) [m[x][y], m[y][x]] = [m[y][x], m[x][y]]; if (d > 0) m.forEach(r => r.reverse()); else m.reverse(); },
+                arenaSweep: function() { let rowCount = 0; outer: for (let y = this.arena.length-1; y>0; --y) { for (let x=0; x<this.arena[y].length; ++x) if(this.arena[y][x] === 0) continue outer; const r = this.arena.splice(y, 1)[0].fill(0); this.arena.unshift(r); ++y; rowCount++; } if (rowCount > 0) { this.player.score += rowCount * 10; if (Math.floor(this.player.score / 60) > Math.floor((this.player.score - rowCount * 10) / 60)) this.dropInterval = Math.max(150, this.dropInterval - 50); this.updateScore(); } },
             };
-
             const dinoGame = {
-                dino: {}, obstacles: [], score: 0, highScore: 0, gameOver: false, spawnTimer: 0,
-                retryOption: 'YES', isPaused: false, pauseOption: 'NO',
-                pixelScale: 3,
+                dino: {}, obstacles: [], score: 0, highScore: 0, gameOver: false, spawnTimer: 0, retryOption: 'YES', isPaused: false, pauseOption: 'NO', pixelScale: 3,
                 start: function() {
-                    cancelAnimationFrame(gameManager.animationFrameId);
-                    this.gameOver = false; this.isPaused = false;
-                    this.retryOption = 'YES'; this.pauseOption = 'NO';
-                    this.highScore = parseInt(localStorage.getItem('dinoHighScore')) || 0;
-                    canvas.height = canvas.clientHeight; canvas.width = canvas.clientWidth;
-                    context.setTransform(1, 0, 0, 1, 0, 0); 
-                    const s = this.pixelScale;
-                    const dinoHeight = s * 6;
-                    this.dino = { x: 50, y: canvas.height - dinoHeight, dy: 0, gravity: 0.6, jumpPower: -13, onGround: true };
-                    this.obstacles = []; this.score = 0; this.spawnTimer = 0;
-                    this.updateScore(); this.update();
+                    cancelAnimationFrame(gameManager.animationFrameId); this.gameOver = false; this.isPaused = false; this.retryOption = 'YES'; this.pauseOption = 'NO'; this.highScore = parseInt(localStorage.getItem('dinoHighScore')) || 0;
+                    canvas.height = canvas.clientHeight; canvas.width = canvas.clientWidth; context.setTransform(1, 0, 0, 1, 0, 0); 
+                    const s = this.pixelScale; const dinoHeight = s * 6; this.dino = { x: 50, y: canvas.height - dinoHeight, dy: 0, gravity: 0.6, jumpPower: -13, onGround: true };
+                    this.obstacles = []; this.score = 0; this.spawnTimer = 0; this.updateScore(); this.update();
                 },
                 end: function() { cancelAnimationFrame(gameManager.animationFrameId); },
                 handleInput: function(key) {
-                    if (this.gameOver) {
-                        if (key === 'Left' || key === 'Right') { this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES'; } 
-                        else if (key === 'A') {
-                            if (this.retryOption === 'YES') this.start();
-                            else gameManager.endGame();
-                        }
-                    } else if (this.isPaused) {
-                        if (key === 'Left' || key === 'Right') { this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; }
-                        else if (key === 'A') {
-                            if (this.pauseOption === 'YES') gameManager.endGame();
-                            else this.isPaused = false;
-                        } else if (key === 'Start') { this.isPaused = false; }
-                    } else {
-                        if (key === 'Start') { this.isPaused = true; this.pauseOption = 'NO'; return; }
-                        if ((key === 'A' || key === 'Up') && this.dino.onGround) { this.dino.dy = this.dino.jumpPower; this.dino.onGround = false; }
-                    }
+                    if (this.gameOver) { if (key === 'Left' || key === 'Right') this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES'; else if (key === 'A') { if (this.retryOption === 'YES') this.start(); else gameManager.endGame(); } } 
+                    else if (this.isPaused) { if (key === 'Left' || key === 'Right') this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; else if (key === 'A') { if (this.pauseOption === 'YES') gameManager.endGame(); else this.isPaused = false; } else if (key === 'Start') this.isPaused = false; } 
+                    else { if (key === 'Start') { this.isPaused = true; this.pauseOption = 'NO'; return; } if ((key === 'A' || key === 'Up') && this.dino.onGround) { this.dino.dy = this.dino.jumpPower; this.dino.onGround = false; } }
                 },
-                updateScore: function() {
-                    const hi = String(Math.floor(this.highScore)).padStart(5, '0');
-                    const current = String(Math.floor(this.score)).padStart(5, '0');
-                    scoreElement.textContent = `HI ${hi}\n${current}`;
-                },
+                updateScore: function() { const hi = String(Math.floor(this.highScore)).padStart(5, '0'); const current = String(Math.floor(this.score)).padStart(5, '0'); scoreElement.textContent = `HI ${hi}\n${current}`; },
                 update: function() {
                     if (!this.gameOver && !this.isPaused) {
-                        this.dino.dy += this.dino.gravity; this.dino.y += this.dino.dy; this.dino.onGround = false;
-                        const s = this.pixelScale;
-                        const dinoHeight = s * 6;
-                        if (this.dino.y + dinoHeight >= canvas.height) {
-                            this.dino.y = canvas.height - dinoHeight;
-                            this.dino.dy = 0;
-                            this.dino.onGround = true;
-                        }
+                        this.dino.dy += this.dino.gravity; this.dino.y += this.dino.dy; this.dino.onGround = false; const s = this.pixelScale; const dinoHeight = s * 6;
+                        if (this.dino.y + dinoHeight >= canvas.height) { this.dino.y = canvas.height - dinoHeight; this.dino.dy = 0; this.dino.onGround = true; }
                         this.spawnTimer--;
-                        if (this.spawnTimer <= 0) { 
-                            const type = Math.random() > 0.5 ? 1 : 2;
-                            const height = type === 1 ? 25 : 45;
-                            const width = type === 1 ? 12 : 23;
-                            this.obstacles.push({ x: canvas.width, width: width, height: height, type: type }); 
-                            this.spawnTimer = 80 + Math.random() * 50; 
-                        }
+                        if (this.spawnTimer <= 0) { const type = Math.random() > 0.5 ? 1 : 2; const height = type === 1 ? 25 : 45; const width = type === 1 ? 12 : 23; this.obstacles.push({ x: canvas.width, width: width, height: height, type: type }); this.spawnTimer = 80 + Math.random() * 50; }
                         const dinoHitbox = { x: this.dino.x - s * 3, y: this.dino.y, width: s * 13, height: s * 6 };
-                        for (let i = this.obstacles.length - 1; i >= 0; i--) {
-                            let obs = this.obstacles[i]; obs.x -= 2.2 + (this.score / 200);
-                            if (obs.x + obs.width < 0) this.obstacles.splice(i, 1);
-                            const obsHitbox = { x: obs.x, y: canvas.height - obs.height, width: obs.width, height: obs.height };
-                            if (dinoHitbox.x < obsHitbox.x + obsHitbox.width && dinoHitbox.x + dinoHitbox.width > obsHitbox.x && dinoHitbox.y < obsHitbox.y + obsHitbox.height && dinoHitbox.y + dinoHitbox.height > obsHitbox.y) {
-                                if (!this.gameOver) {
-                                    if (this.score > this.highScore) {
-                                        this.highScore = this.score;
-                                        localStorage.setItem('dinoHighScore', Math.floor(this.highScore));
-                                    }
-                                }
-                                this.gameOver = true;
-                            }
-                        }
+                        for (let i = this.obstacles.length - 1; i >= 0; i--) { let obs = this.obstacles[i]; obs.x -= 2.2 + (this.score / 200); if (obs.x + obs.width < 0) this.obstacles.splice(i, 1); const obsHitbox = { x: obs.x, y: canvas.height - obs.height, width: obs.width, height: obs.height }; if (dinoHitbox.x < obsHitbox.x + obsHitbox.width && dinoHitbox.x + dinoHitbox.width > obsHitbox.x && dinoHitbox.y < obsHitbox.y + obsHitbox.height && dinoHitbox.y + dinoHitbox.height > obsHitbox.y) { if (!this.gameOver) if (this.score > this.highScore) { this.highScore = this.score; localStorage.setItem('dinoHighScore', Math.floor(this.highScore)); } this.gameOver = true; } }
                         this.score += 0.2; this.updateScore();
                     }
-                    this.draw();
-                    gameManager.animationFrameId = requestAnimationFrame(this.update.bind(this));
+                    this.draw(); gameManager.animationFrameId = requestAnimationFrame(this.update.bind(this));
                 },
                 draw: function() {
-                    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-bg');
-                    const fgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
-                    context.fillStyle = bgColor; context.fillRect(0, 0, canvas.width, canvas.height);
-                    this.drawBlockyDino(context, fgColor);
-                    context.fillStyle = fgColor;
-                    this.obstacles.forEach(obs => { this.drawCactus(context, obs); });
-                    context.setTransform(1, 0, 0, 1, 0, 0);
-                    if (this.gameOver) { drawGameOverScreen(context, canvas, this.retryOption); }
-                    if (this.isPaused) { drawQuitMenuScreen(context, canvas, this.pauseOption); }
+                    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-bg'); const fgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
+                    context.fillStyle = bgColor; context.fillRect(0, 0, canvas.width, canvas.height); this.drawBlockyDino(context, fgColor); context.fillStyle = fgColor; this.obstacles.forEach(obs => { this.drawCactus(context, obs); });
+                    context.setTransform(1, 0, 0, 1, 0, 0); if (this.gameOver) drawGameOverScreen(context, canvas, this.retryOption); if (this.isPaused) drawQuitMenuScreen(context, canvas, this.pauseOption);
                 },
-                drawCactus: function(ctx, obs) {
-                    const groundY = canvas.height;
-                    const stemWidth = obs.width * 0.6;
-                    const stemX = obs.x + (obs.width - stemWidth) / 2;
-                    ctx.fillRect(stemX, groundY - obs.height, stemWidth, obs.height);
-                    const armWidth = obs.width * 0.8;
-                    const armHeight = 5;
-                    if (obs.type === 1) {
-                         ctx.fillRect(obs.x, groundY - obs.height * 0.7, armWidth, armHeight);
-                    } else {
-                         ctx.fillRect(obs.x, groundY - obs.height * 0.8, armWidth, armHeight);
-                         ctx.fillRect(stemX, groundY - obs.height * 0.5, armWidth, armHeight);
-                    }
-                },
-                drawBlockyDino: function(ctx, color) {
-                    const dinoX = this.dino.x; const dinoY = this.dino.y; const s = this.pixelScale; ctx.fillStyle = color;
-                    ctx.fillRect(dinoX, dinoY + s * 2, s * 5, s * 3);
-                    ctx.fillRect(dinoX + s * 4, dinoY, s * 5, s * 5);
-                    ctx.fillRect(dinoX - s * 3, dinoY + s * 3, s * 4, s * 2);
-                    const isRunningFrame1 = Math.floor(this.score / 6) % 2 === 0;
-                    if (this.gameOver) {
-                        ctx.fillRect(dinoX + s * 1, dinoY + s * 5, s * 2, s * 1);
-                        ctx.fillRect(dinoX + s * 4, dinoY + s * 5, s * 2, s * 1);
-                    } else if (!this.dino.onGround) {
-                        ctx.fillRect(dinoX + s * 2, dinoY + s * 5, s * 2, s * 1);
-                    } else if (isRunningFrame1) {
-                        ctx.fillRect(dinoX + s * 1, dinoY + s * 5, s * 2, s * 1);
-                    } else {
-                        ctx.fillRect(dinoX + s * 4, dinoY + s * 5, s * 2, s * 1);
-                    }
-                },
+                drawCactus: function(ctx, obs) { const groundY = canvas.height; const stemWidth = obs.width * 0.6; const stemX = obs.x + (obs.width - stemWidth) / 2; ctx.fillRect(stemX, groundY - obs.height, stemWidth, obs.height); const armWidth = obs.width * 0.8; const armHeight = 5; if (obs.type === 1) ctx.fillRect(obs.x, groundY - obs.height * 0.7, armWidth, armHeight); else { ctx.fillRect(obs.x, groundY - obs.height * 0.8, armWidth, armHeight); ctx.fillRect(stemX, groundY - obs.height * 0.5, armWidth, armHeight); } },
+                drawBlockyDino: function(ctx, color) { const dinoX = this.dino.x; const dinoY = this.dino.y; const s = this.pixelScale; ctx.fillStyle = color; ctx.fillRect(dinoX, dinoY + s * 2, s * 5, s * 3); ctx.fillRect(dinoX + s * 4, dinoY, s * 5, s * 5); ctx.fillRect(dinoX - s * 3, dinoY + s * 3, s * 4, s * 2); const isRunningFrame1 = Math.floor(this.score / 6) % 2 === 0; if (this.gameOver) { ctx.fillRect(dinoX + s * 1, dinoY + s * 5, s * 2, s * 1); ctx.fillRect(dinoX + s * 4, dinoY + s * 5, s * 2, s * 1); } else if (!this.dino.onGround) ctx.fillRect(dinoX + s * 2, dinoY + s * 5, s * 2, s * 1); else if (isRunningFrame1) ctx.fillRect(dinoX + s * 1, dinoY + s * 5, s * 2, s * 1); else ctx.fillRect(dinoX + s * 4, dinoY + s * 5, s * 2, s * 1); },
             };
-            
             const snakeGame = {
-                snake: [], food: {}, score: 0, highScore: 0, gameOver: false,
-                isPaused: false, retryOption: 'YES', pauseOption: 'NO',
-                direction: 'Right', nextDirection: 'Right',
-                gridSize: 0, tileCountX: 20, tileCountY: 0,
+                snake: [], food: {}, score: 0, highScore: 0, gameOver: false, isPaused: false, retryOption: 'YES', pauseOption: 'NO', direction: 'Right', nextDirection: 'Right', gridSize: 0, tileCountX: 20, tileCountY: 0,
                 start: function() {
-                    clearTimeout(gameManager.animationFrameId);
-                    this.gameOver = false; this.isPaused = false;
-                    this.retryOption = 'YES'; this.pauseOption = 'NO';
-                    this.highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
-                    canvas.height = canvas.clientHeight; canvas.width = canvas.clientWidth;
-                    this.gridSize = Math.floor(canvas.width / this.tileCountX);
-                    this.tileCountY = Math.floor(canvas.height / this.gridSize);
-                    
-                    this.snake = [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}];
-                    this.direction = 'Right'; this.nextDirection = 'Right';
-                    this.score = 0;
-                    this.spawnFood();
-                    this.updateScore();
-                    this.update();
+                    clearTimeout(gameManager.animationFrameId); this.gameOver = false; this.isPaused = false; this.retryOption = 'YES'; this.pauseOption = 'NO'; this.highScore = parseInt(localStorage.getItem('snakeHighScore')) || 0;
+                    canvas.height = canvas.clientHeight; canvas.width = canvas.clientWidth; this.gridSize = Math.floor(canvas.width / this.tileCountX); this.tileCountY = Math.floor(canvas.height / this.gridSize);
+                    this.snake = [{x: 10, y: 10}, {x: 9, y: 10}, {x: 8, y: 10}]; this.direction = 'Right'; this.nextDirection = 'Right'; this.score = 0; this.spawnFood(); this.updateScore(); this.update();
                 },
                 end: function() { clearTimeout(gameManager.animationFrameId); },
                 handleInput: function(key) {
-                    if (this.gameOver) {
-                        if (key === 'Left' || key === 'Right') { 
-                            this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES'; 
-                            this.draw();
-                        } 
-                        else if (key === 'A') {
-                            if (this.retryOption === 'YES') this.start();
-                            else gameManager.endGame();
-                        }
-                    } else if (this.isPaused) {
-                        if (key === 'Left' || key === 'Right') { 
-                            this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; 
-                            this.draw();
-                        }
-                        else if (key === 'A') {
-                            if (this.pauseOption === 'YES') gameManager.endGame();
-                            else { this.isPaused = false; this.update(); }
-                        } else if (key === 'Start') { this.isPaused = false; this.update(); }
-                    } else {
-                        if (key === 'Start') { this.isPaused = true; this.pauseOption = 'NO'; this.draw(); return; }
-                        if (key === 'Up' && this.direction !== 'Down') this.nextDirection = 'Up';
-                        else if (key === 'Down' && this.direction !== 'Up') this.nextDirection = 'Down';
-                        else if (key === 'Left' && this.direction !== 'Right') this.nextDirection = 'Left';
-                        else if (key === 'Right' && this.direction !== 'Left') this.nextDirection = 'Right';
-                    }
+                    if (this.gameOver) { if (key === 'Left' || key === 'Right') { this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES'; this.draw(); } else if (key === 'A') { if (this.retryOption === 'YES') this.start(); else gameManager.endGame(); } } 
+                    else if (this.isPaused) { if (key === 'Left' || key === 'Right') { this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; this.draw(); } else if (key === 'A') { if (this.pauseOption === 'YES') gameManager.endGame(); else { this.isPaused = false; this.update(); } } else if (key === 'Start') { this.isPaused = false; this.update(); } } 
+                    else { if (key === 'Start') { this.isPaused = true; this.pauseOption = 'NO'; this.draw(); return; } if (key === 'Up' && this.direction !== 'Down') this.nextDirection = 'Up'; else if (key === 'Down' && this.direction !== 'Up') this.nextDirection = 'Down'; else if (key === 'Left' && this.direction !== 'Right') this.nextDirection = 'Left'; else if (key === 'Right' && this.direction !== 'Left') this.nextDirection = 'Right'; }
                 },
-                updateScore: function() {
-                    const hi = String(this.highScore).padStart(5, '0');
-                    const current = String(this.score).padStart(5, '0');
-                    scoreElement.textContent = `HI ${hi}\n${current}`;
-                },
+                updateScore: function() { const hi = String(this.highScore).padStart(5, '0'); const current = String(this.score).padStart(5, '0'); scoreElement.textContent = `HI ${hi}\n${current}`; },
                 update: function() {
-                    if (this.gameOver || this.isPaused) return;
-
-                    this.direction = this.nextDirection;
-                    let head = {x: this.snake[0].x, y: this.snake[0].y};
-                    if (this.direction === 'Up') head.y--;
-                    else if (this.direction === 'Down') head.y++;
-                    else if (this.direction === 'Left') head.x--;
-                    else if (this.direction === 'Right') head.x++;
-
-                    if (head.x < 0 || head.x >= this.tileCountX || head.y < 0 || head.y >= this.tileCountY) {
-                        this.setGameOver();
-                    }
-                    for (let i = 1; i < this.snake.length; i++) {
-                        if (head.x === this.snake[i].x && head.y === this.snake[i].y) {
-                            this.setGameOver();
-                        }
-                    }
-                    
-                    this.snake.unshift(head);
-                    if (head.x === this.food.x && head.y === this.food.y) {
-                        this.score += 10;
-                        this.updateScore();
-                        this.spawnFood();
-                    } else {
-                        this.snake.pop();
-                    }
-                    
-                    this.draw();
-                    gameManager.animationFrameId = setTimeout(this.update.bind(this), Math.max(90, 300 - (this.score * 2)));
+                    if (this.gameOver || this.isPaused) return; this.direction = this.nextDirection; let head = {x: this.snake[0].x, y: this.snake[0].y};
+                    if (this.direction === 'Up') head.y--; else if (this.direction === 'Down') head.y++; else if (this.direction === 'Left') head.x--; else if (this.direction === 'Right') head.x++;
+                    if (head.x < 0 || head.x >= this.tileCountX || head.y < 0 || head.y >= this.tileCountY) this.setGameOver();
+                    for (let i = 1; i < this.snake.length; i++) if (head.x === this.snake[i].x && head.y === this.snake[i].y) this.setGameOver();
+                    this.snake.unshift(head); if (head.x === this.food.x && head.y === this.food.y) { this.score += 10; this.updateScore(); this.spawnFood(); } else this.snake.pop();
+                    this.draw(); gameManager.animationFrameId = setTimeout(this.update.bind(this), Math.max(90, 300 - (this.score * 2)));
                 },
                 draw: function() {
-                    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-bg');
-                    const fgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
-                    context.fillStyle = bgColor; context.fillRect(0, 0, canvas.width, canvas.height);
-                    context.fillStyle = fgColor;
-                    this.snake.forEach(segment => {
-                        context.fillRect(segment.x * this.gridSize, segment.y * this.gridSize, this.gridSize - 1, this.gridSize - 1);
-                    });
-                    
-                    context.beginPath();
-                    context.arc(
-                        this.food.x * this.gridSize + this.gridSize / 2,
-                        this.food.y * this.gridSize + this.gridSize / 2,
-                        this.gridSize / 2, 
-                        0, 
-                        Math.PI * 2
-                    );
-                    context.fill();
-                    
-                    if (this.gameOver) { drawGameOverScreen(context, canvas, this.retryOption); }
-                    if (this.isPaused) { drawQuitMenuScreen(context, canvas, this.pauseOption); }
+                    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-bg'); const fgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
+                    context.fillStyle = bgColor; context.fillRect(0, 0, canvas.width, canvas.height); context.fillStyle = fgColor; this.snake.forEach(segment => { context.fillRect(segment.x * this.gridSize, segment.y * this.gridSize, this.gridSize - 1, this.gridSize - 1); });
+                    context.beginPath(); context.arc(this.food.x * this.gridSize + this.gridSize / 2, this.food.y * this.gridSize + this.gridSize / 2, this.gridSize / 2, 0, Math.PI * 2); context.fill();
+                    if (this.gameOver) drawGameOverScreen(context, canvas, this.retryOption); if (this.isPaused) drawQuitMenuScreen(context, canvas, this.pauseOption);
                 },
-                spawnFood: function() {
-                    this.food = {
-                        x: Math.floor(Math.random() * this.tileCountX),
-                        y: Math.floor(Math.random() * this.tileCountY)
-                    };
-                    for (let segment of this.snake) {
-                        if (segment.x === this.food.x && segment.y === this.food.y) {
-                            this.spawnFood();
-                            return;
-                        }
-                    }
-                },
-                setGameOver: function() {
-                    this.gameOver = true;
-                    if (this.score > this.highScore) {
-                        this.highScore = this.score;
-                        localStorage.setItem('snakeHighScore', this.highScore);
-                    }
-                    this.updateScore();
-                }
+                spawnFood: function() { this.food = { x: Math.floor(Math.random() * this.tileCountX), y: Math.floor(Math.random() * this.tileCountY) }; for (let segment of this.snake) if (segment.x === this.food.x && segment.y === this.food.y) { this.spawnFood(); return; } },
+                setGameOver: function() { this.gameOver = true; if (this.score > this.highScore) { this.highScore = this.score; localStorage.setItem('snakeHighScore', this.highScore); } this.updateScore(); }
             };
-
             const breakoutGame = {
-                ball: {}, paddle: {}, bricks: [], score: 0, highScore: 0, lives: 3, gameOver: false,
-                isPaused: false, retryOption: 'YES', pauseOption: 'NO',
-                levelComplete: false, winOption: 'YES', level: 1,
+                ball: {}, paddle: {}, bricks: [], score: 0, highScore: 0, lives: 3, gameOver: false, isPaused: false, retryOption: 'YES', pauseOption: 'NO', levelComplete: false, winOption: 'YES', level: 1,
                 start: function() {
-                    cancelAnimationFrame(gameManager.animationFrameId);
-                    this.gameOver = false; this.isPaused = false; this.retryOption = 'YES'; this.pauseOption = 'NO';
-                    this.levelComplete = false; this.winOption = 'YES'; this.level = 1;
-                    this.highScore = parseInt(localStorage.getItem('breakoutHighScore')) || 0;
-                    canvas.height = canvas.clientHeight; canvas.width = canvas.clientWidth;
-                    this.lives = 3; this.score = 0;
-                    this.paddle = {x: canvas.width / 2 - 25, y: canvas.height - 10, width: 50, height: 5};
-                    this.ball = {x: canvas.width / 2, y: canvas.height - 20, radius: 4, dx: 2, dy: -2};
-                    this.createBricks();
-                    this.updateScore();
-                    this.update();
+                    cancelAnimationFrame(gameManager.animationFrameId); this.gameOver = false; this.isPaused = false; this.retryOption = 'YES'; this.pauseOption = 'NO'; this.levelComplete = false; this.winOption = 'YES'; this.level = 1; this.highScore = parseInt(localStorage.getItem('breakoutHighScore')) || 0;
+                    canvas.height = canvas.clientHeight; canvas.width = canvas.clientWidth; this.lives = 3; this.score = 0; this.paddle = {x: canvas.width / 2 - 25, y: canvas.height - 10, width: 50, height: 5}; this.ball = {x: canvas.width / 2, y: canvas.height - 20, radius: 4, dx: 2, dy: -2}; this.createBricks(); this.updateScore(); this.update();
                 },
                 end: function() { cancelAnimationFrame(gameManager.animationFrameId); },
                 nextLevel: function() {
-                    this.level++;
-                    this.levelComplete = false;
-                    this.paddle = {x: canvas.width / 2 - 25, y: canvas.height - 10, width: 50, height: 5};
-                    const speedMultiplier = 1 + (this.level - 1) * 0.15;
-                    this.ball = {
-                        x: canvas.width / 2, 
-                        y: canvas.height - 20, 
-                        radius: 4, 
-                        dx: (Math.random() < 0.5 ? 2 : -2) * speedMultiplier, 
-                        dy: -2 * speedMultiplier
-                    };
-                    this.createBricks();
-                    this.updateScore();
+                    this.level++; this.levelComplete = false; this.paddle = {x: canvas.width / 2 - 25, y: canvas.height - 10, width: 50, height: 5};
+                    const speedMultiplier = 1 + (this.level - 1) * 0.15; this.ball = { x: canvas.width / 2, y: canvas.height - 20, radius: 4, dx: (Math.random() < 0.5 ? 2 : -2) * speedMultiplier, dy: -2 * speedMultiplier };
+                    this.createBricks(); this.updateScore();
                 },
                 handleInput: function(key) {
-                     if (this.gameOver) {
-                        if (key === 'Left' || key === 'Right') { 
-                            this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES'; 
-                        } 
-                        else if (key === 'A') {
-                            if (this.retryOption === 'YES') this.start();
-                            else gameManager.endGame();
-                        }
-                    } else if (this.levelComplete) {
-                        if (key === 'Left' || key === 'Right') {
-                            this.winOption = this.winOption === 'YES' ? 'NO' : 'YES';
-                        } else if (key === 'A') {
-                            if (this.winOption === 'YES') {
-                                this.nextLevel();
-                            } else {
-                                gameManager.endGame();
-                            }
-                        }
-                    } else if (this.isPaused) {
-                        if (key === 'Left' || key === 'Right') { 
-                            this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; 
-                        }
-                        else if (key === 'A') {
-                            if (this.pauseOption === 'YES') gameManager.endGame();
-                            else { this.isPaused = false; }
-                        } else if (key === 'Start') { this.isPaused = false; }
-                    } else {
-                        if (key === 'Start') { this.isPaused = true; this.pauseOption = 'NO'; return; }
-                        if (key === 'Left') { this.paddle.x -= 15; if (this.paddle.x < 0) this.paddle.x = 0; }
-                        else if (key === 'Right') { this.paddle.x += 15; if (this.paddle.x + this.paddle.width > canvas.width) this.paddle.x = canvas.width - this.paddle.width; }
-                    }
+                     if (this.gameOver) { if (key === 'Left' || key === 'Right') this.retryOption = this.retryOption === 'YES' ? 'NO' : 'YES'; else if (key === 'A') { if (this.retryOption === 'YES') this.start(); else gameManager.endGame(); } } 
+                     else if (this.levelComplete) { if (key === 'Left' || key === 'Right') this.winOption = this.winOption === 'YES' ? 'NO' : 'YES'; else if (key === 'A') { if (this.winOption === 'YES') this.nextLevel(); else gameManager.endGame(); } } 
+                     else if (this.isPaused) { if (key === 'Left' || key === 'Right') this.pauseOption = this.pauseOption === 'YES' ? 'NO' : 'YES'; else if (key === 'A') { if (this.pauseOption === 'YES') gameManager.endGame(); else this.isPaused = false; } else if (key === 'Start') this.isPaused = false; } 
+                     else { if (key === 'Start') { this.isPaused = true; this.pauseOption = 'NO'; return; } if (key === 'Left') { this.paddle.x -= 15; if (this.paddle.x < 0) this.paddle.x = 0; } else if (key === 'Right') { this.paddle.x += 15; if (this.paddle.x + this.paddle.width > canvas.width) this.paddle.x = canvas.width - this.paddle.width; } }
                 },
-                updateScore: function() {
-                    const hi = String(this.highScore).padStart(5, '0');
-                    const current = String(this.score).padStart(5, '0');
-                    scoreElement.textContent = `HI ${hi}\n${current}\nLIVES ${this.lives} LV ${this.level}`;
-                },
+                updateScore: function() { const hi = String(this.highScore).padStart(5, '0'); const current = String(this.score).padStart(5, '0'); scoreElement.textContent = `HI ${hi}\n${current}\nLIVES ${this.lives} LV ${this.level}`; },
                 update: function() {
                     if (!this.gameOver && !this.isPaused && !this.levelComplete) {
                         this.ball.x += this.ball.dx; this.ball.y += this.ball.dy;
-
-                        if (this.ball.x + this.ball.radius > canvas.width || this.ball.x - this.ball.radius < 0) this.ball.dx *= -1;
-                        if (this.ball.y - this.ball.radius < 0) this.ball.dy *= -1;
-
-                        if (this.ball.y + this.ball.radius > canvas.height) {
-                            this.lives--;
-                            this.updateScore();
-                            if (this.lives <= 0) {
-                                this.setGameOver();
-                            } else {
-                                this.ball = {x: canvas.width / 2, y: canvas.height - 20, radius: 4, dx: 2, dy: -2};
-                                this.paddle = {x: canvas.width / 2 - 25, y: canvas.height - 10, width: 50, height: 5};
-                            }
-                        }
-                        if (this.ball.y + this.ball.radius > this.paddle.y && this.ball.x > this.paddle.x && this.ball.x < this.paddle.x + this.paddle.width) {
-                            this.ball.dy *= -1;
-                        }
-
-                        this.bricks.forEach(brick => {
-                            if (brick.visible && this.ball.x > brick.x && this.ball.x < brick.x + brick.width && this.ball.y > brick.y && this.ball.y < brick.y + brick.height) {
-                                this.ball.dy *= -1;
-                                brick.visible = false;
-                                this.score += 10;
-                                this.updateScore();
-                            }
-                        });
-
-                        if (this.bricks.every(b => !b.visible)) {
-                            this.levelComplete = true;
-                        }
+                        if (this.ball.x + this.ball.radius > canvas.width || this.ball.x - this.ball.radius < 0) this.ball.dx *= -1; if (this.ball.y - this.ball.radius < 0) this.ball.dy *= -1;
+                        if (this.ball.y + this.ball.radius > canvas.height) { this.lives--; this.updateScore(); if (this.lives <= 0) this.setGameOver(); else { this.ball = {x: canvas.width / 2, y: canvas.height - 20, radius: 4, dx: 2, dy: -2}; this.paddle = {x: canvas.width / 2 - 25, y: canvas.height - 10, width: 50, height: 5}; } }
+                        if (this.ball.y + this.ball.radius > this.paddle.y && this.ball.x > this.paddle.x && this.ball.x < this.paddle.x + this.paddle.width) this.ball.dy *= -1;
+                        this.bricks.forEach(brick => { if (brick.visible && this.ball.x > brick.x && this.ball.x < brick.x + brick.width && this.ball.y > brick.y && this.ball.y < brick.y + brick.height) { this.ball.dy *= -1; brick.visible = false; this.score += 10; this.updateScore(); } });
+                        if (this.bricks.every(b => !b.visible)) this.levelComplete = true;
                     }
-                    this.draw();
-                    gameManager.animationFrameId = requestAnimationFrame(this.update.bind(this));
+                    this.draw(); gameManager.animationFrameId = requestAnimationFrame(this.update.bind(this));
                 },
                 draw: function() {
-                    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-bg');
-                    const fgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
-                    context.fillStyle = bgColor; context.fillRect(0, 0, canvas.width, canvas.height);
-                    context.fillStyle = fgColor;
-                    context.beginPath(); context.arc(this.ball.x, this.ball.y, this.ball.radius, 0, Math.PI * 2); context.fill();
-                    context.fillRect(this.paddle.x, this.paddle.y, this.paddle.width, this.paddle.height);
-                    this.bricks.forEach(brick => {
-                        if (brick.visible) context.fillRect(brick.x, brick.y, brick.width, brick.height);
-                    });
-                    
-                    if (this.gameOver) { drawGameOverScreen(context, canvas, this.retryOption); }
-                    if (this.isPaused) { drawQuitMenuScreen(context, canvas, this.pauseOption); }
-                    if (this.levelComplete) { drawWinScreen(context, canvas, this.winOption); }
+                    const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-bg'); const fgColor = getComputedStyle(document.documentElement).getPropertyValue('--screen-text');
+                    context.fillStyle = bgColor; context.fillRect(0, 0, canvas.width, canvas.height); context.fillStyle = fgColor; context.beginPath(); context.arc(this.ball.x, this.ball.y, this.ball.radius, 0, Math.PI * 2); context.fill(); context.fillRect(this.paddle.x, this.paddle.y, this.paddle.width, this.paddle.height);
+                    this.bricks.forEach(brick => { if (brick.visible) context.fillRect(brick.x, brick.y, brick.width, brick.height); });
+                    if (this.gameOver) drawGameOverScreen(context, canvas, this.retryOption); if (this.isPaused) drawQuitMenuScreen(context, canvas, this.pauseOption); if (this.levelComplete) drawWinScreen(context, canvas, this.winOption);
                 },
-                createBricks: function() {
-                    this.bricks = [];
-                    const brickRowCount = 5, brickColumnCount = 6;
-                    const brickWidth = (canvas.width / brickColumnCount) - 4;
-                    const brickHeight = 8, brickPadding = 3, brickOffsetTop = 50, brickOffsetLeft = 3;
-                    for (let c = 0; c < brickColumnCount; c++) {
-                        for (let r = 0; r < brickRowCount; r++) {
-                            this.bricks.push({
-                                x: c * (brickWidth + brickPadding) + brickOffsetLeft,
-                                y: r * (brickHeight + brickPadding) + brickOffsetTop,
-                                width: brickWidth, height: brickHeight, visible: true
-                            });
-                        }
-                    }
-                },
-                setGameOver: function() {
-                    this.gameOver = true;
-                    if (this.score > this.highScore) {
-                        this.highScore = this.score;
-                        localStorage.setItem('breakoutHighScore', this.highScore);
-                    }
-                    this.updateScore();
-                }
+                createBricks: function() { this.bricks = []; const brickRowCount = 5, brickColumnCount = 6; const brickWidth = (canvas.width / brickColumnCount) - 4; const brickHeight = 8, brickPadding = 3, brickOffsetTop = 50, brickOffsetLeft = 3; for (let c = 0; c < brickColumnCount; c++) for (let r = 0; r < brickRowCount; r++) this.bricks.push({ x: c * (brickWidth + brickPadding) + brickOffsetLeft, y: r * (brickHeight + brickPadding) + brickOffsetTop, width: brickWidth, height: brickHeight, visible: true }); },
+                setGameOver: function() { this.gameOver = true; if (this.score > this.highScore) { this.highScore = this.score; localStorage.setItem('breakoutHighScore', this.highScore); } this.updateScore(); }
             };
 
-            // --- 簡化後的按鈕監聽邏輯 ---
-            const TESTER_MODE = true;
-            const konamiCode = ['Up', 'Up', 'Down', 'Down', 'Left', 'Right', 'Left', 'Right', 'B', 'A', 'Start'];
-            let userInput = [];
-            const testerCode = ['A', 'B', 'B', 'A', 'Start'];
-            let testerInput = [];
+            const konamiCode = ['Up', 'Up', 'Down', 'Down', 'Left', 'Right', 'Left', 'Right', 'B', 'A', 'Start']; let userInput = [];
+            const testerCode = ['A', 'B', 'B', 'A', 'Start']; let testerInput = [];
 
             function handleButtonPress(key) {
-                // 狀態 1: 遊戲中
-                if (gameManager.isGameActive) {
-                    gameManager.handleInput(key);
-                    return;
-                }
-
-                // 狀態 2: 遊戲選單中
-                if (gameboyScreen.classList.contains('tester-active')) {
-                    gameManager.handleGameMenuInput(key);
-                    return;
-                }
-
-                // 狀態 3: 主選單中 (只處理密碼)
+                if (gameManager.isGameActive) { gameManager.handleInput(key); return; }
+                if (gameboyScreen.classList.contains('tester-active')) { gameManager.handleGameMenuInput(key); return; }
                 audioSelect.currentTime = 0; audioSelect.play();
-                
-                userInput.push(key);
-                userInput = userInput.slice(-konamiCode.length);
-                if (JSON.stringify(userInput) === JSON.stringify(konamiCode)) {
-                    gameManager.showTesterMenu();
-                    userInput = [];
-                    testerInput = [];
-                    return;
-                }
-
-                if (TESTER_MODE) {
-                    testerInput.push(key);
-                    testerInput = testerInput.slice(-testerCode.length);
-                    if (JSON.stringify(testerInput) === JSON.stringify(testerCode)) {
-                         gameManager.showTesterMenu();
-                         userInput = [];
-                         testerInput = [];
-                    }
-                }
+                userInput.push(key); userInput = userInput.slice(-konamiCode.length);
+                if (JSON.stringify(userInput) === JSON.stringify(konamiCode)) { gameManager.showTesterMenu(); userInput = []; testerInput = []; return; }
+                testerInput.push(key); testerInput = testerInput.slice(-testerCode.length);
+                if (JSON.stringify(testerInput) === JSON.stringify(testerCode)) { gameManager.showTesterMenu(); userInput = []; testerInput = []; }
             }
             
-            let moveInterval = null;
-            const allButtons = document.querySelectorAll('.gb-button');
-
+            let moveInterval = null; const allButtons = document.querySelectorAll('.gb-button');
             function startAction(key) {
-                clearInterval(moveInterval);
-                
-                if (gameManager.isGameActive) {
-                    audioSelect.currentTime = 0;
-                    audioSelect.play();
-                }
-
-                handleButtonPress(key);
-
-                if (gameManager.isGameActive && ['Left', 'Right', 'Down'].includes(key)) {
-                    moveInterval = setInterval(() => {
-                        handleButtonPress(key);
-                    }, 100);
-                }
+                clearInterval(moveInterval); if (gameManager.isGameActive) { audioSelect.currentTime = 0; audioSelect.play(); }
+                handleButtonPress(key); if (gameManager.isGameActive && ['Left', 'Right', 'Down'].includes(key)) moveInterval = setInterval(() => { handleButtonPress(key); }, 100);
             }
-
-            function stopAction() {
-                clearInterval(moveInterval);
-            }
-
+            function stopAction() { clearInterval(moveInterval); }
             allButtons.forEach(button => {
                 const key = button.dataset.key;
                 button.addEventListener('mousedown', (e) => { e.preventDefault(); startAction(key); });
@@ -1364,7 +928,5 @@
 
 </body>
 </html>
-
-
 
 
