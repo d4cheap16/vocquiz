@@ -653,7 +653,7 @@
                         else if (key === 'Right') this.player.x += this.player.speed;
                         else if (key === 'A' && this.playerShootCooldown === 0) {
                             this.playerBullets.push({ x: this.player.x + this.player.width / 2 - 2, y: this.player.y, width: 4, height: 8, speed: 5 });
-                            this.playerShootCooldown = 25;
+                            this.playerShootCooldown = 15;
                         }
                     }
                 },
@@ -928,6 +928,7 @@
 
 </body>
 </html>
+
 
 
 
